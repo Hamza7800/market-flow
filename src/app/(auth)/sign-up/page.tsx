@@ -56,7 +56,7 @@ const SignUpUser = () => {
 
       toast.success("Account created");
       setIsSubmitting(false);
-      router.push("/onboarding");
+      router.push("/");
     } catch (error: any) {
       setIsSubmitting(false);
       toast.danger(error.message);

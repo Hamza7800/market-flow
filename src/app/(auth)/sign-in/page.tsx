@@ -55,7 +55,7 @@ const SignUser = () => {
 
       toast.success("Login Success");
       setIsSubmitting(false);
-      router.push("/organizations");
+      router.push("/");
     } catch (error: any) {
       setIsSubmitting(false);
       toast.danger(error.message);

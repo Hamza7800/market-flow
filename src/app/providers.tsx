@@ -2,13 +2,15 @@
 
 import ReactQueryProvider from "@/components/react-query/provider";
 import { Toast } from "@heroui/react";
+import NextTopLoader from "nextjs-toploader";
 import type { ReactNode } from "react";
 
 const Providers = ({ children }: { children: ReactNode }) => {
   return (
     <ReactQueryProvider>
       {children}
-      <Toast.Provider />
+      <Toast.Provider placement="bottom end" />
+      <NextTopLoader />
     </ReactQueryProvider>
   );
 };
