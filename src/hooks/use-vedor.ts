@@ -34,16 +34,14 @@ export function useVendor(): VendorContextValue {
   return ctx;
 }
 
-export const useVendorProfile = () => {
-  const { data } = authClient.useSession();
-  const userId = data?.user.id;
-
+export const useVendorProfile = (userId?: string) => {
   return useQuery({
-    queryKey: [vendorKeys.byUser(`${userId}`)],
+    queryKey: vendorKeys.byUser(userId ?? "no-user"),
     queryFn: async () => {
       const result = await getVendorProfile();
       if (!result.success) throw new Error(result.message);
       return result.data;
     },
+    enabled: !!userId,
   });
 };

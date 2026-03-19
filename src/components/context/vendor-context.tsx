@@ -2,6 +2,7 @@ import { createContext, useEffect, useState, type ReactNode } from "react";
 
 import type { VendorProfileType } from "@/actions/vendor";
 import { useVendorProfile } from "@/hooks/use-vedor";
+import { authClient } from "@/server/better-auth/client";
 
 export type VendorContextValue = {
   loading: boolean;
@@ -17,7 +18,9 @@ export type VendorContextValue = {
 export const VendorContext = createContext<VendorContextValue | null>(null);
 
 export const VendorProvider = ({ children }: { children: ReactNode }) => {
-  const { data, isPending, refetch } = useVendorProfile();
+  const { data: userData } = authClient.useSession();
+  const userId = userData?.user.id;
+  const { data, isPending, refetch } = useVendorProfile(userId);
 
   const value: VendorContextValue = {
     loading: isPending,
