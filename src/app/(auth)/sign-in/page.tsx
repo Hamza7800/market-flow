@@ -3,7 +3,6 @@
 import { SignInSchema, type SignInSchemaType } from "@/zod-schema/auth-schema";
 import { authClient } from "@/server/better-auth/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -17,6 +16,7 @@ import {
   TextField,
   toast,
 } from "@heroui/react";
+import { useRouter } from "nextjs-toploader/app";
 
 const SignUser = () => {
   const router = useRouter();

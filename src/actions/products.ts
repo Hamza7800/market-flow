@@ -1,6 +1,7 @@
 "use server";
 import { cacheWrap, cacheDel } from "@/lib/cache-helpers";
 import { productKeys, type ProductFilters } from "@/lib/cache-keys";
+import { returnError } from "@/lib/utils";
 import { getUser } from "@/server/better-auth/server";
 import { db } from "@/server/db";
 import {
@@ -12,26 +13,6 @@ import {
 } from "@/server/db/schema";
 import { eq, isNull, gte, lte, or, ilike, and, asc, desc } from "drizzle-orm";
 import z from "zod";
-
-export const returnError = async (error: any, message: string) => {
-  console.error(message, error);
-
-  let errorMessage = message;
-
-  if (error?.body?.message) {
-    errorMessage = error.body.message;
-  } else if (error instanceof Error) {
-    errorMessage = error.message;
-  } else if (error instanceof z.ZodError) {
-    errorMessage = error.message;
-  }
-
-  return {
-    success: false,
-    message: errorMessage,
-    data: null,
-  };
-};
 
 export const getProducts = async (
   page: number = 1,

@@ -1,5 +1,6 @@
 "use client";
 
+import { useVendor } from "@/hooks/use-vedor";
 import { authClient } from "@/server/better-auth/client";
 import {
   ArrowRightFromSquare,
@@ -12,8 +13,9 @@ import { useRouter } from "nextjs-toploader/app";
 
 const UserLinks = () => {
   const router = useRouter();
-  const { data: session } = authClient.useSession();
-  const isAuthenticated = !!session?.user;
+  const { isActive, profile } = useVendor();
+  const { data } = authClient.useSession();
+  const isAuthenticated = !!data?.user;
 
   const handleSignOut = async () => {
     await authClient.signOut();
@@ -25,7 +27,7 @@ const UserLinks = () => {
         <Person />
       </Button>
       <Dropdown.Popover placement="bottom right">
-        <Dropdown.Menu onAction={(key) => console.log(`Selected: ${key}`)}>
+        <Dropdown.Menu>
           <Dropdown.Item
             id="become-a-vendor"
             textValue="Become a vendor"
@@ -50,14 +52,28 @@ const UserLinks = () => {
 
           {isAuthenticated ? (
             <>
-              <Dropdown.Item id="profile" textValue="Profile">
+              <Dropdown.Item
+                onClick={() => {
+                  router.push(`/user/${data.user?.id}`);
+                }}
+                id="profile"
+                textValue="Profile"
+              >
                 <Person className="text-muted size-4 shrink-0" />
                 <Label>Profile</Label>
               </Dropdown.Item>
-              <Dropdown.Item id="dashboard" textValue="Dashboard">
-                <SquareBars className="text-muted size-4 shrink-0" />
-                <Label>Dashboard</Label>
-              </Dropdown.Item>
+              {isActive && (
+                <Dropdown.Item
+                  onClick={() => {
+                    router.push(`/vendor/${profile?.id}/dashboard`);
+                  }}
+                  id="dashboard"
+                  textValue="Dashboard"
+                >
+                  <SquareBars className="text-muted size-4 shrink-0" />
+                  <Label>Dashboard</Label>
+                </Dropdown.Item>
+              )}
               <Dropdown.Item
                 onClick={handleSignOut}
                 id="logout-user"

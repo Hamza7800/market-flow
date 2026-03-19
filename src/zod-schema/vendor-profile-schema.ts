@@ -20,8 +20,6 @@ export const storeSchema = z.object({
     .max(80, "Store name must be 80 characters or fewer")
     .trim(),
 
-  storeSlug,
-
   description: z
     .string()
     .max(1000, "Description must be 1000 characters or fewer")
@@ -51,7 +49,6 @@ export type StoreSchema = z.infer<typeof storeSchema>;
 
 export const storeDefaults: StoreSchema = {
   storeName: "",
-  storeSlug: "",
   description: "",
   logoUrl: "",
   bannerUrl: "",
