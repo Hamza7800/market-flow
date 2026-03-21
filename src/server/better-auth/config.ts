@@ -5,8 +5,12 @@ import { db } from "@/server/db";
 import { nextCookies } from "better-auth/next-js";
 import { stripe } from "@better-auth/stripe";
 import Stripe from "stripe";
+import {
+  handleAccountDeauthorized,
+  handleAccountUpdated,
+} from "@/actions/stripe";
 
-const stripeClient = new Stripe(env.STRIPE_SECRET_KEY, {
+export const stripeClient = new Stripe(env.STRIPE_SECRET_KEY, {
   apiVersion: "2025-11-17.clover",
 });
 
@@ -23,7 +27,20 @@ export const auth = betterAuth({
       stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
       createCustomerOnSignUp: true,
       onEvent: async (event) => {
-        console.log(event);
+        switch (event.type) {
+          case "account.updated": {
+            const account = event.data.object as Stripe.Account;
+            await handleAccountUpdated(account);
+            break;
+          }
+          case "account.application.deauthorized": {
+            const deauth = event.data.object as { id: string };
+            await handleAccountDeauthorized(deauth.id);
+            break;
+          }
+          default:
+            break;
+        }
       },
     }),
     nextCookies(), //ALWAYS LAST

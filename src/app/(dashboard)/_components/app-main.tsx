@@ -9,6 +9,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
 export function NavMain({
   items,
@@ -24,6 +26,7 @@ export function NavMain({
     }[];
   }[];
 }) {
+  const { vendorId } = useParams<{ vendorId: string }>();
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -31,10 +34,10 @@ export function NavMain({
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton asChild>
-              <a href={item.url}>
+              <Link href={`/vendor/${vendorId}/dashboard/${item.url}`}>
                 <item.icon />
                 <span>{item.title}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
             {/* {item.items?.length ? (
               <SidebarMenuSub key={item.title}>

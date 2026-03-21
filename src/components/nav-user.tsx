@@ -1,5 +1,6 @@
 "use client";
 
+import { authClient } from "@/server/better-auth/client";
 import { Dropdown, Label } from "@heroui/react";
 
 import {
@@ -11,15 +12,8 @@ import {
   LogOut,
 } from "lucide-react";
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-}) {
+export function NavUser() {
+  const { data } = authClient.useSession();
   return (
     <Dropdown>
       {/* TRIGGER */}
@@ -27,9 +21,11 @@ export function NavUser({
         className={"flex flex-row items-center rounded-lg border p-2"}
       >
         <div className="flex flex-1 flex-col items-start text-left">
-          <span className="truncate text-sm font-medium">{user.name}</span>
+          <span className="truncate text-sm font-medium">
+            {data?.user.name}
+          </span>
           <span className="text-default-500 truncate text-xs">
-            {user.email}
+            {data?.user.email}
           </span>
         </div>
 
@@ -47,8 +43,10 @@ export function NavUser({
             <div className="flex items-center gap-2">
               {/* <Avatar src={user.avatar} name={user.name} size="sm" /> */}
               <div className="flex flex-col">
-                <span className="text-sm font-medium">{user.name}</span>
-                <span className="text-default-500 text-xs">{user.email}</span>
+                <span className="text-sm font-medium">{data?.user.name}</span>
+                <span className="text-default-500 text-xs">
+                  {data?.user.email}
+                </span>
               </div>
             </div>
           </Dropdown.Item>

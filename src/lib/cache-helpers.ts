@@ -32,8 +32,8 @@ export const invalidate = {
 
   vendor: {
     // Call after store name, logo, description update
-    updated: (slug: string, userId: string) => {
-      revalidateTag(vendorKeys.tags.detail(slug));
+    updated: (vendorId: string, userId: string) => {
+      revalidateTag(vendorKeys.tags.detail(vendorId));
       revalidateTag(vendorKeys.tags.byUser(userId));
       revalidateTag(vendorKeys.tags.lists());
     },

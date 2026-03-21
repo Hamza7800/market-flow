@@ -66,20 +66,20 @@ export const productKeys = {
 const vendorSegments = {
   all: () => ["vendors"],
   lists: () => ["vendors", "list"],
-  detail: (slug: string) => ["vendors", "detail", slug],
+  detail: (vendorId: string) => ["vendors", "detail", vendorId],
   byUser: (userId: string) => ["vendors", "user", userId],
 };
 
 export const vendorKeys = {
   all: () => vendorSegments.all(),
   lists: () => vendorSegments.lists(),
-  detail: (slug: string) => vendorSegments.detail(slug),
+  detail: (vendorId: string) => vendorSegments.detail(vendorId),
   byUser: (userId: string) => vendorSegments.byUser(userId),
 
   tags: {
     all: () => toTag(vendorSegments.all()),
     lists: () => toTag(vendorSegments.lists()),
-    detail: (slug: string) => toTag(vendorSegments.detail(slug)),
+    detail: (vendorId: string) => toTag(vendorSegments.detail(vendorId)),
     byUser: (userId: string) => toTag(vendorSegments.byUser(userId)),
   },
 };
