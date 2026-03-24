@@ -8,19 +8,35 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Receipt, ShoppingBag } from "@gravity-ui/icons";
+import { List, Settings2, Truck } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
 const items = [
+  {
+    title: "Overview",
+    url: "/",
+    icon: List,
+  },
   {
     title: "Products",
     url: "products?status=active&page?1",
     icon: ShoppingBag,
   },
   {
+    title: "Orders",
+    url: "orders",
+    icon: Truck,
+  },
+  {
     title: "Stripe",
     url: "stripe",
     icon: Receipt,
+  },
+  {
+    title: "Settings",
+    url: "settings",
+    icon: Settings2,
   },
 ];
 

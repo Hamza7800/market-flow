@@ -58,6 +58,8 @@ import {
   useUpdateProductStatus,
 } from "@/hooks/use-product";
 import { MultiImageUploader } from "@/components/image-upload";
+import DeleteProduct from "./delete-product";
+import { LinkButton } from "@/components/link-button";
 
 export type Category = { id: string; name: string; parentId?: string | null };
 // type TagType = { id: string; name: string; slug: string };
@@ -118,10 +120,6 @@ const ProductForm = (props: Props) => {
       )
     : null;
 
-  const deleteMutation = isEdit
-    ? useDeleteProduct(props.vendorId, props.productId, props.currentStatus)
-    : null;
-
   const form = useForm<CreateProductSchema>({
     resolver: zodResolver(createProductSchema),
     defaultValues:
@@ -161,15 +159,15 @@ const ProductForm = (props: Props) => {
         }
       : undefined;
 
-  const onDelete =
-    isEdit && deleteMutation
-      ? async () => {
-          const result = await deleteMutation.mutateAsync(props.productId);
-          if (result.success) {
-            router.back();
-          }
-        }
-      : undefined;
+  // const onDelete =
+  //   isEdit && deleteMutation
+  //     ? async () => {
+  //         const result = await deleteMutation.mutateAsync(props.productId);
+  //         if (result.success) {
+  //           router.back();
+  //         }
+  //       }
+  //     : undefined;
 
   const isSubmitting =
     createMutation.isPending || (updateMutation?.isPending ?? false);
@@ -186,6 +184,9 @@ const ProductForm = (props: Props) => {
 
   return (
     <div className="space-y-6 pb-24">
+      <LinkButton href="" onClick={() => router.back()}>
+        Back
+      </LinkButton>
       <Surface className="flex items-center justify-between p-4">
         <div>
           <h1 className="text-foreground text-2xl font-semibold tracking-tight">
@@ -401,10 +402,13 @@ const ProductForm = (props: Props) => {
               </div>
 
               <div className="flex items-center gap-2">
-                {isEdit && onDelete && (
-                  <Button variant="ghost" size="sm" onPress={onDelete}>
-                    Delete
-                  </Button>
+                {isEdit && (
+                  <DeleteProduct
+                    isEdit={isEdit}
+                    productId={props.productId}
+                    vendorId={props.vendorId}
+                    status={props.currentStatus}
+                  />
                 )}
 
                 <Button

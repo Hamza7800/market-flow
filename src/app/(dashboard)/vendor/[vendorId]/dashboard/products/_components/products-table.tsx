@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import { useQueryStates } from "nuqs";
 import { productSearchParams, type ProductStatus } from "@/lib/nuqs";
 import type { VendorProducts } from "@/actions/products";
+import { LinkButton } from "@/components/link-button";
 
 const STATUS_LABELS: Record<ProductStatus, string> = {
   active: "Active",
@@ -92,30 +93,18 @@ export default function ProductsTable({
 
   return (
     <div className="space-y-6">
-      <Card className="border-default-200 bg-content1/80 border p-5 shadow-sm backdrop-blur">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <Chip>Products</Chip>
-              <Chip color={STATUS_COLOR[activeStatus]}>
-                {STATUS_LABELS[activeStatus]}
-              </Chip>
-            </div>
-
-            <div>
-              <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                Product catalog
-              </h1>
-              <p className="text-default-500 mt-1 text-sm">
-                Manage products, switch status, and jump between pages without
-                losing URL state.
-              </p>
-            </div>
+      <Card className="">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-wrap items-center gap-2">
+            <Chip>Products</Chip>
+            <Chip color={STATUS_COLOR[activeStatus]}>
+              {STATUS_LABELS[activeStatus]}
+            </Chip>
           </div>
 
-          <Link href={`/vendor/${vendorId}/dashboard/products/form`}>
+          <LinkButton href={`/vendor/${vendorId}/dashboard/products/form`}>
             Create product
-          </Link>
+          </LinkButton>
         </div>
 
         <div className="mt-5 flex flex-wrap gap-2">
@@ -184,11 +173,11 @@ export default function ProductsTable({
             <Table.Content aria-label="Vendor products">
               <Table.Header>
                 <Table.Column isRowHeader>Product</Table.Column>
-                <Table.Column>Price</Table.Column>
-                <Table.Column>Stock</Table.Column>
-                <Table.Column>Rating</Table.Column>
-                <Table.Column>Status</Table.Column>
-                <Table.Column>Action</Table.Column>
+                <Table.Column isRowHeader>Price</Table.Column>
+                <Table.Column isRowHeader>Stock</Table.Column>
+                <Table.Column isRowHeader>Rating</Table.Column>
+                <Table.Column isRowHeader>Status</Table.Column>
+                <Table.Column isRowHeader>Action</Table.Column>
               </Table.Header>
 
               <Table.Body
