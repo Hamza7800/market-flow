@@ -1,7 +1,5 @@
 "use client";
 
-import { type LucideIcon } from "lucide-react";
-
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -9,24 +7,26 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { Receipt, ShoppingBag } from "@gravity-ui/icons";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
-export function NavMain({
-  items,
-}: {
-  items: {
-    title: string;
-    url: string;
-    icon: LucideIcon;
-    isActive?: boolean;
-    items?: {
-      title: string;
-      url: string;
-    }[];
-  }[];
-}) {
+const items = [
+  {
+    title: "Products",
+    url: "products",
+    icon: ShoppingBag,
+  },
+  {
+    title: "Stripe",
+    url: "stripe",
+    icon: Receipt,
+  },
+];
+
+export function NavMain() {
   const { vendorId } = useParams<{ vendorId: string }>();
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>

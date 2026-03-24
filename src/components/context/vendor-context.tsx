@@ -33,8 +33,6 @@ export const VendorProvider = ({ children }: { children: ReactNode }) => {
     refresh: refetch,
   };
 
-  console.log(data);
-
   return (
     <VendorContext.Provider value={value}>{children}</VendorContext.Provider>
   );

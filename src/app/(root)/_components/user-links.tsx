@@ -28,28 +28,6 @@ const UserLinks = () => {
       </Button>
       <Dropdown.Popover placement="bottom right">
         <Dropdown.Menu>
-          <Dropdown.Item
-            id="become-a-vendor"
-            textValue="Become a vendor"
-            onClick={() => {
-              router.push("/vendor-onboarding");
-            }}
-          >
-            <ShoppingBasket className="text-muted size-4 shrink-0" />
-            <Label>Become a vendor</Label>
-          </Dropdown.Item>
-
-          <Dropdown.Item
-            id="login"
-            textValue="Login"
-            onClick={() => {
-              router.push("/sign-in");
-            }}
-          >
-            <ArrowRightFromSquare className="text-muted size-4 shrink-0" />
-            <Label>Login</Label>
-          </Dropdown.Item>
-
           {isAuthenticated ? (
             <>
               <Dropdown.Item
@@ -62,7 +40,7 @@ const UserLinks = () => {
                 <Person className="text-muted size-4 shrink-0" />
                 <Label>Profile</Label>
               </Dropdown.Item>
-              {isActive && (
+              {isActive ? (
                 <Dropdown.Item
                   onClick={() => {
                     router.push(`/vendor/${profile?.id}/dashboard`);
@@ -72,6 +50,17 @@ const UserLinks = () => {
                 >
                   <SquareBars className="text-muted size-4 shrink-0" />
                   <Label>Dashboard</Label>
+                </Dropdown.Item>
+              ) : (
+                <Dropdown.Item
+                  id="become-a-vendor"
+                  textValue="Become a vendor"
+                  onClick={() => {
+                    router.push("/vendor-onboarding");
+                  }}
+                >
+                  <ShoppingBasket className="text-muted size-4 shrink-0" />
+                  <Label>Become a vendor</Label>
                 </Dropdown.Item>
               )}
               <Dropdown.Item
@@ -86,6 +75,16 @@ const UserLinks = () => {
             </>
           ) : (
             <>
+              <Dropdown.Item
+                id="login"
+                textValue="Login"
+                onClick={() => {
+                  router.push("/sign-in");
+                }}
+              >
+                <ArrowRightFromSquare className="text-muted size-4 shrink-0" />
+                <Label>Login</Label>
+              </Dropdown.Item>
               {/* <NavLink
                 href="/sign-in"
                 className="text-md hover:border-app-text-quaternary hover:text-app-text-primary flex h-[40px] items-center justify-center rounded-[12px] border border-transparent bg-transparent px-[20px] py-6 font-medium transition-all duration-200 hover:bg-[#2c2c2c]/50"
