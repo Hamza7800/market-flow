@@ -13,10 +13,27 @@ import {
 } from "@/server/db/schema";
 import {
   createProductSchema,
+  updateProductSchema,
+  updateProductStatusSchema,
   type CreateProductSchema,
+  type UpdateProductSchema,
+  type UpdateProductStatusSchema,
 } from "@/zod-schema/product-schema";
-import { eq, isNull, gte, lte, or, ilike, and, asc, desc } from "drizzle-orm";
+import {
+  eq,
+  isNull,
+  gte,
+  lte,
+  or,
+  ilike,
+  and,
+  asc,
+  desc,
+  count,
+  inArray,
+} from "drizzle-orm";
 import z from "zod";
+import { deleteUploadThingFiles } from "./images";
 
 export const getProducts = async (
   page: number = 1,
@@ -167,47 +184,71 @@ export const getVendorProducts = async (
     const LIMIT = 20;
     const offset = (page - 1) * LIMIT;
 
-    const data = await cacheWrap(
-      productKeys.tags.byVendorAndStatus(vendor.id, status) + `:page:${page}`,
-      [
-        productKeys.tags.byVendor(vendor.id),
-        productKeys.tags.byVendorAndStatus(vendor.id, status),
-      ],
-      async () => {
-        return db.query.products.findMany({
-          where: and(
+    const [data, totalCount] = await Promise.all([
+      cacheWrap(
+        productKeys.tags.byVendorAndStatus(vendor.id, status) + `:page:${page}`,
+        [
+          productKeys.tags.byVendor(vendor.id),
+          productKeys.tags.byVendorAndStatus(vendor.id, status),
+        ],
+        async () => {
+          return db.query.products.findMany({
+            where: and(
+              eq(products.vendorId, vendor.id),
+              eq(products.status, status),
+              isNull(products.deletedAt),
+            ),
+            limit: LIMIT,
+            offset,
+            orderBy: [desc(products.createdAt)],
+            with: {
+              images: {
+                where: eq(productImages.isPrimary, true),
+                limit: 1,
+              },
+              variants: {
+                where: isNull(productVariants.deletedAt),
+                columns: { stock: true, price: true },
+              },
+            },
+          });
+        },
+        30,
+      ),
+      db
+        .select({ count: count() })
+        .from(products)
+        .where(
+          and(
             eq(products.vendorId, vendor.id),
             eq(products.status, status),
             isNull(products.deletedAt),
           ),
-          limit: LIMIT,
-          offset,
-          orderBy: [desc(products.createdAt)],
-          with: {
-            images: {
-              where: eq(productImages.isPrimary, true),
-              limit: 1,
-            },
-            variants: {
-              where: isNull(productVariants.deletedAt),
-              columns: { stock: true, price: true },
-            },
-          },
-        });
-      },
-      30,
-    );
+        )
+        .then((res) => res[0]?.count ?? 0),
+    ]);
 
     return {
       success: true,
       message: "Vendor products fetched",
       data,
-      meta: { page, limit: LIMIT, hasMore: data.length === LIMIT },
+      meta: {
+        hasMore: data.length === LIMIT,
+        page,
+        limit: LIMIT,
+        totalCount,
+        totalPages: Math.ceil(totalCount / LIMIT),
+      },
     };
   } catch (error) {
-    return returnError(error, "Unable to get products");
+    return {
+      ...returnError(error, "Unable to get products"),
+      meta: null,
+    };
   }
 };
+
+export type VendorProducts = Awaited<ReturnType<typeof getVendorProducts>>;
 
 async function requireActiveVendor() {
   const user = await getUser();
@@ -271,6 +312,7 @@ export const createProduct = async (values: CreateProductSchema) => {
             altText: img.altText ?? validatedData.name,
             sortOrder: index,
             isPrimary: index === 0,
+            key: img.key,
           })),
         );
       }
@@ -334,3 +376,371 @@ function generateSlug(name: string): string {
     Math.random().toString(36).slice(2, 7)
   );
 }
+
+export const updateProduct = async (
+  productId: string,
+  values: UpdateProductSchema,
+) => {
+  try {
+    const { vendor } = await requireActiveVendor();
+    if (!vendor) {
+      return {
+        success: false,
+        data: null,
+        message: "You must have an active vendor profile to create products",
+      };
+    }
+
+    const validated = updateProductSchema.parse(values);
+    const existing = await db.query.products.findFirst({
+      where: and(
+        eq(products.id, productId),
+        eq(products.vendorId, vendor.id),
+        isNull(products.deletedAt),
+      ),
+      with: {
+        images: true,
+        variants: { where: isNull(productVariants.deletedAt) },
+        productTags: true,
+      },
+    });
+
+    if (!existing) {
+      return {
+        success: false,
+        data: null,
+        message: "Product not found or access denied",
+      };
+    }
+
+    const updatedProduct = await db.transaction(async (tx) => {
+      const productUpdates: Record<string, unknown> = {
+        updatedAt: new Date(),
+      };
+
+      if (validated.name !== undefined) {
+        productUpdates.name = validated.name;
+        if (validated.name !== existing.name) {
+          productUpdates.slug = generateSlug(validated.name);
+        }
+      }
+      if (validated.description !== undefined) {
+        productUpdates.description = validated.description || null;
+      }
+
+      if (validated.categoryId !== undefined) {
+        productUpdates.categoryId = validated.categoryId;
+      }
+
+      if (validated.basePrice !== undefined) {
+        productUpdates.basePrice = validated.basePrice.toString();
+      }
+      if (validated.status !== undefined) {
+        productUpdates.status = validated.status;
+      }
+
+      if (validated.hasVariants !== undefined) {
+        productUpdates.hasVariants = validated.hasVariants;
+        if (!validated.hasVariants) {
+          productUpdates.stock = validated.stock ?? 0;
+        } else {
+          productUpdates.stock = 0;
+        }
+      } else if (validated.stock !== undefined && !existing.hasVariants) {
+        productUpdates.stock = validated.stock;
+      }
+
+      const [updated] = await tx
+        .update(products)
+        .set(productUpdates)
+        .where(eq(products.id, productId))
+        .returning();
+
+      if (validated.images !== undefined) {
+        const normalizedImages = validated.images.map((img, i) => ({
+          ...img,
+          sortOrder: i,
+          isPrimary: i === 0,
+        }));
+
+        if (existing.images.length > 0) {
+          await tx
+            .delete(productImages)
+            .where(eq(productImages.productId, productId));
+
+          const keysToDelete = existing.images
+            .map((img) => extractUploadThingKey(img.url))
+            .filter(Boolean) as string[];
+
+          if (keysToDelete.length > 0) {
+            deleteUploadThingFiles(keysToDelete)
+              .then((r) => console.log("Delete Success", r))
+              .catch((e) => console.error("UploadThing cleanup failed:", e));
+          }
+        }
+        if (normalizedImages.length > 0) {
+          await tx.insert(productImages).values(
+            normalizedImages.map((img) => ({
+              productId,
+              url: img.url,
+              altText: img.altText || null,
+              sortOrder: img.sortOrder,
+              isPrimary: img.isPrimary,
+              key: img.key,
+            })),
+          );
+        }
+      }
+      if (validated.variants !== undefined) {
+        const incomingVariantIds = validated.variants
+          .filter((v) => v.id)
+          .map((v) => v.id!);
+
+        const existingVariantIds = existing.variants.map((v) => v.id);
+
+        const toSoftDelete = existingVariantIds.filter(
+          (id) => !incomingVariantIds.includes(id),
+        );
+
+        if (toSoftDelete.length > 0) {
+          await tx
+            .update(productVariants)
+            .set({ deletedAt: new Date() })
+            .where(
+              and(
+                eq(productVariants.productId, productId),
+                inArray(productVariants.id, toSoftDelete),
+              ),
+            );
+        }
+
+        for (const v of validated.variants) {
+          if (v.id) {
+            await tx
+              .update(productVariants)
+              .set({
+                name: v.name,
+                options: JSON.stringify(v.options),
+                price: v.price?.toString() ?? null,
+                stock: v.stock ?? 0,
+                sku: v.sku || null,
+                imageUrl: v.imageUrl || null,
+                updatedAt: new Date(),
+                deletedAt: null,
+              })
+              .where(
+                and(
+                  eq(productVariants.id, v.id),
+                  eq(productVariants.productId, productId),
+                ),
+              );
+          } else {
+            await tx.insert(productVariants).values({
+              productId,
+              name: v.name,
+              options: JSON.stringify(v.options),
+              price: v.price?.toString() ?? null,
+              stock: v.stock ?? 0,
+              sku: v.sku || null,
+              imageUrl: v.imageUrl || null,
+            });
+          }
+        }
+      }
+
+      if (validated.tagIds !== undefined) {
+        const existingTagIds = existing.productTags.map((pt) => pt.tagId);
+
+        const toAddTagIds = validated.tagIds.filter(
+          (id) => !existingTagIds.includes(id),
+        );
+        const toRemoveTagIds = existingTagIds.filter(
+          (id) => !validated.tagIds!.includes(id),
+        );
+
+        if (toRemoveTagIds.length > 0) {
+          await tx
+            .delete(productTags)
+            .where(
+              and(
+                eq(productTags.productId, productId),
+                inArray(productTags.tagId, toRemoveTagIds),
+              ),
+            );
+        }
+        if (toAddTagIds.length > 0) {
+          await tx
+            .insert(productTags)
+            .values(toAddTagIds.map((tagId) => ({ productId, tagId })));
+        }
+      }
+      return updated;
+    });
+
+    cacheDel(
+      productKeys.tags.detail(updatedProduct?.id!),
+      productKeys.tags.lists(),
+      productKeys.tags.byVendor(vendor.id),
+      productKeys.tags.byVendorAndStatus(vendor.id, updatedProduct?.status!),
+      ...(validated.status && validated.status !== existing.status
+        ? [productKeys.tags.byVendorAndStatus(vendor.id, existing.status)]
+        : []),
+      ...(existing.categoryId
+        ? [productKeys.tags.byCategory(existing.categoryId)]
+        : []),
+      ...(validated.categoryId && validated.categoryId !== existing.categoryId
+        ? [productKeys.tags.byCategory(validated.categoryId)]
+        : []),
+    );
+
+    // TODO: SKU DUP FIX
+    return {
+      success: true,
+      data: updatedProduct,
+      message: "Product updated success",
+    };
+  } catch (error) {
+    return returnError(error, "Unable to update product");
+  }
+};
+
+function extractUploadThingKey(url: string): string | null {
+  const match = url.match(/\/f\/([^/?#]+)/);
+  return match?.[1] ?? null;
+}
+
+export const deleteProduct = async (productId: string) => {
+  try {
+    const { vendor } = await requireActiveVendor();
+    if (!vendor) {
+      return {
+        success: false,
+        data: null,
+        message: "You must have an active vendor profile to create products",
+      };
+    }
+
+    const existing = await db.query.products.findFirst({
+      where: and(
+        eq(products.id, productId),
+        eq(products.vendorId, vendor.id),
+        isNull(products.deletedAt),
+      ),
+      with: {
+        images: true,
+      },
+      columns: { id: true, slug: true, status: true, categoryId: true },
+    });
+
+    if (!existing) {
+      return {
+        success: false,
+        data: null,
+        message: "Product not found or access denied",
+      };
+    }
+
+    if (existing.images.length > 0) {
+      const keysToDelete = existing.images
+        .map((img) => extractUploadThingKey(img.url))
+        .filter(Boolean) as string[];
+
+      if (keysToDelete.length > 0) {
+        deleteUploadThingFiles(keysToDelete)
+          .then((r) => console.log("Delete IMAGE Success", r))
+          .catch((e) => console.error("UploadThing cleanup failed:", e));
+      }
+    }
+
+    await db
+      .update(products)
+      .set({ deletedAt: new Date(), updatedAt: new Date() })
+      .where(eq(products.id, productId));
+
+    cacheDel(
+      productKeys.tags.detail(existing.id),
+      productKeys.tags.lists(),
+      productKeys.tags.byVendor(vendor.id),
+      productKeys.tags.byVendorAndStatus(vendor.id, existing.status),
+      ...(existing.categoryId
+        ? [productKeys.tags.byCategory(existing.categoryId)]
+        : []),
+    );
+
+    return {
+      success: true,
+      message: "Product Deleted",
+      data: existing,
+    };
+  } catch (error) {
+    return returnError(error, "Unable to delete product");
+  }
+};
+
+export const updateProductStatus = async (
+  productId: string,
+  values: UpdateProductStatusSchema,
+) => {
+  try {
+    const { vendor } = await requireActiveVendor();
+    if (!vendor) {
+      return {
+        success: false,
+        data: null,
+        message: "You must have an active vendor profile to create products",
+      };
+    }
+    const validated = updateProductStatusSchema.parse(values);
+
+    const existing = await db.query.products.findFirst({
+      where: and(
+        eq(products.id, productId),
+        eq(products.vendorId, vendor.id),
+        isNull(products.deletedAt),
+      ),
+      columns: { id: true, slug: true, status: true, categoryId: true },
+    });
+
+    if (!existing) {
+      return {
+        success: false,
+        data: null,
+        message: "Product not found or access denied",
+      };
+    }
+
+    if (validated.status === "active" && !vendor.stripeOnboardingComplete) {
+      return {
+        success: false,
+        data: null,
+        message:
+          "Complete your Stripe Connect setup before publishing products",
+      };
+    }
+
+    const [updated] = await db
+      .update(products)
+      .set({ status: validated.status, updatedAt: new Date() })
+      .where(eq(products.id, productId))
+      .returning({ id: products.id, status: products.status });
+
+    cacheDel(
+      productKeys.tags.detail(existing.id),
+      productKeys.tags.lists(),
+      productKeys.tags.byVendor(vendor.id),
+      productKeys.tags.byVendorAndStatus(vendor.id, validated.status),
+      productKeys.tags.byVendorAndStatus(vendor.id, existing.status),
+      ...(existing.categoryId
+        ? [productKeys.tags.byCategory(existing.categoryId)]
+        : []),
+    );
+
+    return {
+      success: true,
+      message: `Product ${validated.status}`,
+      data: updated,
+    };
+  } catch (error) {
+    return returnError(error, "Unable to update status");
+  }
+};

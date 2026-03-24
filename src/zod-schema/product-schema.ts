@@ -5,6 +5,7 @@ export const productImageSchema = z.object({
   altText: z.string().max(255).optional().or(z.literal("")),
   sortOrder: z.number().int().min(0),
   isPrimary: z.boolean(),
+  key: z.string(),
 });
 
 export type ProductImageSchema = z.infer<typeof productImageSchema>;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { X, Upload, Loader2, ImageIcon, GripVertical } from "lucide-react";
 import { useUploadThing } from "@/lib/uploadthing-components";
@@ -14,6 +14,7 @@ export interface UploadedImage {
   altText?: string;
   sortOrder: number;
   isPrimary: boolean;
+  key: string;
 }
 
 interface MultiImageUploaderProps {
@@ -38,6 +39,16 @@ export function MultiImageUploader({
   const [deletingKey, setDeletingKey] = useState<string | null>(null);
   const [uploadedKeys, setUploadedKeys] = useState<Record<string, string>>({});
 
+  useEffect(() => {
+    const map: Record<string, string> = {};
+
+    value.forEach((img) => {
+      map[img.url] = img.key;
+    });
+
+    setUploadedKeys(map);
+  }, [value]);
+
   const { startUpload } = useUploadThing("imageUploader", {
     onClientUploadComplete: (res) => {
       if (res && res.length > 0) {
@@ -46,6 +57,7 @@ export function MultiImageUploader({
           altText: "",
           sortOrder: value.length + i,
           isPrimary: value.length === 0 && i === 0,
+          key: r.key,
         }));
 
         const keyMap: Record<string, string> = {};
@@ -124,17 +136,18 @@ export function MultiImageUploader({
     try {
       if (key) {
         setDeletingKey(key);
-        const result = await deleteUploadThingFile(key);
-        if (result.success) {
-          onChange(
-            value
-              .filter((img) => img.url !== image.url)
-              .map((img, i) => ({ ...img, sortOrder: i })),
-          );
-          toast.success("Image removed");
-        } else {
-          toast.danger("Failed to remove image");
-        }
+        // const result = await deleteUploadThingFile(key);
+        // if (result.success) {
+
+        onChange(
+          value
+            .filter((img) => img.url !== image.url)
+            .map((img, i) => ({ ...img, sortOrder: i })),
+        );
+        toast.success("Image removed");
+        // } else {
+        // toast.danger("Failed to remove image");
+        // }
       }
     } catch {
       toast.danger("Failed to remove image");

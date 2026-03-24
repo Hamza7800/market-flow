@@ -131,14 +131,7 @@ const ProductForm = (props: Props) => {
     // mode: "onTouched",
   });
 
-  const {
-    control,
-    handleSubmit,
-    register,
-    formState: { errors },
-    setValue,
-    watch,
-  } = form;
+  const { control, handleSubmit, setValue, watch } = form;
   const hasVariants = watch("hasVariants");
 
   const onSubmit = async (values: CreateProductSchema) => {
@@ -154,9 +147,9 @@ const ProductForm = (props: Props) => {
       const result = await createMutation.mutateAsync(values);
       if (result.success) {
         form.reset(createProductDefaults);
-        if (props.redirectTo) {
-          router.push(props.redirectTo);
-        }
+        // if (props.redirectTo) {
+        router.back();
+        // }
       }
     }
   };
@@ -172,9 +165,9 @@ const ProductForm = (props: Props) => {
     isEdit && deleteMutation
       ? async () => {
           const result = await deleteMutation.mutateAsync(props.productId);
-          // if (result.success && props.redirectTo) {
-          //   router.push(props.redirectTo);
-          // }
+          if (result.success) {
+            router.back();
+          }
         }
       : undefined;
 
@@ -376,8 +369,9 @@ const ProductForm = (props: Props) => {
             <VariantBuilder setValue={setValue} control={control} />
           )}
 
-          <div className="border-border bg-background/95 fixed inset-x-0 bottom-0 z-50 border-t px-4 py-3 backdrop-blur-sm">
-            <div className="mx-auto flex max-w-4xl items-center justify-between gap-3">
+          <Separator />
+          <Card.Footer>
+            <div className="flex w-full items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 {isEdit && onStatusChange && (
                   <>
@@ -422,7 +416,7 @@ const ProductForm = (props: Props) => {
                 </Button>
               </div>
             </div>
-          </div>
+          </Card.Footer>
         </Form>
       </Card>
     </div>

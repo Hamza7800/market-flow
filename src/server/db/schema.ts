@@ -289,6 +289,7 @@ export const productImages = createTable(
     altText: text("alt_text"),
     sortOrder: integer("sort_order").notNull().default(0),
     isPrimary: boolean("is_primary").notNull().default(false),
+    key: text("key"),
     createdAt,
   },
   (t) => [index("image_product_idx").on(t.productId)],

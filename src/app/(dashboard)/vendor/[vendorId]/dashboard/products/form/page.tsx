@@ -14,7 +14,6 @@ const ProductFormPage = async ({
 
   if (productId) {
     const product = await getVendorProductById(productId);
-    console.log(product);
     if (!product) {
       return <EmptyState title={"Product Not found"} />;
     }
@@ -35,6 +34,7 @@ const ProductFormPage = async ({
             altText: img.altText ?? "",
             sortOrder: img.sortOrder,
             isPrimary: img.isPrimary,
+            key: img.key ?? "",
           })),
           hasVariants: product.data?.hasVariants,
           tagIds: product.data?.productTags?.map((tag) => tag?.tagId),
