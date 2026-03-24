@@ -14,7 +14,7 @@ import { useParams } from "next/navigation";
 const items = [
   {
     title: "Products",
-    url: "products",
+    url: "products?status=active&page?1",
     icon: ShoppingBag,
   },
   {

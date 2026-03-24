@@ -74,7 +74,7 @@ const CategorySelect = ({ value, onChange }: Props) => {
       <Select.Popover className="w-full max-w-[250px]">
         <ListBox className="mt-1 outline-none">
           {flatCategories.map((c) => (
-            <ListBox.Item key={c.id} id={c.id}>
+            <ListBox.Item key={c.id} id={c.id} textValue={c.name}>
               <span
                 style={{ paddingLeft: `${c.depth * 12}px` }}
                 className="flex-1"

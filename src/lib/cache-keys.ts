@@ -43,7 +43,7 @@ export const productKeys = {
   lists: () => productSegments.lists(),
   list: (page: number, filters: ProductFilters) =>
     productSegments.list(page, filters),
-  detail: (slug: string) => productSegments.detail(slug),
+  detail: (productId: string) => productSegments.detail(productId),
   byVendor: (vendorId: string) => productSegments.byVendor(vendorId),
   byCategory: (categoryId: string) => productSegments.byCategory(categoryId),
   byVendorAndStatus: (vendorId: string, status: string) =>
@@ -54,7 +54,7 @@ export const productKeys = {
     lists: () => toTag(productSegments.lists()),
     list: (page: number, filters: ProductFilters) =>
       toTag(productSegments.list(page, filters)),
-    detail: (slug: string) => toTag(productSegments.detail(slug)),
+    detail: (productId: string) => toTag(productSegments.detail(productId)),
     byVendor: (vendorId: string) => toTag(productSegments.byVendor(vendorId)),
     byCategory: (categoryId: string) =>
       toTag(productSegments.byCategory(categoryId)),

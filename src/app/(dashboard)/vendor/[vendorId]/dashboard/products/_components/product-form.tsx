@@ -57,15 +57,16 @@ import {
   useUpdateProduct,
   useUpdateProductStatus,
 } from "@/hooks/use-product";
+import { MultiImageUploader } from "@/components/image-upload";
 
 export type Category = { id: string; name: string; parentId?: string | null };
-type TagType = { id: string; name: string; slug: string };
+// type TagType = { id: string; name: string; slug: string };
 
 type CreateProps = {
   mode: "create";
   vendorId: string;
-  categories: Category[];
-  availableTags: TagType[];
+  // category: string;
+  // availableTags: TagType[];
   redirectTo?: string;
 };
 
@@ -75,8 +76,8 @@ type EditProps = {
   productId: string;
   currentStatus: "draft" | "active" | "archived";
   defaultValues: Partial<CreateProductSchema>;
-  categories: Category[];
-  availableTags: TagType[];
+  // category: string;
+  // availableTags: TagType[];
   redirectTo?: string;
 };
 
@@ -151,12 +152,12 @@ const ProductForm = (props: Props) => {
       // }
     } else {
       const result = await createMutation.mutateAsync(values);
-      // if (result.success) {
-      //   form.reset(createProductDefaults);
-      //   if (props.redirectTo) {
-      //     router.push(props.redirectTo);
-      //   }
-      // }
+      if (result.success) {
+        form.reset(createProductDefaults);
+        if (props.redirectTo) {
+          router.push(props.redirectTo);
+        }
+      }
     }
   };
 
@@ -329,7 +330,26 @@ const ProductForm = (props: Props) => {
             )}
           </div>
 
-          <h2>Images</h2>
+          <Controller
+            control={control}
+            name="images"
+            render={({ field, fieldState }) => (
+              <div className="flex flex-col gap-1.5">
+                <MultiImageUploader
+                  value={field.value}
+                  onChange={field.onChange}
+                  maxFiles={10}
+                  maxSize={4}
+                  disabled={isSubmitting}
+                />
+                {fieldState.error && (
+                  <p className="text-xs text-[--danger]">
+                    {fieldState.error.message ?? fieldState.error.root?.message}
+                  </p>
+                )}
+              </div>
+            )}
+          />
 
           {hasVariants && (
             <Alert color="primary">

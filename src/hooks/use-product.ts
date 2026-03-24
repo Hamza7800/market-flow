@@ -1,14 +1,46 @@
+import { createProduct } from "@/actions/products";
+import { productKeys } from "@/lib/cache-keys";
 import type {
   CreateProductSchema,
   UpdateProductSchema,
 } from "@/zod-schema/product-schema";
-import { useMutation } from "@tanstack/react-query";
+import { toast } from "@heroui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateProduct = (vendorId: string) => {
+  const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async (values: CreateProductSchema) => {
-      console.log(values);
-      return values;
+      const result = await createProduct(values);
+      if (!result.success) {
+        throw new Error(result.message);
+      }
+      return result;
+    },
+    onSuccess: (result, variables) => {
+      if (!result.success) return;
+
+      if (result.data) {
+        qc.setQueryData(
+          [...productKeys.detail(result.data.id), "vendor"],
+          result,
+        );
+      }
+
+      qc.invalidateQueries({ queryKey: productKeys.lists() });
+      qc.invalidateQueries({ queryKey: productKeys.byVendor(vendorId) });
+      qc.invalidateQueries({
+        queryKey: productKeys.byVendorAndStatus(vendorId, "draft"),
+      });
+      if (variables.categoryId) {
+        qc.invalidateQueries({
+          queryKey: productKeys.byCategory(variables.categoryId),
+        });
+      }
+    },
+    onError: (error) => {
+      toast.danger(error.message);
     },
   });
 };

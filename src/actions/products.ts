@@ -11,6 +11,10 @@ import {
   productVariants,
   vendorProfiles,
 } from "@/server/db/schema";
+import {
+  createProductSchema,
+  type CreateProductSchema,
+} from "@/zod-schema/product-schema";
 import { eq, isNull, gte, lte, or, ilike, and, asc, desc } from "drizzle-orm";
 import z from "zod";
 
@@ -109,20 +113,48 @@ function buildOrderBy(sort?: ProductFilters["sort"]) {
   }
 }
 
+export const getVendorProductById = async (productId: string) => {
+  try {
+    const { vendor } = await requireActiveVendor();
+    if (!vendor)
+      return {
+        success: true,
+        message: "You need to be an active vendor",
+      };
+
+    const product = await db.query.products.findFirst({
+      where: and(
+        eq(products.id, productId),
+        eq(products.vendorId, vendor.id),
+        isNull(products.deletedAt),
+      ),
+      with: {
+        images: { orderBy: [asc(productImages.sortOrder)] },
+        variants: {
+          where: isNull(productVariants.deletedAt),
+          orderBy: [asc(productVariants.name)],
+        },
+        productTags: { with: { tag: true } },
+        category: { columns: { id: true, name: true, slug: true } },
+      },
+    });
+
+    return {
+      message: "Product Detail",
+      data: product,
+      success: true,
+    };
+  } catch (error) {
+    return returnError(error, "Unable to get product");
+  }
+};
+
 export const getVendorProducts = async (
   status: "draft" | "active" | "archived" = "active",
   page: number = 1,
 ) => {
   try {
-    const user = await getUser();
-
-    const vendor = await db.query.vendorProfiles.findFirst({
-      where: and(
-        eq(vendorProfiles.userId, user.id),
-        isNull(vendorProfiles.deletedAt),
-      ),
-      columns: { id: true },
-    });
+    const { vendor } = await requireActiveVendor();
 
     if (!vendor) {
       return {
@@ -177,115 +209,128 @@ export const getVendorProducts = async (
   }
 };
 
-// export const createProduct = async (values:CreateProductSchemaType) => {
-//   try {
-//     const user = await getUser();
-//     const validatedData = createProductSchema.parse(values);
+async function requireActiveVendor() {
+  const user = await getUser();
 
-//      const vendor = await db.query.vendorProfiles.findFirst({
-//       where: and(
-//         eq(vendorProfiles.userId, user.id),
-//         eq(vendorProfiles.status, "active"),
-//         isNull(vendorProfiles.deletedAt)
-//       ),
-//     });
+  const vendor = await db.query.vendorProfiles.findFirst({
+    where: and(
+      eq(vendorProfiles.userId, user.id),
+      eq(vendorProfiles.status, "active"),
+      isNull(vendorProfiles.deletedAt),
+    ),
+  });
 
-//     if (!vendor) {
-//       return {
-//         success: false,
-//         data: null,
-//         message: "You must have an active vendor profile to create products",
-//       };
-//     }
+  if (!vendor) return { vendor: null, user };
+  return { vendor, user };
+}
 
-//      if (!vendor.stripeOnboardingComplete) {
-//       return {
-//         success: false,
-//         data: null,
-//         message: "Complete your Stripe Connect setup before listing products",
-//       };
-//     }
+export const createProduct = async (values: CreateProductSchema) => {
+  try {
+    const { vendor } = await requireActiveVendor();
 
-//     const newProduct = await db.transaction(async (tx) => {
-//       const [createdProduct] = await tx.insert(products).values({
-//         vendorId: vendor.id,
-//         categoryId: validatedData.categoryId,
-//         name: validatedData.name,
-//         slug: generateSlug(validatedData.name),
-//         description: validatedData.description,
-//         basePrice: validatedData.basePrice.toString(),
-//         hasVariants: validatedData.hasVariants,
-//         // Stock only applies to simple products
-//         stock: validatedData.hasVariants ? 0 : (validatedData.stock ?? 0),
-//         status: "draft",
-//       }).returning()
+    if (!vendor) {
+      return {
+        success: false,
+        data: null,
+        message: "You must have an active vendor profile to create products",
+      };
+    }
 
-//       if (validatedData.images?.length) {
-//         await tx.insert(productImages).values(
-//           validatedData.images.map((img, index) => ({
-//             productId: createdProduct?.id,
-//             url: img.url,
-//             altText: img.altText ?? validatedData.name,
-//             sortOrder: index,
-//             isPrimary: index === 0,
-//           }))
-//         )
-//       }
+    if (!vendor.stripeOnboardingComplete) {
+      return {
+        success: false,
+        data: null,
+        message: "Complete your Stripe Connect setup before listing products",
+      };
+    }
 
-//       if (validatedData.hasVariants && validatedData.variants?.length) {
-//         await tx.insert(productVariants).values(
-//           validatedData.variants.map((variant) => ({
-//             productId: createdProduct?.id,
-//             name: variant.name,
-//             options: JSON.stringify(variant.options),
-//             price: variant.price?.toString(),
-//             stock: variant.stock ?? 0,
-//             sku: variant.sku,
-//           }))
-//         );
-//       }
-//       if (validatedData.tagIds?.length) {
-//         await tx.insert(productTags).values(
-//           validatedData.tagIds.map((tagId) => ({
-//             productId: createdProduct?.id,
-//             tagId,
-//           }))
-//         );
-//       }
+    const validatedData = createProductSchema.parse(values);
 
-//       return createdProduct;
+    const newProduct = await db.transaction(async (tx) => {
+      const [createdProduct] = await tx
+        .insert(products)
+        .values({
+          vendorId: vendor.id,
+          categoryId: validatedData.categoryId,
+          name: validatedData.name,
+          slug: generateSlug(validatedData.name),
+          description: validatedData.description,
+          basePrice: validatedData.basePrice.toString(),
+          hasVariants: validatedData.hasVariants,
+          // Stock only applies to simple products
+          stock: validatedData.hasVariants ? 0 : (validatedData.stock ?? 0),
+          status: "draft",
+        })
+        .returning();
 
-//     });
+      if (validatedData.images?.length > 0 && createdProduct?.id) {
+        await tx.insert(productImages).values(
+          validatedData.images.map((img, index) => ({
+            productId: createdProduct.id,
+            url: img.url,
+            altText: img.altText ?? validatedData.name,
+            sortOrder: index,
+            isPrimary: index === 0,
+          })),
+        );
+      }
 
-//     cacheDel(
-//       productKeys.tags.lists(),
-//       productKeys.tags.byVendor(vendor.id),
-//       productKeys.tags.byVendorAndStatus(vendor.id, "draft"),
-//       ...(validatedData.categoryId
-//         ? [productKeys.tags.byCategory(validatedData.categoryId)]
-//         : [])
-//     )
+      if (
+        validatedData.hasVariants &&
+        validatedData.variants?.length > 0 &&
+        createdProduct?.id
+      ) {
+        await tx.insert(productVariants).values(
+          validatedData.variants.map((variant) => ({
+            productId: createdProduct.id,
+            name: variant.name,
+            options: JSON.stringify(variant.options),
+            price: variant.price?.toString(),
+            stock: variant.stock ?? 0,
+            sku: variant.sku,
+          })),
+        );
+      }
+      if (validatedData.tagIds?.length > 0 && createdProduct?.id) {
+        await tx.insert(productTags).values(
+          validatedData.tagIds.map((tagId) => ({
+            productId: createdProduct.id,
+            tagId,
+          })),
+        );
+      }
 
-//       return {
-//       success: true,
-//       message: "Product created",
-//       data: newProduct,
-//     };
+      return createdProduct;
+    });
 
-//   } catch (error) {
-//      return returnError(error, "Unable to create product");
-//   }
+    cacheDel(
+      productKeys.tags.lists(),
+      productKeys.tags.byVendor(vendor.id),
+      productKeys.tags.byVendorAndStatus(vendor.id, "draft"),
+      ...(validatedData.categoryId
+        ? [productKeys.tags.byCategory(validatedData.categoryId)]
+        : []),
+    );
 
-// function generateSlug(name: string): string {
-//   return (
-//     name
-//       .toLowerCase()
-//       .trim()
-//       .replace(/[^a-z0-9\s-]/g, "")
-//       .replace(/\s+/g, "-")
-//       .replace(/-+/g, "-") +
-//     "-" +
-//     Math.random().toString(36).slice(2, 7)
-//   );
-// }
-// }
+    return {
+      success: true,
+      message: "Product created",
+      data: newProduct,
+    };
+  } catch (error) {
+    return returnError(error, "Unable to create product");
+  }
+};
+
+function generateSlug(name: string): string {
+  return (
+    name
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-") +
+    "-" +
+    Math.random().toString(36).slice(2, 7)
+  );
+}

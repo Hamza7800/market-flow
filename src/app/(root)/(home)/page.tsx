@@ -6,6 +6,8 @@ export default async function Home() {
   const res = await getProducts();
   const products = res.data;
 
+  console.log(res);
+
   return (
     <main className="mx-auto max-w-7xl px-6 py-10">
       <h1 className="mb-8 text-2xl font-semibold">Products</h1>
@@ -32,7 +34,10 @@ export default async function Home() {
                 <div className="relative aspect-square overflow-hidden">
                   <div className="relative aspect-square w-full overflow-hidden">
                     <Image
-                      src={primaryImage}
+                      src={
+                        primaryImage ??
+                        "https://picsum.photos/seed/artisan-banner/1200/400"
+                      }
                       alt={product.name}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
