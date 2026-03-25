@@ -37,7 +37,9 @@ import { deleteUploadThingFiles } from "./images";
 
 export const getProducts = async (
   page: number = 1,
-  filters: ProductFilters = {},
+  filters: ProductFilters = {
+    inStock: true,
+  },
 ) => {
   try {
     const { category, inStock, maxPrice, minPrice, search, sort } = filters;
@@ -92,8 +94,11 @@ export const getProducts = async (
             variants: {
               where: isNull(productVariants.deletedAt),
               columns: {
+                id: true,
                 price: true,
                 stock: true,
+                name: true,
+                options: true,
               },
             },
           },
@@ -115,6 +120,8 @@ export const getProducts = async (
     return returnError(error, "Unable to fetch products");
   }
 };
+
+export type Products = Awaited<ReturnType<typeof getProducts>>["data"];
 
 function buildOrderBy(sort?: ProductFilters["sort"]) {
   switch (sort) {

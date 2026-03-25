@@ -4,7 +4,7 @@ import type { VariantProps } from "tailwind-variants";
 
 import { Button, buttonVariants } from "@heroui/react";
 import { tv } from "tailwind-variants";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 
 const myButtonVariants = tv({
   base: "text-md font-semibold shadow-md text-shadow-lg data-[pending=true]:opacity-40",

@@ -1,12 +1,12 @@
 import { getProducts } from "@/actions/products";
-import { Card, CardFooter, Chip } from "@heroui/react";
+import { Card, Chip } from "@heroui/react";
 import Image from "next/image";
+import { AddToCartButton } from "@/app/(root)/_components/add-to-cart";
+import AddToCartWithVariant from "@/app/(root)/_components/add-to-cart-with-variant";
 
 export default async function Home() {
   const res = await getProducts();
   const products = res.data;
-
-  console.log(res);
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-10">
@@ -48,11 +48,11 @@ export default async function Home() {
                   <div className="absolute top-3 right-3">
                     {totalStock > 0 ? (
                       <Chip size="sm" color="success" variant="secondary">
-                        In Stock
+                        In Stock {totalStock}
                       </Chip>
                     ) : (
                       <Chip size="sm" color="danger" variant="tertiary">
-                        Out of Stock
+                        Out of Stock {totalStock}
                       </Chip>
                     )}
                   </div>
@@ -97,6 +97,17 @@ export default async function Home() {
                   </span>
                 </div>
               </Card.Content>
+              <Card.Footer className="p-2">
+                {!!totalStock &&
+                  (product.hasVariants ? (
+                    <AddToCartWithVariant
+                      productId={product.id}
+                      variants={product.variants}
+                    />
+                  ) : (
+                    <AddToCartButton productId={product.id} />
+                  ))}
+              </Card.Footer>
             </Card>
           );
         })}
