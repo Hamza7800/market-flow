@@ -235,6 +235,8 @@ export function useClearCart() {
       qc.setQueryData<Cart | null>(cartKey, (old) =>
         old ? { ...old, items: [] } : old,
       );
+      //  cartKeys.byUser(userId ?? "guest"), "checkout-summary"]
+
       // qc.setQueryData<Cart | null>(cartKey, null);
       return { snapshot };
     },
@@ -247,6 +249,7 @@ export function useClearCart() {
 
     onSettled: () => {
       qc.setQueryData<Cart | null>(cartKey, null);
+      qc.setQueryData<Cart | null>([...cartKey, "checkout-summary"], null);
       qc.invalidateQueries({ queryKey: cartKey });
     },
   });

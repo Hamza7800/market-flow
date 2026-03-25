@@ -9,8 +9,10 @@ import { Button, Spinner } from "@heroui/react";
 import { CartItemRow } from "../../_components/cart-item";
 import { LoadingState } from "@/components/loading-state";
 import MaxWidthContainer from "@/components/max-w-container";
+import { useRouter } from "nextjs-toploader/app";
 
 const CartDetails = () => {
+  const router = useRouter();
   const { data: cart, isPending } = useCart();
   const clearItems = useClearCart();
 
@@ -49,7 +51,9 @@ const CartDetails = () => {
       ))}
 
       <div className="flex items-center justify-end gap-3">
-        <Button variant="secondary">Checkout</Button>
+        <Button onClick={() => router.push("/checkout")} variant="secondary">
+          Checkout
+        </Button>
         <Button size="sm" onPress={() => clearItems.mutate()}>
           Clear cart
         </Button>

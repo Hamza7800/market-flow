@@ -6,7 +6,14 @@ import { vendorKeys } from "@/lib/cache-keys";
 import { stripeClient } from "@/server/better-auth/config";
 import { getUser } from "@/server/better-auth/server";
 import { db } from "@/server/db";
-import { vendorProfiles } from "@/server/db/schema";
+import {
+  cartItems,
+  orderItems,
+  orders,
+  payments,
+  vendorProfiles,
+  vendorTransfers,
+} from "@/server/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 import type Stripe from "stripe";
 
@@ -286,4 +293,232 @@ export const handleAccountDeauthorized = async (stripeAccountId: string) => {
   console.log(
     `[stripe-webhook] account.application.deauthorized → vendor ${vendor.id} disconnected`,
   );
+};
+
+export const handlePaymentSucceeded = async (pi: Stripe.PaymentIntent) => {
+  const { orderId, cartId } = pi.metadata ?? {};
+  if (!orderId) {
+    console.warn(
+      "[webhook] payment_intent.succeeded — no orderId in metadata",
+      pi.id,
+    );
+    return;
+  }
+
+  const order = await db.query.orders.findFirst({
+    where: eq(orders.id, orderId),
+    with: {
+      items: {
+        with: {
+          product: {
+            columns: { vendorId: true },
+            with: {
+              vendor: {
+                columns: {
+                  id: true,
+                  stripeAccountId: true,
+                  commissionRate: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!order) {
+    console.warn("[webhook] Order not found:", orderId);
+    return;
+  }
+
+  if (order.status === "paid") {
+    console.log("[webhook] Order already paid — skipping:", orderId);
+    return;
+  }
+
+  await db.transaction(async (tx) => {
+    await tx
+      .update(orders)
+      .set({
+        status: "paid",
+        paidAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(orders.id, orderId));
+
+    await tx
+      .update(payments)
+      .set({
+        status: "succeeded",
+        stripeChargeId: (pi.latest_charge as string) ?? null,
+        updatedAt: new Date(),
+      })
+      .where(eq(payments.stripePaymentIntentId, pi.id));
+
+    await tx
+      .update(orderItems)
+      .set({
+        status: "processing",
+        updatedAt: new Date(),
+      })
+      .where(eq(orderItems.orderId, orderId));
+
+    const chargeId =
+      typeof pi.latest_charge === "string"
+        ? pi.latest_charge
+        : (pi.latest_charge?.id ??
+          (
+            await stripeClient.charges.list({
+              payment_intent: pi.id,
+              limit: 1,
+            })
+          ).data[0]?.id);
+
+    if (!chargeId) {
+      console.log(`No charge found for PaymentIntent ${pi.id}`);
+    }
+
+    await createVendorTransfers(orderId, pi.id, chargeId);
+
+    if (cartId) {
+      await clearCartAfterOrder(cartId);
+    }
+    console.log(`[webhook] Order ${orderId} marked paid. Transfers initiated.`);
+  });
+};
+
+const createVendorTransfers = async (
+  orderId: string,
+  paymentIntentId: string,
+  chargeId?: string,
+) => {
+  const items = await db.query.orderItems.findMany({
+    where: eq(orderItems.orderId, orderId),
+    with: {
+      product: {
+        with: {
+          vendor: {
+            columns: {
+              id: true,
+              stripeAccountId: true,
+              commissionRate: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const byVendor = new Map<
+    string,
+    {
+      vendor: {
+        id: string;
+        stripeAccountId: string | null;
+        commissionRate: string;
+      };
+      gross: number;
+    }
+  >();
+
+  for (const item of items) {
+    const vendor = item.product.vendor;
+    if (!vendor?.stripeAccountId) continue;
+    const existing = byVendor.get(vendor.id);
+    const itemTotal = Number(item.totalPrice);
+
+    if (existing) {
+      existing.gross += itemTotal;
+    } else {
+      byVendor.set(vendor.id, { vendor, gross: itemTotal });
+    }
+  }
+
+  for (const [, { vendor, gross }] of byVendor) {
+    if (!vendor.stripeAccountId) continue;
+    const commissionRate = Number(vendor.commissionRate);
+    const commissionAmount = Math.round(gross * commissionRate * 100) / 100;
+    const netAmount = Math.round((gross - commissionAmount) * 100) / 100;
+    const netInCents = Math.round(netAmount * 100);
+
+    if (netInCents <= 0) continue;
+
+    let stripeTransferId: string | null = null;
+    let transferStatus: "completed" | "failed" = "completed";
+    let failureReason: string | null = null;
+
+    try {
+      const transfer = await stripeClient.transfers.create({
+        amount: netInCents,
+        currency: "usd",
+        destination: vendor.stripeAccountId,
+        source_transaction: chargeId,
+        transfer_group: orderId,
+        metadata: {
+          orderId,
+          vendorId: vendor.id,
+        },
+      });
+
+      stripeTransferId = transfer.id;
+    } catch (error) {
+      console.error(
+        `[webhook] Transfer failed for vendor ${vendor.id}:`,
+        error,
+      );
+      transferStatus = "failed";
+      failureReason =
+        error instanceof Error ? error.message : "Transfer failed";
+    }
+
+    await db
+      .insert(vendorTransfers)
+      .values({
+        orderId,
+        vendorId: vendor.id,
+        stripeAccountId: vendor.stripeAccountId,
+        stripeTransferId,
+        grossAmount: gross.toFixed(2),
+        commissionAmount: commissionAmount.toFixed(2),
+        netAmount: netAmount.toFixed(2),
+        status: transferStatus,
+        transferredAt: transferStatus === "completed" ? new Date() : null,
+        failureReason,
+      })
+      .onConflictDoNothing();
+  }
+};
+
+async function clearCartAfterOrder(cartId: string) {
+  try {
+    await db.delete(cartItems).where(eq(cartItems.cartId, cartId));
+  } catch (error) {
+    console.error("[webhook] Failed to clear cart:", error);
+  }
+}
+
+export const handlePaymentFailed = async (pi: Stripe.PaymentIntent) => {
+  const { orderId } = pi.metadata ?? {};
+  if (!orderId) return;
+
+  await db.transaction(async (tx) => {
+    await tx
+      .update(orders)
+      .set({
+        status: "cancelled",
+        updatedAt: new Date(),
+      })
+      .where(and(eq(orders.id, orderId), eq(orders.status, "pending")));
+
+    await tx
+      .update(payments)
+      .set({
+        status: "failed",
+        updatedAt: new Date(),
+      })
+      .where(eq(payments.stripePaymentIntentId, pi.id));
+  });
+
+  console.log(`[webhook] Payment failed for order ${orderId}`);
 };

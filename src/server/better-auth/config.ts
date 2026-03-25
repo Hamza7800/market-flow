@@ -8,10 +8,12 @@ import Stripe from "stripe";
 import {
   handleAccountDeauthorized,
   handleAccountUpdated,
+  handlePaymentFailed,
+  handlePaymentSucceeded,
 } from "@/actions/stripe";
 
 export const stripeClient = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-11-17.clover",
+  apiVersion: "2026-02-25.clover",
 });
 
 export const auth = betterAuth({
@@ -38,6 +40,20 @@ export const auth = betterAuth({
             await handleAccountDeauthorized(deauth.id);
             break;
           }
+          case "payment_intent.succeeded": {
+            await handlePaymentSucceeded(
+              event.data.object as Stripe.PaymentIntent,
+            );
+            break;
+          }
+
+          case "payment_intent.payment_failed": {
+            await handlePaymentFailed(
+              event.data.object as Stripe.PaymentIntent,
+            );
+            break;
+          }
+
           default:
             break;
         }
