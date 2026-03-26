@@ -37,6 +37,7 @@ export const emptyImage = (): ProductImageSchema => ({
   altText: "",
   sortOrder: 0,
   isPrimary: false,
+  key: "",
 });
 
 type CreateMode = {

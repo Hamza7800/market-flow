@@ -1,4 +1,3 @@
-// app/(dashboard)/vendor/[vendorId]/dashboard/products/page.tsx
 import { getVendorProducts } from "@/actions/products";
 import ProductsTable from "./_components/products-table";
 import { loadProductSearchParams } from "@/lib/nuqs";
