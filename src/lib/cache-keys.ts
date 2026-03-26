@@ -108,7 +108,7 @@ export const cartKeys = {
   items: (userId: string) => ["cart", userId, "items"],
 };
 
-export const orderKeys = {
+const orderSegments = {
   all: () => ["orders"],
   byUser: (userId: string) => ["orders", "user", userId],
   userList: (userId: string, page: number) => [
@@ -127,6 +127,28 @@ export const orderKeys = {
     page.toString(),
   ],
   detail: (orderId: string) => ["orders", "detail", orderId],
+};
+
+export const orderKeys = {
+  all: () => orderSegments.all(),
+  byUser: (userId: string) => orderSegments.byUser(userId),
+  userList: (userId: string, page: number) =>
+    orderSegments.userList(userId, page),
+  byVendor: (vendorId: string) => orderSegments.byVendor(vendorId),
+  vendorList: (vendorId: string, status: string, page: number) =>
+    orderSegments.vendorList(vendorId, status, page),
+  detail: (orderId: string) => orderSegments.detail(orderId),
+
+  tags: {
+    all: () => toTag(orderSegments.all()),
+    byUser: (userId: string) => toTag(orderSegments.byUser(userId)),
+    userList: (userId: string, page: number) =>
+      toTag(orderSegments.userList(userId, page)),
+    byVendor: (vendorId: string) => toTag(orderSegments.byVendor(vendorId)),
+    vendorList: (vendorId: string, status: string, page: number) =>
+      toTag(orderSegments.vendorList(vendorId, status, page)),
+    detail: (orderId: string) => toTag(orderSegments.detail(orderId)),
+  },
 };
 
 const reviewSegments = {

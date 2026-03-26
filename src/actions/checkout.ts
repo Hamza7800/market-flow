@@ -1,4 +1,6 @@
 "use server";
+import { cacheDel } from "@/lib/cache-helpers";
+import { orderKeys } from "@/lib/cache-keys";
 import { returnError } from "@/lib/utils";
 import { stripeClient } from "@/server/better-auth/config";
 import { getUser } from "@/server/better-auth/server";
@@ -326,6 +328,8 @@ export const createPaymentIntent = async (values: CheckoutSchema) => {
       currency: "usd",
       status: "pending",
     });
+
+    cacheDel(orderKeys.tags.all());
 
     return {
       success: true,

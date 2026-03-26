@@ -9,8 +9,8 @@ import {
 
 export const invalidate = {
   product: {
-    updated: (slug: string, vendorId: string, categoryId?: string) => {
-      revalidateTag(productKeys.tags.detail(slug), "max");
+    updated: (productId: string, vendorId: string, categoryId?: string) => {
+      revalidateTag(productKeys.tags.detail(productId), "max");
       revalidateTag(productKeys.tags.lists(), "max");
       revalidateTag(productKeys.tags.byVendor(vendorId), "max");
       if (categoryId) {
@@ -18,8 +18,8 @@ export const invalidate = {
       }
     },
 
-    statusChanged: (slug: string, vendorId: string, status: string) => {
-      revalidateTag(productKeys.tags.detail(slug), "max");
+    statusChanged: (productId: string, vendorId: string, status: string) => {
+      revalidateTag(productKeys.tags.detail(productId), "max");
       revalidateTag(
         productKeys.tags.byVendorAndStatus(vendorId, status),
         "max",
@@ -27,8 +27,8 @@ export const invalidate = {
       revalidateTag(productKeys.tags.lists(), "max");
     },
 
-    sold: (slug: string, vendorId: string) => {
-      revalidateTag(productKeys.tags.detail(slug), "max");
+    sold: (productId: string, vendorId: string) => {
+      revalidateTag(productKeys.tags.detail(productId), "max");
       revalidateTag(productKeys.tags.byVendor(vendorId), "max");
     },
   },

@@ -1,6 +1,6 @@
 "use client";
 
-import { type LucideIcon } from "lucide-react";
+import { Settings, Truck, type LucideIcon } from "lucide-react";
 
 import {
   SidebarGroup,
@@ -8,31 +8,35 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useParams } from "next/navigation";
+import Link from "next/link";
 
-export function NavMain({
-  items,
-}: {
-  items: {
-    title: string;
-    url: string;
-    icon: LucideIcon;
-    isActive?: boolean;
-    items?: {
-      title: string;
-      url: string;
-    }[];
-  }[];
-}) {
+const items = [
+  {
+    title: "Orders",
+    url: "orders",
+    icon: Truck,
+  },
+  {
+    title: "Settings",
+    url: "settings",
+    icon: Settings,
+  },
+];
+
+export function NavMain() {
+  const { userId } = useParams<{ userId: string }>();
+
   return (
     <SidebarGroup>
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton asChild>
-              <a href={item.url}>
+              <Link href={`/user/${userId}/${item.url}`}>
                 <item.icon />
                 <span>{item.title}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}

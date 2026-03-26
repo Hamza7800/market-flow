@@ -1,6 +1,6 @@
 "use client";
 
-import { Command, User } from "lucide-react";
+import { Command, Truck, User } from "lucide-react";
 
 import {
   Sidebar,
@@ -15,22 +15,6 @@ import { NavMain } from "@/app/(root)/user/_components/app-main";
 import { NavUser } from "@/components/nav-user";
 import Link from "next/link";
 import type { ComponentProps } from "react";
-
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "User Profile",
-      url: "#",
-      icon: User,
-      isActive: true,
-    },
-  ],
-};
 
 export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
   return (
@@ -52,7 +36,7 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

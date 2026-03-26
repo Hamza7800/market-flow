@@ -11,9 +11,16 @@ import {
   Bell,
   LogOut,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export function NavUser() {
   const { data } = authClient.useSession();
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsLoaded(true);
+  }, [data]);
+
   return (
     <Dropdown>
       {/* TRIGGER */}

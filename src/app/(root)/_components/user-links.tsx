@@ -32,7 +32,7 @@ const UserLinks = () => {
             <>
               <Dropdown.Item
                 onClick={() => {
-                  router.push(`/user/${data.user?.id}`);
+                  router.push(`/user/${data.user?.id}/orders`);
                 }}
                 id="profile"
                 textValue="Profile"

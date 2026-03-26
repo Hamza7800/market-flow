@@ -25,3 +25,5 @@ export const returnError = (error: any, message: string) => {
     data: null,
   };
 };
+
+export const formatMoney = (value: string) => `$${Number(value).toFixed(2)}`;
