@@ -15,6 +15,13 @@
       "when": 1774350550968,
       "tag": "0001_wealthy_mattie_franklin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1774593059650,
+      "tag": "0002_lucky_blue_blade",
+      "breakpoints": true
     }
   ]
 }

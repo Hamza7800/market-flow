@@ -8,7 +8,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Receipt, ShoppingBag } from "@gravity-ui/icons";
-import { List, Settings2, Truck } from "lucide-react";
+import { DollarSign, List, Settings2, Truck } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -27,6 +27,11 @@ const items = [
     title: "Orders",
     url: "orders",
     icon: Truck,
+  },
+  {
+    title: "Refunds",
+    url: "refunds?status=pending",
+    icon: DollarSign,
   },
   {
     title: "Stripe",

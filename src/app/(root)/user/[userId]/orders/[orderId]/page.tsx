@@ -4,8 +4,9 @@ import { ErrorState } from "@/components/error-state";
 import { LoadingState } from "@/components/loading-state";
 import { useUserOrdersDetails } from "@/hooks/use-orders";
 import { formatMoney } from "@/lib/utils";
-import { Card, Chip, Separator } from "@heroui/react";
+import { Button, Card, Chip, Separator } from "@heroui/react";
 import { AlertCircle } from "lucide-react";
+import CancelOrder from "@/app/(root)/user/_components/cancel-order";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -22,6 +23,8 @@ const getStatusColor = (status: string) => {
 
 const OrderDetails = () => {
   const { data, isPending, isError, error, refetch } = useUserOrdersDetails();
+
+  console.log(data);
 
   if (isPending) {
     return <LoadingState />;
@@ -55,17 +58,10 @@ const OrderDetails = () => {
       <Card>
         <Card.Header className="">
           <div className="flex gap-2">
-            <Chip color={getStatusColor(data.status)} variant="primary">
-              {data.status}
-            </Chip>
+            {/* <Chip variant="primary">{data?.isPaid ? "paid" : "unpaid"}</Chip> */}
 
-            <Chip
-              color={
-                data.payment?.status === "succeeded" ? "success" : "warning"
-              }
-              variant="soft"
-            >
-              {data.payment?.status || "unpaid"}
+            <Chip color={data?.isPaid ? "success" : "warning"} variant="soft">
+              {data?.isPaid ? "paid" : "unpaid"}
             </Chip>
           </div>
         </Card.Header>
@@ -135,9 +131,11 @@ const OrderDetails = () => {
                     {formatMoney(item.unitPrice)} each
                   </p>
 
-                  <Chip size="sm" variant="soft" className="mt-2">
+                  <Chip size="sm" variant="soft" className="my-2">
                     {item.status}
                   </Chip>
+                  {["pending", "processing"].includes(item.status) &&
+                    data.isPaid && <CancelOrder orderId={data.id} />}
                 </div>
               </div>
             );
@@ -197,6 +195,36 @@ const OrderDetails = () => {
           </Card.Content>
         </Card>
       </div>
+      <>
+        <div>
+          <h3 className="font-semibold">Refunds</h3>
+        </div>
+
+        <Card.Content className="space-y-1 text-sm">
+          {data.refunds.length ? (
+            data.refunds.map((refund) => {
+              return (
+                <Card key={refund.id}>
+                  <Card.Header>
+                    <Chip className="w-fit">{refund.status}</Chip>
+                  </Card.Header>
+                  <Card.Content>
+                    <img
+                      src={refund.orderItem?.imageUrl ?? ""}
+                      alt={refund.orderItem?.product.name}
+                      className="h-20 w-20 rounded-xl object-cover"
+                    />
+                    {refund.orderItem?.product.name}
+                  </Card.Content>
+                  <Card.Footer>{refund.reason}</Card.Footer>
+                </Card>
+              );
+            })
+          ) : (
+            <h2>No Refunds Request</h2>
+          )}
+        </Card.Content>
+      </>
     </div>
   );
 };

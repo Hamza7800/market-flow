@@ -470,6 +470,7 @@ export const orders = createTable(
     ),
     discountCodeUsed: text("discount_code_used"),
     paidAt: timestamp("paid_at", { withTimezone: true }),
+    isPaid: boolean("is_paid").default(false).notNull(),
     createdAt,
     updatedAt,
     ...softDelete,

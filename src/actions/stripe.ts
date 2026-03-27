@@ -2,7 +2,8 @@
 
 import { env } from "@/env";
 import { cacheDel } from "@/lib/cache-helpers";
-import { vendorKeys } from "@/lib/cache-keys";
+import { orderKeys, vendorKeys } from "@/lib/cache-keys";
+import { deriveOrderStatus, returnError } from "@/lib/utils";
 import { stripeClient } from "@/server/better-auth/config";
 import { getUser } from "@/server/better-auth/server";
 import { db } from "@/server/db";
@@ -11,10 +12,11 @@ import {
   orderItems,
   orders,
   payments,
+  refunds,
   vendorProfiles,
   vendorTransfers,
 } from "@/server/db/schema";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNull } from "drizzle-orm";
 import type Stripe from "stripe";
 
 export const requireVendorProfile = async () => {
@@ -343,6 +345,7 @@ export const handlePaymentSucceeded = async (pi: Stripe.PaymentIntent) => {
       .set({
         status: "paid",
         paidAt: new Date(),
+        isPaid: true,
         updatedAt: new Date(),
       })
       .where(eq(orders.id, orderId));
@@ -522,3 +525,384 @@ export const handlePaymentFailed = async (pi: Stripe.PaymentIntent) => {
 
   console.log(`[webhook] Payment failed for order ${orderId}`);
 };
+
+export const requestItemRefund = async (orderItemId: string) => {
+  try {
+    const user = await getUser();
+
+    const item = await db.query.orderItems.findFirst({
+      where: eq(orderItems.id, orderItemId),
+      with: {
+        order: {
+          columns: {
+            id: true,
+            userId: true,
+            isPaid: true,
+            total: true,
+          },
+          with: {
+            items: {
+              columns: { id: true, status: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!item) {
+      return {
+        message: "Order item not found",
+        success: false,
+        data: null,
+      };
+    }
+
+    if (item.order.userId !== user.id) {
+      return {
+        message: "Access denied",
+        data: null,
+        success: false,
+      };
+    }
+
+    if (!item.order.isPaid) {
+      return {
+        success: false,
+        message: "Order has not been paid",
+        data: null,
+      };
+    }
+
+    const CANCELLABLE = ["pending", "processing"] as const;
+    if (!CANCELLABLE.includes(item.status as any)) {
+      const message =
+        item.status === "shipped"
+          ? "This item has already shipped and cannot be cancelled"
+          : item.status === "delivered"
+            ? "This item has been delivered and cannot be cancelled"
+            : item.status === "cancelled"
+              ? "This item is already cancelled"
+              : item.status === "refunded"
+                ? "This item has already been refunded"
+                : "This item cannot be cancelled";
+
+      return {
+        success: false,
+        data: null,
+        message,
+      };
+    }
+
+    const existingRefund = await db.query.refunds.findFirst({
+      where: and(
+        eq(refunds.orderItemId, orderItemId),
+        eq(refunds.status, "pending"),
+      ),
+      columns: { id: true },
+    });
+
+    if (existingRefund) {
+      return {
+        success: false,
+        data: null,
+        message: "A refund request for this item is already pending",
+      };
+    }
+
+    const updatedStatuses = item.order.items.map((i) =>
+      i.id === orderItemId ? "cancelled" : i.status,
+    );
+
+    const newOrderStatus = deriveOrderStatus(updatedStatuses);
+    await db.transaction(async (tx) => {
+      await tx
+        .update(orderItems)
+        .set({
+          status: "cancelled",
+          updatedAt: new Date(),
+        })
+        .where(eq(orderItems.id, orderItemId));
+
+      await tx
+        .update(orders)
+        .set({
+          status: newOrderStatus,
+          updatedAt: new Date(),
+        })
+        .where(eq(orders.id, item.orderId));
+
+      await tx.insert(refunds).values({
+        orderId: item.orderId,
+        orderItemId,
+        stripeRefundId: null,
+        amount: Number(item.totalPrice).toFixed(2),
+        reason: "Customer requested cancellation",
+        status: "pending",
+      });
+    });
+
+    cacheDel(
+      orderKeys.tags.detail(item.orderId),
+      orderKeys.tags.byUser(user.id),
+      orderKeys.tags.byVendor(item.vendorId),
+    );
+
+    return {
+      success: true,
+      message:
+        "Refund requested. The vendor will review and process your refund.",
+      data: null,
+    };
+  } catch (error) {
+    return returnError(error, "Unable to request refund");
+  }
+};
+
+const getVendor = async (userId: string) => {
+  const vendor = await db.query.vendorProfiles.findFirst({
+    where: and(
+      eq(vendorProfiles.userId, userId),
+      eq(vendorProfiles.status, "active"),
+      isNull(vendorProfiles.deletedAt),
+    ),
+    columns: { id: true },
+  });
+  return vendor;
+};
+
+export const approveItemRefund = async (refundId: string) => {
+  try {
+    const user = await getUser();
+    const vendor = await getVendor(user.id);
+
+    if (!vendor) {
+      return {
+        success: false,
+        message: "Vendor profile not found",
+        data: null,
+      };
+    }
+
+    const refund = await db.query.refunds.findFirst({
+      where: and(eq(refunds.id, refundId), eq(refunds.status, "pending")),
+      with: {
+        orderItem: {
+          columns: {
+            id: true,
+            vendorId: true,
+            totalPrice: true,
+            status: true,
+          },
+        },
+        order: {
+          with: {
+            payment: {
+              columns: {
+                stripePaymentIntentId: true,
+                status: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!refund) {
+      return {
+        success: false,
+        message: "Refund request not found or already processed",
+        data: null,
+      };
+    }
+
+    if (refund.orderItem?.vendorId !== vendor.id) {
+      return {
+        success: false,
+        message: "Access denied",
+        data: null,
+      };
+    }
+
+    if (!refund.order.payment || refund.order.payment.status !== "succeeded") {
+      return {
+        success: false,
+        message: "No successful payment found for this order",
+        data: null,
+      };
+    }
+
+    const refundAmountCents = Math.round(Number(refund.amount) * 100);
+
+    const stripeRefund = await stripeClient.refunds.create({
+      payment_intent: refund.order.payment.stripePaymentIntentId,
+      amount: refundAmountCents,
+      reason: "requested_by_customer",
+      metadata: {
+        orderId: refund.orderId,
+        orderItemId: refund.orderItemId ?? "",
+        vendorId: vendor.id,
+        refundId,
+      },
+    });
+
+    await db
+      .update(refunds)
+      .set({
+        stripeRefundId: stripeRefund.id,
+        status: "succeeded",
+        updatedAt: new Date(),
+      })
+      .where(eq(refunds.id, refundId));
+
+    cacheDel(
+      orderKeys.tags.detail(refund.orderId),
+      orderKeys.tags.byVendor(vendor.id),
+    );
+
+    return {
+      success: true,
+      data: null,
+      message:
+        "Refund approved. Customer will receive funds in 5–10 business days.",
+    };
+  } catch (error) {
+    return returnError(error, "Unable to approve refund");
+  }
+};
+
+export const rejectItemRefund = async (refundId: string, reason?: string) => {
+  try {
+    const user = await getUser();
+    const vendor = await getVendor(user.id);
+
+    if (!vendor) {
+      return {
+        success: false,
+        message: "Vendor profile not found",
+        data: null,
+      };
+    }
+
+    const refund = await db.query.refunds.findFirst({
+      where: and(eq(refunds.id, refundId), eq(refunds.status, "pending")),
+      with: {
+        orderItem: {
+          columns: { id: true, vendorId: true },
+        },
+        order: {
+          with: {
+            items: { columns: { id: true, status: true } },
+          },
+        },
+      },
+    });
+
+    if (!refund) {
+      return {
+        success: false,
+        message: "Refund request not found or already processed",
+        data: null,
+      };
+    }
+
+    if (refund.orderItem?.vendorId !== vendor.id) {
+      return {
+        success: false,
+        message: "Access denied",
+        data: null,
+      };
+    }
+
+    const restoredStatuses = refund.order.items.map((i) =>
+      i.id === refund.orderItemId ? "processing" : i.status,
+    );
+
+    const newOrderStatus = deriveOrderStatus(restoredStatuses as any);
+
+    await db.transaction(async (tx) => {
+      await tx
+        .update(refunds)
+        .set({
+          status: "failed",
+          reason: reason?.trim() || "Refund request rejected by vendor",
+          updatedAt: new Date(),
+        })
+        .where(eq(refunds.id, refundId));
+
+      if (refund.orderItemId) {
+        await tx
+          .update(orderItems)
+          .set({ status: "processing", updatedAt: new Date() })
+          .where(eq(orderItems.id, refund.orderItemId));
+      }
+
+      await tx
+        .update(orders)
+        .set({ status: newOrderStatus, updatedAt: new Date() })
+        .where(eq(orders.id, refund.orderId));
+    });
+
+    cacheDel(
+      orderKeys.tags.detail(refund.orderId),
+      orderKeys.tags.byVendor(vendor.id),
+    );
+
+    return {
+      success: true,
+      data: null,
+      message: "Refund request rejected.",
+    };
+  } catch (error) {
+    return returnError(error, "Unable to reject refund");
+  }
+};
+
+export async function getVendorRefundRequests(
+  status: "pending" | "succeeded" | "failed" | "refunded",
+) {
+  try {
+    const user = await getUser();
+
+    const vendor = await getVendor(user.id);
+    if (!vendor)
+      return {
+        message: "Vendor profile not found",
+        data: null,
+        success: false,
+      };
+
+    const pending = await db
+      .select({
+        refund: refunds,
+        orderItem: {
+          id: orderItems.id,
+          productName: orderItems.productName,
+          variantName: orderItems.variantName,
+          quantity: orderItems.quantity,
+          totalPrice: orderItems.totalPrice,
+          imageUrl: orderItems.imageUrl,
+        },
+        order: {
+          id: orders.id,
+          createdAt: orders.createdAt,
+        },
+      })
+      .from(refunds)
+      .innerJoin(orderItems, eq(refunds.orderItemId, orderItems.id))
+      .innerJoin(orders, eq(refunds.orderId, orders.id))
+      .where(
+        and(eq(refunds.status, status), eq(orderItems.vendorId, vendor.id)),
+      )
+      .orderBy(desc(refunds.createdAt));
+
+    const vendorRefunds = pending.filter((r) => r.orderItem !== null);
+
+    return {
+      data: vendorRefunds,
+      message: "Refund requests fetched",
+      success: true,
+    };
+  } catch (error) {
+    return returnError(error, "Unable to fetch refund requests");
+  }
+}

@@ -88,6 +88,21 @@ export const getUserOrderDetails = async (orderId: string) => {
                 status: true,
                 createdAt: true,
               },
+              with: {
+                orderItem: {
+                  columns: {
+                    imageUrl: true,
+                  },
+                  with: {
+                    product: {
+                      columns: {
+                        name: true,
+                        id: true,
+                      },
+                    },
+                  },
+                },
+              },
             },
             discountCode: {
               columns: { code: true, type: true, value: true },

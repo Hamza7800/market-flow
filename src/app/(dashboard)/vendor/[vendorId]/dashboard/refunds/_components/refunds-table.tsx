@@ -3,7 +3,7 @@
 import type { SortDescriptor } from "@heroui/react";
 import type { SortingState } from "@tanstack/react-table";
 
-import { Chip, Pagination, Table } from "@heroui/react";
+import { Button, Chip, EmptyState, Pagination, Table, cn } from "@heroui/react";
 import {
   createColumnHelper,
   flexRender,
@@ -13,84 +13,140 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
-import type { OrdersType } from "@/actions/orders";
-import { useRouter } from "nextjs-toploader/app";
-import { useParams } from "next/navigation";
-import { formatMoney } from "@/lib/utils";
+import RejectRefund from "@/app/(dashboard)/vendor/[vendorId]/dashboard/refunds/_components/reject-refund";
+import ApproveRefund from "@/app/(dashboard)/vendor/[vendorId]/dashboard/refunds/_components/approve-refund";
+import { FloppyDisk } from "@gravity-ui/icons";
 
-type Orders = NonNullable<OrdersType["data"]>;
-type Order = Orders[number];
+// ---------------- TYPES ----------------
+interface RefundRow {
+  refund: {
+    id: string;
+    amount: string;
+    reason: string;
+    status: string;
+    createdAt: string;
+  };
+  orderItem: {
+    productName: string;
+    variantName: string;
+    quantity: number;
+    totalPrice: string;
+    imageUrl: string;
+  };
+  order: {
+    id: string;
+    createdAt: string;
+  };
+}
 
-const parseAddress = (snapshot: string) => {
-  try {
-    const data = JSON.parse(snapshot);
-    return data.city || "—";
-  } catch {
-    return "—";
-  }
-};
+// ---------------- HELPERS ----------------
+const formatMoney = (v: string) => `$${Number(v).toFixed(2)}`;
 
 const statusColorMap: Record<string, any> = {
   pending: "warning",
-  paid: "success",
-  failed: "danger",
+  approved: "success",
+  rejected: "danger",
 };
 
-const columnHelper = createColumnHelper<Order>();
+// ---------------- COLUMNS ----------------
+const columnHelper = createColumnHelper<RefundRow>();
 
 const columns = [
-  columnHelper.accessor("createdAt", {
-    header: "Date",
-    cell: (info) => new Date(info.getValue()).toLocaleDateString(),
+  columnHelper.accessor((row) => row.orderItem, {
+    id: "product",
+    header: "Product",
+    cell: (info) => {
+      const item = info.getValue();
+      return (
+        <div className="flex items-center gap-3">
+          <img
+            src={item.imageUrl}
+            className="h-12 w-12 rounded-lg object-cover"
+          />
+          <div>
+            <p className="text-sm font-medium">{item.productName}</p>
+            <p className="text-default-500 text-xs">{item.variantName}</p>
+          </div>
+        </div>
+      );
+    },
   }),
 
-  columnHelper.accessor("shippingAddressSnapshot", {
-    header: "City",
-    cell: (info) => parseAddress(info.getValue()),
+  columnHelper.accessor((row) => row.order.id, {
+    id: "order",
+    header: "Order",
+    cell: (info) => (
+      <span className="font-mono text-xs">
+        {info.getValue().slice(0, 8)}...
+      </span>
+    ),
   }),
 
-  columnHelper.accessor("total", {
-    header: "Total",
+  columnHelper.accessor((row) => row.refund.amount, {
+    id: "amount",
+    header: "Amount",
     cell: (info) => formatMoney(info.getValue()),
   }),
 
-  columnHelper.accessor("isPaid", {
-    header: "Order Status",
+  columnHelper.accessor((row) => row.orderItem.quantity, {
+    id: "qty",
+    header: "Qty",
+  }),
+
+  columnHelper.accessor((row) => row.refund.reason, {
+    id: "reason",
+    header: "Reason",
+    cell: (info) => (
+      <p className="max-w-[200px] truncate text-sm">{info.getValue()}</p>
+    ),
+  }),
+
+  columnHelper.accessor((row) => row.refund.status, {
+    id: "status",
+    header: "Status",
     cell: (info) => (
       <Chip
-        // color={statusColorMap[info.getValue()] || "default"}
         size="sm"
         variant="soft"
+        color={statusColorMap[info.getValue()] || "default"}
       >
-        {info.getValue() ? "paid" : "unpaid"}
+        {info.getValue()}
       </Chip>
     ),
   }),
 
-  columnHelper.accessor((row) => row.payment?.status || "unpaid", {
-    id: "payment",
-    header: "Payment",
+  // ---------------- ACTIONS ----------------
+  columnHelper.display({
+    id: "actions",
+    header: "Actions",
     cell: (info) => {
-      const value = info.getValue();
+      const row = info.row.original;
+      const isPending = row.refund.status === "pending";
+      if (!isPending) {
+        return;
+      }
       return (
-        <Chip
-          color={
-            value === "succeeded"
-              ? "success"
-              : value === "pending"
-                ? "warning"
-                : "danger"
-          }
-          size="sm"
-          variant="secondary"
-        >
-          {value}
-        </Chip>
+        <div className="flex gap-2">
+          <ApproveRefund refundId={row.refund.id} />
+          <RejectRefund refundId={row.refund.id} />
+        </div>
       );
     },
   }),
 ];
 
+// ---------------- ACTION HANDLERS ----------------
+const handleApprove = (id: string) => {
+  console.log("Approve refund:", id);
+  // call mutation here
+};
+
+const handleReject = (id: string) => {
+  console.log("Reject refund:", id);
+  // call mutation here
+};
+
+// ---------------- SORT BRIDGE ----------------
 function toSortDescriptor(sorting: SortingState): SortDescriptor | undefined {
   const first = sorting[0];
   if (!first) return undefined;
@@ -110,24 +166,23 @@ function toSortingState(descriptor: SortDescriptor): SortingState {
   ];
 }
 
-const PAGE_SIZE = 20;
+// ---------------- COMPONENT ----------------
+const PAGE_SIZE = 5;
 
-const OrdersTable = ({ orders }: { orders: Orders }) => {
+export function RefundsTable({ data }: { data: any }) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const { userId } = useParams<{ userId: string }>();
-  const router = useRouter();
 
   const table = useReactTable({
+    data,
     columns,
-    data: orders,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    state: { sorting },
+    onSortingChange: setSorting,
     initialState: {
       pagination: { pageSize: PAGE_SIZE },
     },
-    state: { sorting },
-    onSortingChange: setSorting,
   });
 
   const sortDescriptor = useMemo(() => toSortDescriptor(sorting), [sorting]);
@@ -136,25 +191,16 @@ const OrdersTable = ({ orders }: { orders: Orders }) => {
   const pageCount = table.getPageCount();
   const pages = Array.from({ length: pageCount }, (_, i) => i + 1);
 
-  const start = pageIndex * PAGE_SIZE + 1;
-  const end = Math.min((pageIndex + 1) * PAGE_SIZE, orders.length);
-
   return (
     <Table>
       <Table.ScrollContainer>
         <Table.Content
-          aria-label="User Orders"
-          className="min-w-[700px]"
-          onRowAction={(key) => {
-            const row = table.getRowModel().rows.find((r) => r.id === key);
-            if (!row) return;
-            router.push(`/user/${userId}/orders/${row.original.id}`);
-          }}
+          aria-label="Refunds Table"
           sortDescriptor={sortDescriptor}
           onSortChange={(d) => setSorting(toSortingState(d))}
         >
           <Table.Header>
-            {table.getHeaderGroups()[0]!.headers.map((header) => (
+            {table?.getHeaderGroups()[0]!.headers.map((header) => (
               <Table.Column
                 key={header.id}
                 isRowHeader
@@ -167,28 +213,24 @@ const OrdersTable = ({ orders }: { orders: Orders }) => {
                       header.column.columnDef.header,
                       header.getContext(),
                     )}
-                    {/* {!!sortDirection && (
-                      <Icon
-                        icon="gravity-ui:chevron-up"
-                        className={cn(
-                          "size-3 transition-transform",
-                          sortDirection === "descending" && "rotate-180"
-                        )}
-                      />
-                    )} */}
                   </span>
                 )}
               </Table.Column>
             ))}
           </Table.Header>
 
-          <Table.Body>
+          <Table.Body
+            renderEmptyState={() => {
+              return (
+                <EmptyState className="mt-6 flex h-full w-full flex-col items-center justify-center gap-4 text-center">
+                  <FloppyDisk />
+                  <span className="text-muted text-sm">No results found</span>
+                </EmptyState>
+              );
+            }}
+          >
             {table.getRowModel().rows.map((row) => (
-              <Table.Row
-                // href={`/user/${userId}/orders/${row.original.id}`}
-                key={row.id}
-                id={row.id}
-              >
+              <Table.Row key={row.id} id={row.id}>
                 {row.getVisibleCells().map((cell) => (
                   <Table.Cell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -202,17 +244,13 @@ const OrdersTable = ({ orders }: { orders: Orders }) => {
 
       <Table.Footer>
         <Pagination size="sm">
-          <Pagination.Summary>
-            {start} to {end} of {orders.length} orders
-          </Pagination.Summary>
-
           <Pagination.Content>
             <Pagination.Item>
               <Pagination.Previous
                 isDisabled={!table.getCanPreviousPage()}
                 onPress={() => table.previousPage()}
               >
-                Prev
+                Previous
               </Pagination.Previous>
             </Pagination.Item>
 
@@ -240,6 +278,4 @@ const OrdersTable = ({ orders }: { orders: Orders }) => {
       </Table.Footer>
     </Table>
   );
-};
-
-export default OrdersTable;
+}
