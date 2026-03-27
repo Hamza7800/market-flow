@@ -74,3 +74,28 @@ export function deriveOrderStatus(
   // Everything is pending — order was just paid
   return "processing";
 }
+
+export function getPageItems(page: number, totalPages: number) {
+  const pages: Array<number | "..."> = [];
+
+  const add = (item: number | "...") => {
+    const last = pages[pages.length - 1];
+    if (item === "..." && last === "...") return;
+    pages.push(item);
+  };
+
+  add(1);
+
+  const start = Math.max(2, page - 1);
+  const end = Math.min(totalPages - 1, page + 1);
+
+  if (start > 2) add("...");
+
+  for (let p = start; p <= end; p++) add(p);
+
+  if (end < totalPages - 1) add("...");
+
+  if (totalPages > 1) add(totalPages);
+
+  return pages;
+}

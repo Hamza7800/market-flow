@@ -6,7 +6,7 @@ export const getSession = cache(async () =>
   auth.api.getSession({ headers: await headers() }),
 );
 
-export const getUser = async () => {
+export const getUser = cache(async () => {
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session?.user || !session?.user.id) {
@@ -14,4 +14,4 @@ export const getUser = async () => {
   }
 
   return session.user;
-};
+});

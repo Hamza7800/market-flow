@@ -1,16 +1,35 @@
 import {
   createProduct,
   deleteProduct,
+  getVendorProducts,
   updateProduct,
   updateProductStatus,
 } from "@/actions/products";
 import { productKeys } from "@/lib/cache-keys";
+import type { ProductStatus } from "@/lib/nuqs";
 import type {
   CreateProductSchema,
   UpdateProductSchema,
 } from "@/zod-schema/product-schema";
 import { toast } from "@heroui/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+export const useVendorProducts = (
+  vendorId: string,
+  page: number,
+  status: ProductStatus,
+) => {
+  return useQuery({
+    queryKey: [...productKeys.byVendorAndStatus(vendorId, status), page],
+    queryFn: async () => {
+      const result = await getVendorProducts(status, page);
+      if (!result.success) {
+        throw new Error(result.message);
+      }
+      return result;
+    },
+  });
+};
 
 export const useCreateProduct = (vendorId: string) => {
   const qc = useQueryClient();

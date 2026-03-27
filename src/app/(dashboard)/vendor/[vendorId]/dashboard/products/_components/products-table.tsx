@@ -3,19 +3,25 @@
 import { Button, Card, Chip, Input, Pagination, Table } from "@heroui/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo } from "react";
 import { useQueryStates } from "nuqs";
 import { productSearchParams, type ProductStatus } from "@/lib/nuqs";
-import type { VendorProducts } from "@/actions/products";
-import { LinkButton } from "@/components/link-button";
+import { useVendorProducts } from "@/hooks/use-product";
+import { LoadingState } from "@/components/loading-state";
+import { EmptyState } from "@/components/empty-state";
+import { AlertCircle } from "lucide-react";
+import { useRouter } from "nextjs-toploader/app";
+import { getPageItems } from "@/lib/utils";
 
-const STATUS_LABELS: Record<ProductStatus, string> = {
+export const STATUS_LABELS: Record<ProductStatus, string> = {
   active: "Active",
   draft: "Draft",
   archived: "Archived",
 };
 
-const STATUS_COLOR: Record<ProductStatus, "success" | "warning" | "default"> = {
+export const STATUS_COLOR: Record<
+  ProductStatus,
+  "success" | "warning" | "default"
+> = {
   active: "success",
   draft: "warning",
   archived: "default",
@@ -23,47 +29,21 @@ const STATUS_COLOR: Record<ProductStatus, "success" | "warning" | "default"> = {
 
 const PAGE_SIZE = 10;
 
-function getPageItems(page: number, totalPages: number) {
-  const pages: Array<number | "..."> = [];
-
-  const add = (item: number | "...") => {
-    const last = pages[pages.length - 1];
-    if (item === "..." && last === "...") return;
-    pages.push(item);
-  };
-
-  add(1);
-
-  const start = Math.max(2, page - 1);
-  const end = Math.min(totalPages - 1, page + 1);
-
-  if (start > 2) add("...");
-
-  for (let p = start; p <= end; p++) add(p);
-
-  if (end < totalPages - 1) add("...");
-
-  if (totalPages > 1) add(totalPages);
-
-  return pages;
-}
-
 export default function ProductsTable({
   vendorId,
   status,
   page,
-  result,
 }: {
   vendorId: string;
   status: ProductStatus;
   page: number;
-  result: VendorProducts;
 }) {
-  const items = result.data ?? [];
-  const totalItems = result?.meta?.totalCount ?? items.length;
-  const totalPages =
-    result?.meta?.totalPages ?? Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
-
+  const router = useRouter();
+  const { data: products, isPending } = useVendorProducts(
+    vendorId,
+    page,
+    status,
+  );
   const [{ status: urlStatus, page: urlPage }, setQuery] = useQueryStates(
     productSearchParams,
     {
@@ -72,20 +52,42 @@ export default function ProductsTable({
     },
   );
 
+  const items = products?.data;
+
+  if (isPending) {
+    return <LoadingState label="Products" />;
+  }
+
+  if (!items?.length) {
+    return (
+      <EmptyState
+        icon={AlertCircle}
+        title="No Products"
+        description="No product available yet"
+        action={{
+          label: "Create",
+          onClick: () => {
+            router.push(`/vendor/${vendorId}/dashboard/products/form`);
+          },
+        }}
+      />
+    );
+  }
+
+  // const items = result.data ?? [];
+  const totalItems = products?.meta?.totalCount ?? items.length;
+  const totalPages =
+    products?.meta?.totalPages ??
+    Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+
   const activeStatus = urlStatus ?? status;
+
   const activePage = urlPage ?? page;
 
   const start = totalItems === 0 ? 0 : (activePage - 1) * PAGE_SIZE + 1;
   const end = Math.min(activePage * PAGE_SIZE, totalItems);
 
-  const pageItems = useMemo(
-    () => getPageItems(activePage, totalPages),
-    [activePage, totalPages],
-  );
-
-  const setStatus = (nextStatus: ProductStatus) => {
-    setQuery({ status: nextStatus, page: 1 });
-  };
+  const pageItems = getPageItems(activePage, totalPages);
 
   const setPage = (nextPage: number) => {
     setQuery({ page: nextPage });
@@ -93,68 +95,41 @@ export default function ProductsTable({
 
   return (
     <div className="space-y-6">
-      <Card className="">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap items-center gap-2">
-            <Chip>Products</Chip>
-            <Chip color={STATUS_COLOR[activeStatus]}>
-              {STATUS_LABELS[activeStatus]}
-            </Chip>
-          </div>
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <Card className="border-default-200 border p-4 shadow-none">
+          <p className="text-default-500 text-xs tracking-wide uppercase">
+            Total products
+          </p>
+          <p className="mt-2 text-2xl font-semibold">{totalItems}</p>
+        </Card>
 
-          <LinkButton href={`/vendor/${vendorId}/dashboard/products/form`}>
-            Create product
-          </LinkButton>
-        </div>
+        <Card className="border-default-200 border p-4 shadow-none">
+          <p className="text-default-500 text-xs tracking-wide uppercase">
+            Current page
+          </p>
+          <p className="mt-2 text-2xl font-semibold">
+            {activePage} / {totalPages}
+          </p>
+        </Card>
 
-        <div className="mt-5 flex flex-wrap gap-2">
-          {(["active", "draft", "archived"] as const).map((item) => {
-            const selected = item === activeStatus;
+        <Card className="border-default-200 border p-4 shadow-none">
+          <p className="text-default-500 text-xs tracking-wide uppercase">
+            Showing
+          </p>
+          <p className="mt-2 text-2xl font-semibold">
+            {start}-{end}
+          </p>
+        </Card>
 
-            return (
-              <Button key={item} size="sm" onPress={() => setStatus(item)}>
-                {STATUS_LABELS[item]}
-              </Button>
-            );
-          })}
-        </div>
-
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <Card className="border-default-200 border p-4 shadow-none">
-            <p className="text-default-500 text-xs tracking-wide uppercase">
-              Total products
-            </p>
-            <p className="mt-2 text-2xl font-semibold">{totalItems}</p>
-          </Card>
-
-          <Card className="border-default-200 border p-4 shadow-none">
-            <p className="text-default-500 text-xs tracking-wide uppercase">
-              Current page
-            </p>
-            <p className="mt-2 text-2xl font-semibold">
-              {activePage} / {totalPages}
-            </p>
-          </Card>
-
-          <Card className="border-default-200 border p-4 shadow-none">
-            <p className="text-default-500 text-xs tracking-wide uppercase">
-              Showing
-            </p>
-            <p className="mt-2 text-2xl font-semibold">
-              {start}-{end}
-            </p>
-          </Card>
-
-          <Card className="border-default-200 border p-4 shadow-none">
-            <p className="text-default-500 text-xs tracking-wide uppercase">
-              Status
-            </p>
-            <p className="text-default-500 mt-2 text-sm">
-              Filtered by {STATUS_LABELS[activeStatus].toLowerCase()}
-            </p>
-          </Card>
-        </div>
-      </Card>
+        <Card className="border-default-200 border p-4 shadow-none">
+          <p className="text-default-500 text-xs tracking-wide uppercase">
+            Status
+          </p>
+          <p className="text-default-500 mt-2 text-sm">
+            Filtered by {STATUS_LABELS[activeStatus].toLowerCase()}
+          </p>
+        </Card>
+      </div>
 
       <Card className="border-default-200 border p-4 sm:p-5">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
