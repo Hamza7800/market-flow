@@ -27,6 +27,7 @@ export const STATUS_COLOR: Record<
   archived: "default",
 };
 
+// TODO: FIX SIZE
 const PAGE_SIZE = 10;
 
 export default function ProductsTable({

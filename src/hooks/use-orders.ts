@@ -1,5 +1,10 @@
-import { getUserOrderDetails, getUserOrders } from "@/actions/orders";
+import {
+  getUserOrderDetails,
+  getUserOrders,
+  getVendorOrders,
+} from "@/actions/orders";
 import { orderKeys } from "@/lib/cache-keys";
+import type { OrderStatus } from "@/lib/nuqs";
 import { authClient } from "@/server/better-auth/client";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
@@ -34,5 +39,22 @@ export const useUserOrdersDetails = () => {
       return result.data;
     },
     enabled: !!orderId,
+  });
+};
+
+export const useVendorOrders = (
+  vendorId: string,
+  status: OrderStatus,
+  page: number,
+) => {
+  return useQuery({
+    queryKey: orderKeys.vendorList(vendorId, status, page),
+    queryFn: async () => {
+      const result = await getVendorOrders(status, page);
+      if (!result.success) {
+        throw new Error(result.message);
+      }
+      return result;
+    },
   });
 };

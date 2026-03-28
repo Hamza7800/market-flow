@@ -7,10 +7,14 @@ import { vendorKeys } from "@/lib/cache-keys";
 import { authClient } from "@/server/better-auth/client";
 import type { StoreSchema } from "@/zod-schema/vendor-profile-schema";
 import { toast } from "@heroui/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext } from "react";
 
 export const useVendorApplication = () => {
+  const qc = useQueryClient();
+  const { data } = authClient.useSession();
+  const userId = data?.user.id;
+
   return useMutation({
     mutationFn: async (values: StoreSchema) => {
       const result = await submitVendorApplication(values);
@@ -19,6 +23,11 @@ export const useVendorApplication = () => {
     },
     onSuccess: (result) => {
       toast.success(result?.message);
+    },
+    onSettled: () => {
+      qc.invalidateQueries({
+        queryKey: vendorKeys.byUser(userId ?? "no-user"),
+      });
     },
     onError: (error) => {
       toast.danger(error?.message);
@@ -42,6 +51,6 @@ export const useVendorProfile = (userId?: string) => {
       if (!result.success) throw new Error(result.message);
       return result.data;
     },
-    enabled: !!userId,
+    // enabled: !!userId,
   });
 };

@@ -2,6 +2,7 @@
 
 import { authClient } from "@/server/better-auth/client";
 import { Dropdown, Label } from "@heroui/react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import {
   ChevronsUpDown,
@@ -11,9 +12,12 @@ import {
   Bell,
   LogOut,
 } from "lucide-react";
+import { useRouter } from "nextjs-toploader/app";
 import { useEffect, useState } from "react";
 
 export function NavUser() {
+  const qc = useQueryClient();
+  const router = useRouter();
   const { data } = authClient.useSession();
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -90,7 +94,15 @@ export function NavUser() {
             </Dropdown.Item>
           </Dropdown.Section>
 
-          <Dropdown.Item id="logout" variant="danger">
+          <Dropdown.Item
+            onClick={async () => {
+              await authClient.signOut();
+              qc.clear();
+              router.replace("/");
+            }}
+            id="logout"
+            variant="danger"
+          >
             <div className="flex items-center gap-2">
               <LogOut size={16} />
               <Label>Log out</Label>

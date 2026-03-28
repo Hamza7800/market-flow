@@ -11,7 +11,9 @@ export type VendorContextValue = {
   isActive: boolean;
   isSuspended: boolean;
   isStripeConnected: boolean;
-  profile: VendorProfileType["data"] | null;
+  isError: boolean;
+  error: { message: string };
+  profile: NonNullable<VendorProfileType["data"]> | null;
   refresh: () => void;
 };
 
@@ -20,7 +22,7 @@ export const VendorContext = createContext<VendorContextValue | null>(null);
 export const VendorProvider = ({ children }: { children: ReactNode }) => {
   const { data: userData } = authClient.useSession();
   const userId = userData?.user.id;
-  const { data, isPending, refetch } = useVendorProfile(userId);
+  const { data, isPending, refetch, isError, error } = useVendorProfile(userId);
 
   const value: VendorContextValue = {
     loading: isPending,
@@ -29,7 +31,11 @@ export const VendorProvider = ({ children }: { children: ReactNode }) => {
     isActive: data?.status === "active",
     isSuspended: data?.status === "suspended",
     isStripeConnected: data?.stripeOnboardingComplete ?? false,
-    profile: data,
+    profile: data ?? null,
+    isError,
+    error: {
+      message: error?.message ?? "No active vendor",
+    },
     refresh: refetch,
   };
 

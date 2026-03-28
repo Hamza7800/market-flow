@@ -17,6 +17,7 @@ import RejectRefund from "@/app/(dashboard)/vendor/[vendorId]/dashboard/refunds/
 import ApproveRefund from "@/app/(dashboard)/vendor/[vendorId]/dashboard/refunds/_components/approve-refund";
 import { FloppyDisk } from "@gravity-ui/icons";
 
+// TODO:FIX TYPES
 // ---------------- TYPES ----------------
 interface RefundRow {
   refund: {
@@ -135,17 +136,6 @@ const columns = [
   }),
 ];
 
-// ---------------- ACTION HANDLERS ----------------
-const handleApprove = (id: string) => {
-  console.log("Approve refund:", id);
-  // call mutation here
-};
-
-const handleReject = (id: string) => {
-  console.log("Reject refund:", id);
-  // call mutation here
-};
-
 // ---------------- SORT BRIDGE ----------------
 function toSortDescriptor(sorting: SortingState): SortDescriptor | undefined {
   const first = sorting[0];
@@ -166,8 +156,7 @@ function toSortingState(descriptor: SortDescriptor): SortingState {
   ];
 }
 
-// ---------------- COMPONENT ----------------
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 
 export function RefundsTable({ data }: { data: any }) {
   const [sorting, setSorting] = useState<SortingState>([]);

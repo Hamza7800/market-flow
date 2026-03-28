@@ -29,7 +29,7 @@ const ProductNavHeader = ({
 
   return (
     <Card className="">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      {/* <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-2">
           <Chip>Products</Chip>
           <Chip color={STATUS_COLOR[activeStatus]}>
@@ -40,14 +40,19 @@ const ProductNavHeader = ({
         <LinkButton href={`/vendor/${vendorId}/dashboard/products/form`}>
           Create product
         </LinkButton>
-      </div>
+      </div> */}
 
       <div className="mt-5 flex flex-wrap gap-2">
         {(["active", "draft", "archived"] as const).map((item) => {
           const selected = item === activeStatus;
 
           return (
-            <Button key={item} size="sm" onPress={() => setStatus(item)}>
+            <Button
+              variant={selected ? "primary" : "secondary"}
+              key={item}
+              size="sm"
+              onPress={() => setStatus(item)}
+            >
               {STATUS_LABELS[item]}
             </Button>
           );

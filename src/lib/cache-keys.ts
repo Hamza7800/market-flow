@@ -210,3 +210,5 @@ export const analyticsKeys = {
     "top-products",
   ],
 };
+
+export const REFUND_REQUESTS_KEY = ["vendor", "refund-requests"] as const;

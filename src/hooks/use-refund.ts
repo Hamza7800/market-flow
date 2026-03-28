@@ -4,7 +4,7 @@ import {
   rejectItemRefund,
   requestItemRefund,
 } from "@/actions/stripe";
-import { orderKeys } from "@/lib/cache-keys";
+import { orderKeys, REFUND_REQUESTS_KEY } from "@/lib/cache-keys";
 import { authClient } from "@/server/better-auth/client";
 import { toast } from "@heroui/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -60,8 +60,6 @@ export const useRequestItemRefund = (orderId: string) => {
     },
   });
 };
-
-const REFUND_REQUESTS_KEY = ["vendor", "refund-requests"] as const;
 
 export function useVendorRefundRequests(
   status: "pending" | "succeeded" | "failed" | "refunded",

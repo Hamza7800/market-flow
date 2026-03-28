@@ -5,8 +5,101 @@ import { orderKeys } from "@/lib/cache-keys";
 import { returnError } from "@/lib/utils";
 import { getUser } from "@/server/better-auth/server";
 import { db } from "@/server/db";
-import { orders } from "@/server/db/schema";
-import { and, eq } from "drizzle-orm";
+import { orderItems, orders, vendorProfiles } from "@/server/db/schema";
+import { and, eq, isNull } from "drizzle-orm";
+import { getVendorProfile } from "@/actions/vendor";
+import type { OrderStatus } from "@/lib/nuqs";
+
+const LIMIT = 20;
+
+export const getVendorOrders = async (
+  status: OrderStatus,
+  page: number = 1,
+) => {
+  try {
+    const user = await getUser();
+    const vendor = await db.query.vendorProfiles.findFirst({
+      where: and(
+        eq(vendorProfiles.userId, user.id),
+        eq(vendorProfiles.status, "active"),
+        isNull(vendorProfiles.deletedAt),
+      ),
+      columns: { id: true },
+    });
+
+    if (!vendor) {
+      return {
+        success: false,
+        data: [],
+        meta: null,
+        message: "You need to be an active vendor",
+      };
+    }
+
+    const offset = (page - 1) * LIMIT;
+
+    const data = await cacheWrap(
+      orderKeys.tags.vendorList(vendor.id, status, page),
+      [
+        orderKeys.tags.byVendor(vendor.id),
+        orderKeys.tags.vendorList(vendor.id, status, page),
+      ],
+      async () => {
+        return await db.query.orderItems.findMany({
+          where: and(
+            eq(orderItems.vendorId, vendor.id),
+            eq(orderItems.status, status),
+          ),
+          limit: LIMIT,
+          offset,
+          orderBy: (oi, { desc }) => [desc(oi.createdAt)],
+          with: {
+            variant: {
+              columns: { id: true, name: true, options: true },
+            },
+            order: {
+              columns: {
+                id: true,
+                isPaid: true,
+                shippingAddressSnapshot: true,
+                createdAt: true,
+                paidAt: true,
+              },
+              with: {
+                refunds: {
+                  where: (r, { eq }) => eq(r.status, "pending"),
+                  columns: {
+                    id: true,
+                    amount: true,
+                    reason: true,
+                    createdAt: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+      },
+      30,
+    );
+
+    return {
+      data: data,
+      success: true,
+      message: "Vendor Orders",
+      meta: {
+        page,
+        limit: LIMIT,
+        hasMore: data.length === LIMIT,
+        status,
+      },
+    };
+  } catch (error) {
+    return returnError(error, "Unable to get vendor orders");
+  }
+};
+
+export type VendorOrders = Awaited<ReturnType<typeof getVendorOrders>>;
 
 export const getUserOrders = async () => {
   try {

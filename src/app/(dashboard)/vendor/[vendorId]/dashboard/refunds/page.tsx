@@ -1,89 +1,62 @@
-"use client";
-
-import { useVendorRefundRequests } from "@/hooks/use-refund";
-import { RefundsTable } from "./_components/refunds-table";
-import { refundSearchParams } from "@/lib/nuqs";
-import { useQueryStates } from "nuqs";
-import { Button } from "@heroui/react";
 import { LoadingState } from "@/components/loading-state";
-import { ErrorState } from "@/components/error-state";
-import { EmptyState } from "@/components/empty-state";
-import { AlertCircle } from "lucide-react";
+import { REFUND_REQUESTS_KEY } from "@/lib/cache-keys";
+import { loadRefundSearchParams, type RefundStatus } from "@/lib/nuqs";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import { Suspense } from "react";
+import RefundsRequest from "./_components/refund-requests";
+import { getVendorRefundRequests } from "@/actions/stripe";
+import RefundNavHeader from "@/app/(dashboard)/vendor/[vendorId]/dashboard/refunds/_components/refund-nav-header";
 
-const STATUS_LABELS: Record<any, string> = {
-  pending: "Pending",
-  succeeded: "succeeded",
-  failed: "failed",
-};
+const Content = async ({
+  vendorId,
+  status,
+  page,
+}: {
+  vendorId: string;
+  page: number;
+  status: RefundStatus;
+}) => {
+  const queryClient = new QueryClient();
 
-const Layout = () => {
-  const [{ status: urlStatus }, setQuery] = useQueryStates(refundSearchParams, {
-    history: "push",
-    shallow: false,
+  await queryClient.prefetchQuery({
+    queryKey: [...REFUND_REQUESTS_KEY, vendorId, status],
+    queryFn: async () => {
+      const result = await getVendorRefundRequests(status);
+      if (!result.success) throw new Error(result.message);
+      return result.data;
+    },
   });
 
-  const activeStatus = urlStatus;
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <RefundsRequest urlStatus={status} />
+    </HydrationBoundary>
+  );
+};
 
-  const setStatus = (nextStatus: any) => {
-    setQuery({ status: nextStatus, page: 1 });
-  };
+type PageProps = {
+  params: Promise<{ vendorId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+const RefundsPage = async ({ params, searchParams }: PageProps) => {
+  const [{ vendorId }, { status, page }] = await Promise.all([
+    params,
+    loadRefundSearchParams(searchParams),
+  ]);
 
   return (
     <div>
-      <div className="mt-5 flex flex-wrap gap-2">
-        {(["pending", "succeeded", "failed"] as const).map((item) => {
-          const selected = item === activeStatus;
-
-          return (
-            <Button key={item} size="sm" onPress={() => setStatus(item)}>
-              {STATUS_LABELS[item]}
-            </Button>
-          );
-        })}
-      </div>
-      <div className="mt-10">
-        <RefundsRequest urlStatus={urlStatus} />
-      </div>
+      <RefundNavHeader status={status} />
+      <Suspense fallback={<LoadingState />}>
+        <Content vendorId={vendorId} status={status} page={page} />
+      </Suspense>
     </div>
   );
 };
 
-const RefundsRequest = ({
-  urlStatus,
-}: {
-  urlStatus: "pending" | "succeeded" | "failed" | "refunded";
-}) => {
-  const { data, isPending, isError, error, refetch } =
-    useVendorRefundRequests(urlStatus);
-
-  if (isPending) {
-    return <LoadingState />;
-  }
-
-  if (isError) {
-    <ErrorState
-      title={"No Requests"}
-      message={error.message}
-      onRetry={refetch}
-      homeHref={"/"}
-    />;
-  }
-
-  // if (!data?.length) {
-  //   return (
-  //     <EmptyState
-  //       icon={AlertCircle}
-  //       title="No Requests"
-  //       description="No Refund Requests Yet"
-  //       action={{
-  //         label: "Refresh",
-  //         onClick: refetch,
-  //       }}
-  //     />
-  //   );
-  // }
-
-  return <RefundsTable data={data} />;
-};
-
-export default Layout;
+export default RefundsPage;

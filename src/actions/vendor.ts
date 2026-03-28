@@ -46,6 +46,7 @@ export const submitVendorApplication = async (values: StoreSchema) => {
         storeSlug: await generateStoreSlug(storeName),
         userId: user.id,
         contactEmail,
+        returnPolicy,
         status: "active",
       })
       .returning();
@@ -76,6 +77,14 @@ export const getVendorProfile = async () => {
       },
       120,
     );
+
+    if (!profile) {
+      return {
+        success: false,
+        data: null,
+        message: "No Active Vendor",
+      };
+    }
 
     return {
       success: true,

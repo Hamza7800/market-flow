@@ -21,6 +21,8 @@ const VendorDashboardGuard = ({
     isSuspended,
     isActive,
     profile,
+    isError,
+    error,
   } = useVendor();
 
   useEffect(() => {
@@ -37,11 +39,11 @@ const VendorDashboardGuard = ({
     );
   }
 
-  if (!isVendor) {
+  if (!isVendor || isError) {
     return (
       <ErrorState
         title={"Not A Vendor"}
-        message={"You are not a vendor"}
+        message={error.message ?? "You are not a vendor"}
         onRetry={refresh}
         homeHref={"/"}
       />

@@ -9,16 +9,20 @@ import {
   ShoppingBasket,
 } from "@gravity-ui/icons";
 import { Button, Dropdown, Label } from "@heroui/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "nextjs-toploader/app";
 
 const UserLinks = () => {
   const router = useRouter();
+  const qc = useQueryClient();
   const { isActive, profile } = useVendor();
   const { data } = authClient.useSession();
   const isAuthenticated = !!data?.user;
 
   const handleSignOut = async () => {
     await authClient.signOut();
+    qc.clear();
+    router.replace("/");
   };
 
   return (
