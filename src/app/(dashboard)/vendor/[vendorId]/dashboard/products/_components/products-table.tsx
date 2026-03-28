@@ -96,42 +96,6 @@ export default function ProductsTable({
 
   return (
     <div className="space-y-6">
-      <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Card className="border-default-200 border p-4 shadow-none">
-          <p className="text-default-500 text-xs tracking-wide uppercase">
-            Total products
-          </p>
-          <p className="mt-2 text-2xl font-semibold">{totalItems}</p>
-        </Card>
-
-        <Card className="border-default-200 border p-4 shadow-none">
-          <p className="text-default-500 text-xs tracking-wide uppercase">
-            Current page
-          </p>
-          <p className="mt-2 text-2xl font-semibold">
-            {activePage} / {totalPages}
-          </p>
-        </Card>
-
-        <Card className="border-default-200 border p-4 shadow-none">
-          <p className="text-default-500 text-xs tracking-wide uppercase">
-            Showing
-          </p>
-          <p className="mt-2 text-2xl font-semibold">
-            {start}-{end}
-          </p>
-        </Card>
-
-        <Card className="border-default-200 border p-4 shadow-none">
-          <p className="text-default-500 text-xs tracking-wide uppercase">
-            Status
-          </p>
-          <p className="text-default-500 mt-2 text-sm">
-            Filtered by {STATUS_LABELS[activeStatus].toLowerCase()}
-          </p>
-        </Card>
-      </div>
-
       <Card className="border-default-200 border p-4 sm:p-5">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Input
@@ -139,9 +103,9 @@ export default function ProductsTable({
             placeholder="Search products..."
           />
 
-          <div className="text-default-500 text-sm">
+          {/* <div className="text-default-500 text-sm">
             {totalItems} {totalItems === 1 ? "product" : "products"}
-          </div>
+          </div> */}
         </div>
 
         <Table variant="secondary" className="w-full">

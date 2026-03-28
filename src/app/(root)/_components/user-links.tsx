@@ -21,7 +21,7 @@ const UserLinks = () => {
 
   const handleSignOut = async () => {
     await authClient.signOut();
-    qc.clear();
+    qc.resetQueries();
     router.replace("/");
   };
 

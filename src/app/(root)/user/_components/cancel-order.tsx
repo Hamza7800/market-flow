@@ -2,7 +2,13 @@ import { ConfirmModal } from "@/components/confirm-modal";
 import { useRequestItemRefund } from "@/hooks/use-refund";
 import { Button } from "@heroui/react";
 
-const CancelOrder = ({ orderId }: { orderId: string }) => {
+const CancelOrder = ({
+  orderId,
+  orderItemId,
+}: {
+  orderItemId: string;
+  orderId: string;
+}) => {
   const requestRefund = useRequestItemRefund(orderId ?? "");
 
   return (
@@ -12,7 +18,7 @@ const CancelOrder = ({ orderId }: { orderId: string }) => {
       confirmText="Cancel"
       isLoading={requestRefund?.isPending}
       onConfirm={(close) => {
-        requestRefund?.mutateAsync(orderId, {
+        requestRefund?.mutateAsync(orderItemId, {
           onSuccess: () => {
             close();
           },

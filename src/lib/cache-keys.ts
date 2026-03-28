@@ -209,6 +209,14 @@ export const analyticsKeys = {
     vendorId,
     "top-products",
   ],
+  tags: {
+    all: () => toTag(["analytics"]),
+    byVendor: (vendorId: string) => toTag(["analytics", "vendor", vendorId]),
+    sales: (vendorId: string, period: string) =>
+      toTag(["analytics", "vendor", vendorId, "sales", period]),
+    topProducts: (vendorId: string) =>
+      toTag(["analytics", "vendor", vendorId, "top-products"]),
+  },
 };
 
 export const REFUND_REQUESTS_KEY = ["vendor", "refund-requests"] as const;

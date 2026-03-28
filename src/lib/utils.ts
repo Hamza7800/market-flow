@@ -99,3 +99,12 @@ export function getPageItems(page: number, totalPages: number) {
 
   return pages;
 }
+
+export function round2(n: number): number {
+  return Math.round(n * 100) / 100;
+}
+
+export function calcDelta(current: number, previous: number): number {
+  if (previous === 0) return current > 0 ? 100 : 0;
+  return Math.round(((current - previous) / previous) * 100);
+}

@@ -97,7 +97,7 @@ export function NavUser() {
           <Dropdown.Item
             onClick={async () => {
               await authClient.signOut();
-              qc.clear();
+              qc.resetQueries();
               router.replace("/");
             }}
             id="logout"

@@ -745,14 +745,24 @@ export const approveItemRefund = async (refundId: string) => {
       },
     });
 
-    await db
-      .update(refunds)
-      .set({
-        stripeRefundId: stripeRefund.id,
-        status: "succeeded",
-        updatedAt: new Date(),
-      })
-      .where(eq(refunds.id, refundId));
+    await db.transaction(async (tx) => {
+      await tx
+        .update(refunds)
+        .set({
+          stripeRefundId: stripeRefund.id,
+          status: "succeeded",
+          updatedAt: new Date(),
+        })
+        .where(eq(refunds.id, refundId));
+
+      await tx
+        .update(orderItems)
+        .set({
+          status: "refunded",
+          updatedAt: new Date(),
+        })
+        .where(eq(orderItems.id, refund.orderItem?.id!));
+    });
 
     cacheDel(
       orderKeys.tags.detail(refund.orderId),

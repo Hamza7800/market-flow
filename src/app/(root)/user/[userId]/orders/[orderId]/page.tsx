@@ -130,12 +130,14 @@ const OrderDetails = () => {
                   <p className="text-default-500 text-xs">
                     {formatMoney(item.unitPrice)} each
                   </p>
-
+                  <p>{item.id}</p>
                   <Chip size="sm" variant="soft" className="my-2">
                     {item.status}
                   </Chip>
                   {["pending", "processing"].includes(item.status) &&
-                    data.isPaid && <CancelOrder orderId={data.id} />}
+                    data.isPaid && (
+                      <CancelOrder orderId={data.id} orderItemId={item.id} />
+                    )}
                 </div>
               </div>
             );
