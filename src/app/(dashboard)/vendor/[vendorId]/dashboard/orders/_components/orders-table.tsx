@@ -13,7 +13,7 @@ import {
 } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 import { useQueryStates } from "nuqs";
-import { orderSearchParams, type OrderStatus } from "@/lib/nuqs";
+import { orderSearchParams, type OrderStatus } from "@/lib/nuqs/nuqs";
 import { useVendorOrders } from "@/hooks/use-orders";
 import type { VendorOrders } from "@/actions/orders";
 import { LoadingState } from "@/components/loading-state";

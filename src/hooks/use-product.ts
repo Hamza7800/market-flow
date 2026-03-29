@@ -6,7 +6,7 @@ import {
   updateProductStatus,
 } from "@/actions/products";
 import { productKeys } from "@/lib/cache-keys";
-import type { ProductStatus } from "@/lib/nuqs";
+import type { ProductStatus } from "@/lib/nuqs/product";
 import type {
   CreateProductSchema,
   UpdateProductSchema,

@@ -4,7 +4,7 @@ import {
   getVendorOrders,
 } from "@/actions/orders";
 import { orderKeys } from "@/lib/cache-keys";
-import type { OrderStatus } from "@/lib/nuqs";
+import type { OrderStatus } from "@/lib/nuqs/nuqs";
 import { authClient } from "@/server/better-auth/client";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";

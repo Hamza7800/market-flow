@@ -1,6 +1,6 @@
 "use client";
 
-import { refundSearchParams, type RefundStatus } from "@/lib/nuqs";
+import { refundSearchParams, type RefundStatus } from "@/lib/nuqs/nuqs";
 import { Button, Card, Chip } from "@heroui/react";
 import { useQueryStates } from "nuqs";
 

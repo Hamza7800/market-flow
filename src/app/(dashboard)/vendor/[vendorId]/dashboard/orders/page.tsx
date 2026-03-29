@@ -1,6 +1,6 @@
 import { getVendorOrders } from "@/actions/orders";
 import { LoadingState } from "@/components/loading-state";
-import { loadOrderSearchParams, type OrderStatus } from "@/lib/nuqs";
+import { loadOrderSearchParams, type OrderStatus } from "@/lib/nuqs/nuqs";
 import { Surface } from "@heroui/react";
 import { Suspense } from "react";
 import OrdersNavHeader from "./_components/orders-nav-header";

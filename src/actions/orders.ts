@@ -8,7 +8,7 @@ import { db } from "@/server/db";
 import { orderItems, orders, vendorProfiles } from "@/server/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 import { getVendorProfile } from "@/actions/vendor";
-import type { OrderStatus } from "@/lib/nuqs";
+import type { OrderStatus } from "@/lib/nuqs/nuqs";
 
 const LIMIT = 20;
 

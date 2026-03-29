@@ -1,7 +1,7 @@
 "use client";
 
 import { useVendorRefundRequests } from "@/hooks/use-refund";
-import { type RefundStatus } from "@/lib/nuqs";
+import { type RefundStatus } from "@/lib/nuqs/nuqs";
 import { ErrorState } from "@/components/error-state";
 import { LoadingState } from "@/components/loading-state";
 import { RefundsTable } from "@/app/(dashboard)/vendor/[vendorId]/dashboard/refunds/_components/refunds-table";

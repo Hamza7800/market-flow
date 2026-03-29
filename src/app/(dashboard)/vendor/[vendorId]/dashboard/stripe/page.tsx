@@ -24,8 +24,6 @@ import {
 const StripeConnect = () => {
   const stripe = useStripeConnect();
 
-  console.log(stripe);
-
   const isConnected = stripe.state === "connected";
   const isPending = stripe.state === "pending";
   const isError = stripe.state === "error";

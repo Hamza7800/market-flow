@@ -1,6 +1,6 @@
 import { LoadingState } from "@/components/loading-state";
 import { REFUND_REQUESTS_KEY } from "@/lib/cache-keys";
-import { loadRefundSearchParams, type RefundStatus } from "@/lib/nuqs";
+import { loadRefundSearchParams, type RefundStatus } from "@/lib/nuqs/nuqs";
 import {
   dehydrate,
   HydrationBoundary,

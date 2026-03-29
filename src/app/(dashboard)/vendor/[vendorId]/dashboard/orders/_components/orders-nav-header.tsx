@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, Card, Chip } from "@heroui/react";
-import { orderSearchParams, type OrderStatus } from "@/lib/nuqs";
+import { orderSearchParams, type OrderStatus } from "@/lib/nuqs/nuqs";
 import { useQueryStates } from "nuqs";
 
 const STATUS_LABELS: Record<any, string> = {
