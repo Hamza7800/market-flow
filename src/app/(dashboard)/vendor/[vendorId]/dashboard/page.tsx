@@ -5,46 +5,21 @@ import {
   getRevenueByMonth,
   getTopProducts,
 } from "@/actions/analytics";
-import {
-  OrderStatusChart,
-  RecentOrdersTable,
-} from "@/app/(dashboard)/_components/overview/order-status";
-import {
-  RevenueChart,
-  TopProductsChart,
-} from "@/app/(dashboard)/_components/overview/revenue-chart";
-import {
-  DashboardHeader,
-  StatCards,
-} from "@/app/(dashboard)/_components/overview/stat-cards";
+import { OrderStatusChart } from "@/app/(dashboard)/_components/overview/charts/order-status-chart";
+import { RevenueChart } from "@/app/(dashboard)/_components/overview/charts/revenue-chart";
+import { TopProductsChart } from "@/app/(dashboard)/_components/overview/charts/top-products-charts";
+import { RecentOrdersTable } from "@/app/(dashboard)/_components/overview/order-status";
+import { OverviewHeader } from "@/app/(dashboard)/_components/overview/over-header";
+import { StatCards } from "@/app/(dashboard)/_components/overview/stat-cards";
 import { analyticsKeys } from "@/lib/cache-keys";
 import { fKey, type MonthFilter } from "@/lib/utils";
-import { Separator, Skeleton } from "@heroui/react";
+import { Skeleton } from "@heroui/react";
 import {
   dehydrate,
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
 import { Suspense } from "react";
-
-// const VendorDashboard = async () => {
-//   const ins = await getOverviewStats();
-//   const inss = await getRevenueByMonth();
-//   const insss = await getTopProducts();
-//   const inssss = await getOrderStatusBreakdown();
-
-//   return (
-//     <div>
-//       <pre>{JSON.stringify(ins, null, 2)}</pre>
-//       <Separator />
-//       <pre>{JSON.stringify(inss, null, 2)}</pre>
-//       <Separator />
-//       <pre>{JSON.stringify(insss, null, 2)}</pre>
-//       <Separator />
-//       <pre>{JSON.stringify(inssss, null, 2)}</pre>
-//     </div>
-//   );
-// };
 
 type PageProps = {
   params: Promise<{ vendorId: string }>;
@@ -97,10 +72,7 @@ async function Content({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      {/* Row 1 — KPI cards */}
       <StatCards vendorId={vendorId} filter={filter} />
-
-      {/* Row 2 — Revenue chart + Order status */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <RevenueChart vendorId={vendorId} />
@@ -109,11 +81,11 @@ async function Content({
       </div>
 
       {/* Row 3 — Top products + Recent orders */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <TopProductsChart vendorId={vendorId} filter={filter} />
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
+        <div className="lg:col-span-3">
           <RecentOrdersTable vendorId={vendorId} filter={filter} />
         </div>
+        <TopProductsChart vendorId={vendorId} filter={filter} />
       </div>
     </HydrationBoundary>
   );
@@ -125,9 +97,7 @@ const OverViewPage = async ({ params, searchParams }: PageProps) => {
 
   return (
     <div className="space-y-5">
-      {/* Header is a client component — handles month filter navigation */}
-      <DashboardHeader vendorId={vendorId} filter={filter} />
-
+      <OverviewHeader vendorId={vendorId} filter={filter} />
       <Suspense fallback={<DashboardSkeleton />}>
         <Content vendorId={vendorId} filter={filter} />
       </Suspense>

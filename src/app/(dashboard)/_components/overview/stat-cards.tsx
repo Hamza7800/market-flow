@@ -1,128 +1,17 @@
 "use client";
 
-import { LinkButton } from "@/components/link-button";
 import { useInventoryStats, useOverviewStats } from "@/hooks/use-analytics";
-import { getMonthOptions, monthLabel, type MonthFilter } from "@/lib/utils";
-/**
- * _components/dashboard-header.tsx
- * _components/stat-cards.tsx
- *
- * Two client components:
- *  DashboardHeader — title, month picker, new product CTA
- *  StatCards       — 4 KPI metric cards
- */
+import { monthLabel, type MonthFilter } from "@/lib/utils";
 
-// ============================================================================
-// DashboardHeader
-// ============================================================================
-
-import {
-  Button,
-  Chip,
-  Card,
-  Select,
-  ListBox,
-  Label,
-  Skeleton,
-} from "@heroui/react";
+import { Chip, Card, Skeleton } from "@heroui/react";
 import {
   AlertTriangleIcon,
-  ArrowDownRightIcon,
   ArrowRightIcon,
-  ArrowUpRightIcon,
   BarChart2Icon,
-  PackageIcon,
-  PlusIcon,
   ShoppingBagIcon,
   TrendingUpIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
-
-// ---------------------------------------------------------------------------
-// DashboardHeader
-// ---------------------------------------------------------------------------
-
-export function DashboardHeader({
-  vendorId,
-  filter,
-}: {
-  vendorId: string;
-  filter: MonthFilter;
-}) {
-  const router = useRouter();
-  const options = getMonthOptions(13); // 12 past + current
-  const currentKey = filter ? `${filter.year}-${filter.month}` : "all";
-
-  const handleSelect = useCallback(
-    (key: string) => {
-      if (key === "all") {
-        router.push("?");
-      } else {
-        const [year, month] = key.split("-");
-        router.push(`?year=${year}&month=${month}`);
-      }
-    },
-    [router],
-  );
-
-  return (
-    <div className="flex items-center justify-between">
-      <div>
-        <h1 className="text-foreground text-[22px] font-bold tracking-tight">
-          Dashboard
-        </h1>
-        <p className="text-default-400 mt-0.5 text-sm">
-          {filter ? monthLabel(filter) : "All time overview"}
-        </p>
-      </div>
-
-      <div className="flex items-center gap-2">
-        {/* Month picker */}
-        <Select
-          value={currentKey}
-          onChange={(k) => handleSelect(String(k))}
-          className="w-36"
-          aria-label="Select month"
-        >
-          <Select.Trigger className="border-default-200 bg-background rounded-xl border px-3 text-sm">
-            <Select.Value />
-            <Select.Indicator />
-          </Select.Trigger>
-          <Select.Popover>
-            <ListBox>
-              <ListBox.Item key="all" id="all" textValue="All time">
-                <Label>All time</Label>
-              </ListBox.Item>
-              {options.map((opt) => {
-                const key = `${opt!.year}-${opt!.month}`;
-                return (
-                  <ListBox.Item key={key} id={key} textValue={monthLabel(opt)}>
-                    <Label>{monthLabel(opt)}</Label>
-                  </ListBox.Item>
-                );
-              })}
-            </ListBox>
-          </Select.Popover>
-        </Select>
-
-        {/* New product CTA */}
-        <LinkButton
-          href={`/vendor/${vendorId}/products/new`}
-          size="sm"
-          className="rounded-xl font-semibold"
-        >
-          New Product
-        </LinkButton>
-      </div>
-    </div>
-  );
-}
-
-// ============================================================================
-// StatCards
-// ============================================================================
 
 type StatCardProps = {
   title: string;
@@ -132,7 +21,7 @@ type StatCardProps = {
   iconColor: string;
   iconBg: string;
   delta?: number;
-  href: string;
+  href: string | null;
   loading?: boolean;
 };
 
@@ -150,20 +39,22 @@ function StatCard({
   const isUp = (delta ?? 0) >= 0;
 
   return (
-    <Card className="border-default-100 bg-background rounded-2xl border shadow-sm transition-shadow hover:shadow-md">
-      <Card.Content className="p-5">
+    <Card>
+      <Card.Content>
         <div className="flex items-start justify-between">
           <div
             className={`flex h-10 w-10 items-center justify-center rounded-xl ${iconBg}`}
           >
             <Icon className={`h-5 w-5 ${iconColor}`} />
           </div>
-          <Link
-            href={href}
-            className="border-default-200 text-default-400 hover:border-primary hover:text-primary flex h-7 w-7 items-center justify-center rounded-lg border transition-colors"
-          >
-            <ArrowRightIcon className="h-3.5 w-3.5" />
-          </Link>
+          {href && (
+            <Link
+              href={href}
+              className="border-default-200 text-default-400 hover:border-primary hover:text-primary flex h-7 w-7 items-center justify-center rounded-lg border transition-colors"
+            >
+              <ArrowRightIcon className="h-3.5 w-3.5" />
+            </Link>
+          )}
         </div>
 
         <div className="mt-4">
@@ -200,13 +91,13 @@ function StatCard({
   );
 }
 
-export function StatCards({
+export const StatCards = ({
   vendorId,
   filter,
 }: {
   vendorId: string;
   filter: MonthFilter;
-}) {
+}) => {
   const { data: overview, isLoading: overviewLoading } = useOverviewStats(
     vendorId,
     filter,
@@ -225,7 +116,7 @@ export function StatCards({
       iconColor: "text-primary",
       iconBg: "bg-primary/10",
       delta: undefined,
-      href: `/vendor/${vendorId}/payouts`,
+      href: null,
       loading: overviewLoading,
     },
     {
@@ -236,7 +127,7 @@ export function StatCards({
       iconColor: "text-secondary",
       iconBg: "bg-secondary/10",
       delta: undefined,
-      href: `/vendor/${vendorId}/orders`,
+      href: `/vendor/${vendorId}/dashboard/orders`,
       loading: overviewLoading,
     },
     {
@@ -247,7 +138,7 @@ export function StatCards({
       iconColor: "text-warning",
       iconBg: "bg-warning/10",
       delta: undefined,
-      href: `/vendor/${vendorId}/products`,
+      href: `/vendor/${vendorId}/dashboard/products`,
       loading: inventoryLoading,
     },
     {
@@ -258,7 +149,7 @@ export function StatCards({
       iconColor: "text-success",
       iconBg: "bg-success/10",
       delta: undefined,
-      href: `/vendor/${vendorId}/payouts`,
+      href: null,
       loading: overviewLoading,
     },
   ];
@@ -270,4 +161,4 @@ export function StatCards({
       ))}
     </div>
   );
-}
+};
