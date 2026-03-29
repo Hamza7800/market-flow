@@ -1,0 +1,273 @@
+"use client";
+
+import { LinkButton } from "@/components/link-button";
+import { useInventoryStats, useOverviewStats } from "@/hooks/use-analytics";
+import { getMonthOptions, monthLabel, type MonthFilter } from "@/lib/utils";
+/**
+ * _components/dashboard-header.tsx
+ * _components/stat-cards.tsx
+ *
+ * Two client components:
+ *  DashboardHeader — title, month picker, new product CTA
+ *  StatCards       — 4 KPI metric cards
+ */
+
+// ============================================================================
+// DashboardHeader
+// ============================================================================
+
+import {
+  Button,
+  Chip,
+  Card,
+  Select,
+  ListBox,
+  Label,
+  Skeleton,
+} from "@heroui/react";
+import {
+  AlertTriangleIcon,
+  ArrowDownRightIcon,
+  ArrowRightIcon,
+  ArrowUpRightIcon,
+  BarChart2Icon,
+  PackageIcon,
+  PlusIcon,
+  ShoppingBagIcon,
+  TrendingUpIcon,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
+
+// ---------------------------------------------------------------------------
+// DashboardHeader
+// ---------------------------------------------------------------------------
+
+export function DashboardHeader({
+  vendorId,
+  filter,
+}: {
+  vendorId: string;
+  filter: MonthFilter;
+}) {
+  const router = useRouter();
+  const options = getMonthOptions(13); // 12 past + current
+  const currentKey = filter ? `${filter.year}-${filter.month}` : "all";
+
+  const handleSelect = useCallback(
+    (key: string) => {
+      if (key === "all") {
+        router.push("?");
+      } else {
+        const [year, month] = key.split("-");
+        router.push(`?year=${year}&month=${month}`);
+      }
+    },
+    [router],
+  );
+
+  return (
+    <div className="flex items-center justify-between">
+      <div>
+        <h1 className="text-foreground text-[22px] font-bold tracking-tight">
+          Dashboard
+        </h1>
+        <p className="text-default-400 mt-0.5 text-sm">
+          {filter ? monthLabel(filter) : "All time overview"}
+        </p>
+      </div>
+
+      <div className="flex items-center gap-2">
+        {/* Month picker */}
+        <Select
+          value={currentKey}
+          onChange={(k) => handleSelect(String(k))}
+          className="w-36"
+          aria-label="Select month"
+        >
+          <Select.Trigger className="border-default-200 bg-background rounded-xl border px-3 text-sm">
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox>
+              <ListBox.Item key="all" id="all" textValue="All time">
+                <Label>All time</Label>
+              </ListBox.Item>
+              {options.map((opt) => {
+                const key = `${opt!.year}-${opt!.month}`;
+                return (
+                  <ListBox.Item key={key} id={key} textValue={monthLabel(opt)}>
+                    <Label>{monthLabel(opt)}</Label>
+                  </ListBox.Item>
+                );
+              })}
+            </ListBox>
+          </Select.Popover>
+        </Select>
+
+        {/* New product CTA */}
+        <LinkButton
+          href={`/vendor/${vendorId}/products/new`}
+          size="sm"
+          className="rounded-xl font-semibold"
+        >
+          New Product
+        </LinkButton>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// StatCards
+// ============================================================================
+
+type StatCardProps = {
+  title: string;
+  value: string;
+  sub: string;
+  icon: React.ElementType;
+  iconColor: string;
+  iconBg: string;
+  delta?: number;
+  href: string;
+  loading?: boolean;
+};
+
+function StatCard({
+  title,
+  value,
+  sub,
+  icon: Icon,
+  iconColor,
+  iconBg,
+  delta,
+  href,
+  loading,
+}: StatCardProps) {
+  const isUp = (delta ?? 0) >= 0;
+
+  return (
+    <Card className="border-default-100 bg-background rounded-2xl border shadow-sm transition-shadow hover:shadow-md">
+      <Card.Content className="p-5">
+        <div className="flex items-start justify-between">
+          <div
+            className={`flex h-10 w-10 items-center justify-center rounded-xl ${iconBg}`}
+          >
+            <Icon className={`h-5 w-5 ${iconColor}`} />
+          </div>
+          <Link
+            href={href}
+            className="border-default-200 text-default-400 hover:border-primary hover:text-primary flex h-7 w-7 items-center justify-center rounded-lg border transition-colors"
+          >
+            <ArrowRightIcon className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+
+        <div className="mt-4">
+          <p className="text-default-400 text-xs font-medium">{title}</p>
+
+          {loading ? (
+            <Skeleton className="mt-1.5 h-8 w-28 rounded-lg" />
+          ) : (
+            <div className="mt-1 flex items-end gap-2">
+              <span className="text-foreground text-2xl font-bold tracking-tight">
+                {value}
+              </span>
+              {delta !== undefined && (
+                <Chip
+                  size="sm"
+                  // variant="flat"
+                  color={isUp ? "success" : "danger"}
+                  className="mb-0.5 h-5 text-[11px] font-semibold"
+                >
+                  {Math.abs(delta)}%
+                </Chip>
+              )}
+            </div>
+          )}
+
+          {loading ? (
+            <Skeleton className="mt-2 h-3.5 w-40 rounded" />
+          ) : (
+            <p className="text-default-400 mt-1.5 text-xs">{sub}</p>
+          )}
+        </div>
+      </Card.Content>
+    </Card>
+  );
+}
+
+export function StatCards({
+  vendorId,
+  filter,
+}: {
+  vendorId: string;
+  filter: MonthFilter;
+}) {
+  const { data: overview, isLoading: overviewLoading } = useOverviewStats(
+    vendorId,
+    filter,
+  );
+  const { data: inventory, isLoading: inventoryLoading } =
+    useInventoryStats(vendorId);
+
+  const label = filter ? monthLabel(filter) : "all time";
+
+  const cards: StatCardProps[] = [
+    {
+      title: "Total Revenue",
+      value: `$${(overview?.totalRevenue ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      sub: `${overview?.totalOrders ?? 0} orders · ${overview?.totalItemsSold ?? 0} items sold`,
+      icon: BarChart2Icon,
+      iconColor: "text-primary",
+      iconBg: "bg-primary/10",
+      delta: undefined,
+      href: `/vendor/${vendorId}/payouts`,
+      loading: overviewLoading,
+    },
+    {
+      title: "Active Orders",
+      value: String(overview?.pendingOrders ?? 0),
+      sub: `${overview?.totalOrders ?? 0} total · avg $${(overview?.avgOrderValue ?? 0).toFixed(2)}`,
+      icon: ShoppingBagIcon,
+      iconColor: "text-secondary",
+      iconBg: "bg-secondary/10",
+      delta: undefined,
+      href: `/vendor/${vendorId}/orders`,
+      loading: overviewLoading,
+    },
+    {
+      title: "Low Stock Items",
+      value: `${(inventory?.products.lowStock ?? 0) + (inventory?.variants.lowStock ?? 0)} SKUs`,
+      sub: `${(inventory?.products.outOfStock ?? 0) + (inventory?.variants.outOfStock ?? 0)} out of stock`,
+      icon: AlertTriangleIcon,
+      iconColor: "text-warning",
+      iconBg: "bg-warning/10",
+      delta: undefined,
+      href: `/vendor/${vendorId}/products`,
+      loading: inventoryLoading,
+    },
+    {
+      title: "Net Payouts",
+      value: `$${(overview?.totalNetPayout ?? 0).toLocaleString()}`,
+      sub: `$${(overview?.totalRefunded ?? 0).toFixed(2)} refunded · ${overview?.pendingRefunds ?? 0} pending`,
+      icon: TrendingUpIcon,
+      iconColor: "text-success",
+      iconBg: "bg-success/10",
+      delta: undefined,
+      href: `/vendor/${vendorId}/payouts`,
+      loading: overviewLoading,
+    },
+  ];
+
+  return (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {cards.map((card) => (
+        <StatCard key={card.title} {...card} />
+      ))}
+    </div>
+  );
+}

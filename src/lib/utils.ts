@@ -1,6 +1,6 @@
 import type { orderItems, orders } from "@/server/db/schema";
 import { clsx, type ClassValue } from "clsx";
-import type { InferSelectModel } from "drizzle-orm";
+import { gte, lte, type InferSelectModel } from "drizzle-orm";
 import { twMerge } from "tailwind-merge";
 import z from "zod";
 
@@ -104,7 +104,40 @@ export function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
+export function toNum(v: unknown): number {
+  return Number(v) || 0;
+}
+
 export function calcDelta(current: number, previous: number): number {
   if (previous === 0) return current > 0 ? 100 : 0;
   return Math.round(((current - previous) / previous) * 100);
+}
+
+export type MonthFilter = { year: number; month: number } | null;
+
+export function monthConds(col: any, filter: MonthFilter) {
+  if (!filter) return [];
+  const from = new Date(filter.year, filter.month - 1, 1);
+  const to = new Date(filter.year, filter.month, 1);
+  return [gte(col, from), lte(col, to)];
+}
+
+export function getMonthOptions(n = 12): MonthFilter[] {
+  const now = new Date();
+  return Array.from({ length: n }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    return { year: d.getFullYear(), month: d.getMonth() + 1 };
+  });
+}
+
+export function monthLabel(f: MonthFilter): string {
+  if (!f) return "All time";
+  return new Date(f.year, f.month - 1).toLocaleString("default", {
+    month: "long",
+    year: "numeric",
+  });
+}
+
+export function fKey(f: MonthFilter) {
+  return f ? `${f.year}-${f.month}` : "all";
 }
