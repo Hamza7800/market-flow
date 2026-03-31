@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
 import {
@@ -75,14 +74,14 @@ export const RevenueChart = ({ vendorId }: { vendorId: string }) => {
   }
 
   return (
-    <Card>
+    <Card className="h-full">
       <Card.Header>
         <Card.Title>Revenue Chart</Card.Title>
         <Card.Description>Monthly orders and revenue</Card.Description>
       </Card.Header>
 
       <Card.Content>
-        <ChartContainer config={chartConfig}>
+        <ChartContainer className="h-full" config={chartConfig}>
           <BarChart
             accessibilityLayer
             data={chartData}
@@ -102,7 +101,7 @@ export const RevenueChart = ({ vendorId }: { vendorId: string }) => {
               content={<ChartTooltipContent indicator="dashed" />}
             />
             {/* <Bar dataKey="orders" fill="pink" radius={4} maxBarSize={18} /> */}
-            <Bar dataKey="revenue" fill="" radius={4} maxBarSize={18} />
+            <Bar dataKey="revenue" fill="#006fee" radius={4} maxBarSize={18} />
           </BarChart>
         </ChartContainer>
       </Card.Content>

@@ -21,7 +21,13 @@ import {
 import { useVendorProducts } from "@/hooks/use-product";
 import { LoadingState } from "@/components/loading-state";
 import { EmptyState } from "@/components/empty-state";
-import { AlertCircle, ChevronUp, PackageSearch } from "lucide-react";
+import {
+  AlertCircle,
+  Archive,
+  ChevronUp,
+  PackageSearch,
+  Trash2,
+} from "lucide-react";
 import { useRouter } from "nextjs-toploader/app";
 import {
   createColumnHelper,
@@ -42,6 +48,7 @@ import {
 } from "@/lib/consts/product";
 import { LinkButton } from "@/components/link-button";
 import { Pencil } from "@gravity-ui/icons";
+import ProductActions from "./product-actions";
 
 const PAGE_SIZE = 20;
 
@@ -85,8 +92,8 @@ export default function ProductsTable({
     { history: "push", shallow: false },
   );
 
-  const activeStatus = urlStatus ?? statusProp;
-  const activePage = urlPage ?? pageProp;
+  // const activeStatus = urlStatus ?? statusProp;
+  // const activePage = urlPage ?? pageProp;
 
   const [{ search, priceSort, minRating }, setClientQuery] = useQueryStates(
     clientProductParams,
@@ -96,8 +103,8 @@ export default function ProductsTable({
   const [sorting, setSorting] = useState<SortingState>([]);
   const { data: products, isPending } = useVendorProducts(
     vendorId,
-    activePage,
-    activeStatus,
+    pageProp,
+    statusProp,
   );
 
   const rawItems = products?.data ?? [];
@@ -223,20 +230,11 @@ export default function ProductsTable({
         header: "Actions",
         enableSorting: false,
         cell: ({ row }) => (
-          <Tooltip delay={500}>
-            <LinkButton
-              size="sm"
-              radius="full"
-              isIconOnly
-              className="h-7 w-7 rounded-full px-3 text-xs font-medium"
-              href={`/vendor/${vendorId}/dashboard/products/form?productId=${row.original.id}`}
-            >
-              <Pencil />
-            </LinkButton>
-            <Tooltip.Content>
-              <p>Edit</p>
-            </Tooltip.Content>
-          </Tooltip>
+          <ProductActions
+            status={row.original.status}
+            vendorId={vendorId}
+            productId={row.original.id}
+          />
         ),
       }),
     ],
@@ -287,8 +285,8 @@ export default function ProductsTable({
   );
 
   const rows = table.getRowModel().rows;
-  const start = totalItems === 0 ? 0 : (activePage - 1) * PAGE_SIZE + 1;
-  const end = Math.min(activePage * PAGE_SIZE, totalItems);
+  // const start = totalItems === 0 ? 0 : (activePage - 1) * PAGE_SIZE + 1;
+  // const end = Math.min(activePage * PAGE_SIZE, totalItems);
 
   if (isPending) return <LoadingState label="Products" />;
 
@@ -306,6 +304,8 @@ export default function ProductsTable({
       />
     );
   }
+
+  console.log(filteredData);
 
   return (
     <Table className="w-full">
@@ -326,8 +326,18 @@ export default function ProductsTable({
                 key={header.id}
                 id={header.id}
                 allowsSorting={header.column.getCanSort()}
-                isRowHeader={header.id === "product"}
-                className="bg-default-50 text-default-500 text-xs font-semibold tracking-wide uppercase first:pl-5 last:pr-5"
+                // isRowHeader={header.id === "product"}
+                isRowHeader
+                className={cn(
+                  "bg-default-50 text-default-500 text-xs font-semibold tracking-wide uppercase first:pl-5 last:pr-5",
+                  header.id === "product" && "w-full", // 👈 full width
+                  header.id === "actions" && "min-w-[140px]",
+                  header.id === "status" && "min-w-[80px]",
+                  header.id === "rating" && "min-w-[150px]",
+                  header.id === "stock" && "min-w-[120px]",
+                  header.id === "price" && "min-w-[120px]",
+                )}
+                // className="bg-default-50 text-default-500 text-xs font-semibold tracking-wide uppercase first:pl-5 last:pr-5"
               >
                 {({ sortDirection }) => (
                   <SortableHeader sortDirection={sortDirection}>
@@ -395,9 +405,9 @@ export default function ProductsTable({
             <Pagination.Content className="justify-end">
               <Pagination.Item>
                 <Pagination.Previous
-                  isDisabled={activePage <= 1}
+                  isDisabled={pageProp <= 1}
                   onPress={() =>
-                    setServerQuery({ page: Math.max(1, activePage - 1) })
+                    setServerQuery({ page: Math.max(1, pageProp - 1) })
                   }
                 >
                   <Pagination.PreviousIcon />
@@ -407,7 +417,7 @@ export default function ProductsTable({
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <Pagination.Item key={p}>
                   <Pagination.Link
-                    isActive={p === activePage}
+                    isActive={p === pageProp}
                     onPress={() => setServerQuery({ page: p })}
                   >
                     {p}
@@ -417,10 +427,10 @@ export default function ProductsTable({
 
               <Pagination.Item>
                 <Pagination.Next
-                  isDisabled={activePage >= totalPages}
+                  isDisabled={pageProp >= totalPages}
                   onPress={() =>
                     setServerQuery({
-                      page: Math.min(totalPages, activePage + 1),
+                      page: Math.min(totalPages, pageProp + 1),
                     })
                   }
                 >

@@ -1,18 +1,21 @@
 import { ConfirmModal } from "@/components/confirm-modal";
 import { useDeleteProduct } from "@/hooks/use-product";
-import { Button } from "@heroui/react";
-import { useParams } from "next/navigation";
 import { useRouter } from "nextjs-toploader/app";
+import type { ReactNode } from "react";
 
 const DeleteProduct = ({
   isEdit,
   productId,
   vendorId,
   status,
+  trigger,
+  isTable = false,
 }: {
   isEdit: boolean;
+  isTable?: boolean;
   productId: string;
   vendorId: string;
+  trigger: ReactNode;
   status: "draft" | "active" | "archived";
 }) => {
   const router = useRouter();
@@ -30,16 +33,12 @@ const DeleteProduct = ({
         deleteMutation?.mutateAsync(productId, {
           onSuccess: () => {
             close();
-            // router.push(`/${slug}/my-issues/assigned`);
+            if (isTable) return;
             router.back();
           },
         });
       }}
-      trigger={
-        <Button fullWidth variant="danger-soft">
-          Delete Product
-        </Button>
-      }
+      trigger={trigger}
     />
   );
 };

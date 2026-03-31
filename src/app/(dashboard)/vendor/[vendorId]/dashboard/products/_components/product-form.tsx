@@ -43,17 +43,14 @@ import {
   TagIcon,
   Trash2Icon,
 } from "lucide-react";
-import { Controller, useForm, useWatch } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { VariantBuilder } from "./variant-builder";
-import { ImageManager } from "./image-manage";
-import { useMemo } from "react";
 import { useRouter } from "nextjs-toploader/app";
 import { zodResolver } from "@hookform/resolvers/zod";
 import CategorySelect from "@/app/(dashboard)/vendor/[vendorId]/dashboard/products/_components/category-select";
 import TagSelect from "@/app/(dashboard)/vendor/[vendorId]/dashboard/products/_components/tags-select";
 import {
   useCreateProduct,
-  useDeleteProduct,
   useUpdateProduct,
   useUpdateProductStatus,
 } from "@/hooks/use-product";
@@ -408,6 +405,11 @@ const ProductForm = (props: Props) => {
                     productId={props.productId}
                     vendorId={props.vendorId}
                     status={props.currentStatus}
+                    trigger={
+                      <Button fullWidth variant="danger-soft">
+                        Delete Product
+                      </Button>
+                    }
                   />
                 )}
 

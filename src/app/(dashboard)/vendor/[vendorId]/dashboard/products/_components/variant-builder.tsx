@@ -180,8 +180,8 @@ export const VariantBuilder = ({ control, setValue }: Props) => {
                         name={`variants.${index}.price`}
                         render={({ field }) => (
                           <NumberField
-                            value={field.value ?? undefined}
-                            onChange={field.onChange}
+                            value={Number(field.value) ?? undefined}
+                            onChange={(v) => field.onChange(Number(v))}
                             isInvalid={!!variantError?.price}
                             formatOptions={{
                               style: "decimal",

@@ -1,30 +1,11 @@
 "use client";
 
-import { Card, Chip, Skeleton } from "@heroui/react";
+import { Card, Chip, Separator, Skeleton } from "@heroui/react";
 import Link from "next/link";
 
-import {
-  ArrowUpRightIcon,
-  CheckCircle2Icon,
-  ClockIcon,
-  PackageIcon,
-  TruckIcon,
-  XCircleIcon,
-  RotateCcwIcon,
-} from "lucide-react";
+import { ArrowUpRightIcon, PackageIcon } from "lucide-react";
 import type { MonthFilter } from "@/lib/utils";
 import { useVendorOrders } from "@/hooks/use-orders";
-
-// ============================================================================
-// OrderStatusChart — radial bar + horizontal breakdown
-// ============================================================================
-
-type StatusConfig = {
-  key: string;
-  label: string;
-  color: string;
-  icon: React.ElementType;
-};
 
 // const STATUS_CONFIG: StatusConfig[] = [
 //   { key: "pending", label: "Pending", color: "#F5A524", icon: ClockIcon },
@@ -73,7 +54,6 @@ export function RecentOrdersTable({
   vendorId: string;
   filter: MonthFilter;
 }) {
-  // Fetch pending + processing for recent activity
   const { data: pendingData, isLoading: pendingLoading } = useVendorOrders(
     vendorId,
     "pending",
@@ -84,7 +64,6 @@ export function RecentOrdersTable({
 
   const isLoading = pendingLoading || processingLoading;
 
-  // Merge + take latest 8
   const items = [...(pendingData?.data ?? []), ...(processingData?.data ?? [])]
     .sort(
       (a, b) =>
@@ -115,7 +94,7 @@ export function RecentOrdersTable({
             </p>
           </div>
           <Link
-            href={`/vendor/${vendorId}/orders`}
+            href={`/vendor/${vendorId}/dashboard/orders`}
             className="text-primary flex items-center gap-1 text-xs font-medium hover:underline"
           >
             View all <ArrowUpRightIcon className="h-3 w-3" />
@@ -153,6 +132,7 @@ export function RecentOrdersTable({
                 </p>
               ))}
             </div>
+            <Separator />
 
             <div className="divide-default-100 divide-y">
               {items.map((item) => {

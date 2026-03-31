@@ -8,7 +8,7 @@ import {
 import { OrderStatusChart } from "@/app/(dashboard)/_components/overview/charts/order-status-chart";
 import { RevenueChart } from "@/app/(dashboard)/_components/overview/charts/revenue-chart";
 import { TopProductsChart } from "@/app/(dashboard)/_components/overview/charts/top-products-charts";
-import { RecentOrdersTable } from "@/app/(dashboard)/_components/overview/order-status";
+import { RecentOrdersTable } from "@/app/(dashboard)/_components/overview/recent-orders";
 import { OverviewHeader } from "@/app/(dashboard)/_components/overview/over-header";
 import { StatCards } from "@/app/(dashboard)/_components/overview/stat-cards";
 import { analyticsKeys } from "@/lib/cache-keys";
@@ -36,6 +36,7 @@ function parseMonthFilter(
 }
 
 // TODO: CACHE CLEAR ANALYTICS
+// TODO: Reduce Stock By One WHEN SHIPPED
 
 async function Content({
   vendorId,
@@ -80,7 +81,6 @@ async function Content({
         <OrderStatusChart vendorId={vendorId} filter={filter} />
       </div>
 
-      {/* Row 3 — Top products + Recent orders */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
         <div className="lg:col-span-3">
           <RecentOrdersTable vendorId={vendorId} filter={filter} />

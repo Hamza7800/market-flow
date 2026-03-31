@@ -9,6 +9,7 @@ import {
   products,
   productTags,
   productVariants,
+  reviews,
   vendorProfiles,
 } from "@/server/db/schema";
 import {
@@ -31,8 +32,8 @@ import {
   desc,
   count,
   inArray,
+  sql,
 } from "drizzle-orm";
-import z from "zod";
 import { deleteUploadThingFiles } from "./images";
 
 export const getProducts = async (
@@ -69,7 +70,22 @@ export const getProducts = async (
                 ilike(products.description, `%${search}%`),
               )
             : undefined,
-          inStock && !products.hasVariants ? gte(products.stock, 1) : undefined,
+          inStock
+            ? or(
+                and(eq(products.hasVariants, false), gte(products.stock, 1)),
+                and(
+                  eq(products.hasVariants, true),
+                  inArray(
+                    products.id,
+                    db
+                      .select({ productId: productVariants.productId })
+                      .from(productVariants)
+                      .where(gte(productVariants.stock, 1)),
+                  ),
+                ),
+              )
+            : undefined,
+          // inStock && !products.hasVariants ? gte(products.stock, 1) : undefined,
         ].filter(Boolean) as any[];
 
         console.log("DB HIT");
@@ -199,6 +215,7 @@ export const getVendorProducts = async (
           productKeys.tags.byVendorAndStatus(vendor.id, status),
         ],
         async () => {
+          console.log("VENDOR DB HIT");
           return db.query.products.findMany({
             where: and(
               eq(products.vendorId, vendor.id),
@@ -750,4 +767,25 @@ export const updateProductStatus = async (
   } catch (error) {
     return returnError(error, "Unable to update status");
   }
+};
+
+export const syncProductRating = async (productId: string) => {
+  const [result] = await db
+    .select({
+      avg: sql<string>`COALESCE(ROUND(AVG(${reviews.rating}::numeric), 2), 0)`,
+      count: sql<string>`COUNT(*)`,
+    })
+    .from(reviews)
+    .where(
+      and(eq(reviews.productId, productId), eq(reviews.status, "approved")),
+    );
+
+  await db
+    .update(products)
+    .set({
+      averageRating: result?.avg,
+      reviewCount: Number(result?.count),
+      updatedAt: new Date(),
+    })
+    .where(eq(products.id, productId));
 };

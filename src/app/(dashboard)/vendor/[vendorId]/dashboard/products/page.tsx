@@ -37,7 +37,9 @@ const Content = async ({
     queryKey: [...productKeys.byVendorAndStatus(vendorId, status), page],
     queryFn: async () => {
       const result = await getVendorProducts(status, page);
-      if (!result.success) throw new Error(result.message);
+      if (!result.success) {
+        throw new Error(result.message);
+      }
       return result;
     },
   });

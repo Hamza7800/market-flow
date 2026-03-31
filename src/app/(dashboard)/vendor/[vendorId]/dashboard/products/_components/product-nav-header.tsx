@@ -5,6 +5,7 @@ import { Button, Card, Chip } from "@heroui/react";
 import { serverProductParams, type ProductStatus } from "@/lib/nuqs/product";
 import { useQueryStates } from "nuqs";
 import { STATUS_LABELS } from "@/lib/consts/product";
+import { useRouter } from "nextjs-toploader/app";
 
 const ProductNavHeader = ({
   status,
@@ -13,6 +14,7 @@ const ProductNavHeader = ({
   status: ProductStatus;
   vendorId: string;
 }) => {
+  const router = useRouter();
   const [{ status: urlStatus, page: urlPage }, setQuery] = useQueryStates(
     serverProductParams,
     {
@@ -29,20 +31,7 @@ const ProductNavHeader = ({
 
   return (
     <div className="">
-      {/* <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex flex-wrap items-center gap-2">
-          <Chip>Products</Chip>
-          <Chip color={STATUS_COLOR[activeStatus]}>
-            {STATUS_LABELS[activeStatus]}
-          </Chip>
-        </div>
-
-        <LinkButton href={`/vendor/${vendorId}/dashboard/products/form`}>
-          Create product
-        </LinkButton>
-      </div> */}
-
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         {(["active", "draft", "archived"] as const).map((item) => {
           const selected = item === activeStatus;
 
@@ -57,6 +46,16 @@ const ProductNavHeader = ({
             </Button>
           );
         })}
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 shadow-none"
+          onClick={() =>
+            router.push(`/vendor/${vendorId}/dashboard/products/form`)
+          }
+        >
+          Create
+        </Button>
       </div>
     </div>
   );
