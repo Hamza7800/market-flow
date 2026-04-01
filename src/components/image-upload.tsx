@@ -6,9 +6,8 @@ import { X, Upload, Loader2, ImageIcon, GripVertical } from "lucide-react";
 import { useUploadThing } from "@/lib/uploadthing-components";
 import { useDropzone } from "react-dropzone";
 import { toast } from "@heroui/react";
-import { deleteUploadThingFile } from "@/actions/images";
+// import { deleteUploadThingFile } from "@/actions/images";
 
-// matches productImageSchema exactly
 export interface UploadedImage {
   url: string;
   altText?: string;

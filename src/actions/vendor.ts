@@ -1,14 +1,14 @@
 "use server";
 
-import { cacheWrap } from "@/lib/cache-helpers";
+import { cacheDel, cacheWrap } from "@/lib/cache-helpers";
 import { vendorKeys } from "@/lib/cache-keys";
 import { returnError } from "@/lib/utils";
 import { getUser } from "@/server/better-auth/server";
 import { db } from "@/server/db";
 import { vendorProfiles } from "@/server/db/schema";
 import {
-  storeSchema,
-  type StoreSchema,
+  vendorSchema,
+  type VendorSchema,
 } from "@/zod-schema/vendor-profile-schema";
 import { and, eq, isNull } from "drizzle-orm";
 
@@ -22,10 +22,10 @@ export async function generateStoreSlug(storeName: string): Promise<string> {
     .replace(/^-|-$/g, "");
 }
 
-export const submitVendorApplication = async (values: StoreSchema) => {
+export const submitVendorApplication = async (values: VendorSchema) => {
   try {
     const user = await getUser();
-    const validatedValues = storeSchema.safeParse(values);
+    const validatedValues = vendorSchema.safeParse(values);
 
     if (validatedValues.error) {
       return {
@@ -35,7 +35,7 @@ export const submitVendorApplication = async (values: StoreSchema) => {
       };
     }
 
-    const { storeName, description, returnPolicy, contactEmail } =
+    const { storeName, description, banner, logo, returnPolicy, contactEmail } =
       validatedValues.data;
 
     const [application] = await db
@@ -48,8 +48,14 @@ export const submitVendorApplication = async (values: StoreSchema) => {
         contactEmail,
         returnPolicy,
         status: "active",
+        bannerKey: banner.key,
+        bannerUrl: banner.url,
+        logoUrl: logo.url,
+        logoKey: logo.key,
       })
       .returning();
+
+    cacheDel(vendorKeys.tags.byUser(user.id), vendorKeys.tags.all());
 
     return {
       success: true,
@@ -60,6 +66,8 @@ export const submitVendorApplication = async (values: StoreSchema) => {
     return returnError(error, "Unable to submit application");
   }
 };
+
+export type VendorRow = typeof vendorProfiles.$inferSelect;
 
 export const getVendorProfile = async () => {
   try {
@@ -97,3 +105,90 @@ export const getVendorProfile = async () => {
 };
 
 export type VendorProfileType = Awaited<ReturnType<typeof getVendorProfile>>;
+
+export const updateVendor = async (values: VendorSchema) => {
+  try {
+    const user = await getUser();
+    const parsed = vendorSchema.parse(values);
+
+    const { storeName, description, logo, banner, contactEmail, returnPolicy } =
+      parsed;
+
+    const vendor = await db.query.vendorProfiles.findFirst({
+      where: and(
+        eq(vendorProfiles.userId, user.id),
+        eq(vendorProfiles.status, "active"),
+        isNull(vendorProfiles.deletedAt),
+      ),
+      columns: { id: true },
+    });
+    if (!vendor)
+      return {
+        success: false,
+        data: null,
+        message: "Vendor profile not found",
+      };
+
+    const updatePayload: Partial<typeof vendorProfiles.$inferInsert> = {
+      storeName,
+      description: description ?? null,
+      logoUrl: logo?.url ?? null,
+      logoKey: logo?.key ?? null,
+      bannerUrl: banner?.url ?? null,
+      bannerKey: banner?.key ?? null,
+      contactEmail: contactEmail ?? null,
+      returnPolicy: returnPolicy ?? null,
+    };
+
+    const [updated] = await db
+      .update(vendorProfiles)
+      .set(updatePayload)
+      .where(eq(vendorProfiles.id, vendor.id))
+      .returning();
+
+    if (!updated) {
+      return {
+        success: false,
+        message: "Vendor profile not found",
+        data: null,
+      };
+    }
+
+    cacheDel(vendorKeys.tags.byUser(user.id), vendorKeys.tags.all());
+
+    return {
+      success: true,
+      message: "Store profile updated successfully",
+      data: updated,
+    };
+  } catch (error) {
+    return returnError(error, "Something went wrong. Please try again.");
+  }
+};
+
+export const isVendor = async () => {
+  try {
+    const user = await getUser();
+    const vendor = await db.query.vendorProfiles.findFirst({
+      where: and(
+        eq(vendorProfiles.userId, user.id),
+        eq(vendorProfiles.status, "active"),
+        isNull(vendorProfiles.deletedAt),
+      ),
+      columns: { id: true },
+    });
+    if (!vendor)
+      return {
+        success: false,
+        data: null,
+        message: "Vendor profile not found",
+      };
+    return {
+      success: true,
+      data: vendor,
+      message: "Vendor Profile",
+    };
+  } catch (error) {
+    return returnError(error, "Unable to find vendor profile.");
+  }
+};

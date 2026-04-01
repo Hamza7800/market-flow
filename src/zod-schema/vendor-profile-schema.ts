@@ -1,19 +1,24 @@
 import z from "zod";
 
-const storeSlug = z
-  .string()
-  .min(3, "Slug must be at least 3 characters")
-  .max(60, "Slug must be 60 characters or fewer")
-  .regex(
-    /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-    "Only lowercase letters, numbers, and hyphens — no leading/trailing hyphens",
-  );
+// const storeSlug = z
+//   .string()
+//   .min(3, "Slug must be at least 3 characters")
+//   .max(60, "Slug must be 60 characters or fewer")
+//   .regex(
+//     /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+//     "Only lowercase letters, numbers, and hyphens — no leading/trailing hyphens",
+//   );
 
 const httpsUrl = z
   .url("Must be a valid URL")
   .refine((v) => v.startsWith("https://"), "Must start with https://");
 
-export const storeSchema = z.object({
+export const imageSchema = z.object({
+  url: z.url("Must be a valid URL").min(1, "Image URL is required"),
+  key: z.string(),
+});
+
+export const vendorSchema = z.object({
   storeName: z
     .string()
     .min(2, "Store name must be at least 2 characters")
@@ -27,9 +32,9 @@ export const storeSchema = z.object({
     .optional()
     .or(z.literal("")),
 
-  logoUrl: httpsUrl.optional().or(z.literal("")),
+  logo: imageSchema,
 
-  bannerUrl: httpsUrl.optional().or(z.literal("")),
+  banner: imageSchema,
   contactEmail: z
     .email("Must be a valid email address")
     .max(255)
@@ -45,13 +50,21 @@ export const storeSchema = z.object({
     .or(z.literal("")),
 });
 
-export type StoreSchema = z.infer<typeof storeSchema>;
+export type VendorSchema = z.infer<typeof vendorSchema>;
 
-export const storeDefaults: StoreSchema = {
+export type ImageSchema = z.infer<typeof imageSchema>;
+
+export const vendorDefaults: VendorSchema = {
   storeName: "",
   description: "",
-  logoUrl: "",
-  bannerUrl: "",
+  logo: {
+    key: "",
+    url: "",
+  },
+  banner: {
+    key: "",
+    url: "",
+  },
   contactEmail: "",
   returnPolicy: "",
 };

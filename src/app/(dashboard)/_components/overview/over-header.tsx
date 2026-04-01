@@ -65,7 +65,7 @@ export const OverviewHeader = ({
         </Select>
 
         <LinkButton
-          href={`/vendor/${vendorId}/products/new`}
+          href={`/vendor/${vendorId}/dashboard/products/form`}
           size="sm"
           className="rounded-xl font-semibold"
         >

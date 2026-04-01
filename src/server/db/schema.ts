@@ -199,7 +199,9 @@ export const vendorProfiles = createTable(
     storeSlug: text("store_slug").notNull().unique(),
     description: text("description"),
     logoUrl: text("logo_url"),
+    logoKey: text("logo_key"),
     bannerUrl: text("banner_url"),
+    bannerKey: text("banner_key"),
     stripeAccountId: text("stripe_account_id").unique(),
     stripeOnboardingComplete: boolean("stripe_onboarding_complete")
       .notNull()

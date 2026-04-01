@@ -1,11 +1,15 @@
-import { getVendorProfile, submitVendorApplication } from "@/actions/vendor";
+import {
+  getVendorProfile,
+  submitVendorApplication,
+  updateVendor,
+} from "@/actions/vendor";
 import {
   VendorContext,
   type VendorContextValue,
 } from "@/components/context/vendor-context";
 import { vendorKeys } from "@/lib/cache-keys";
 import { authClient } from "@/server/better-auth/client";
-import type { StoreSchema } from "@/zod-schema/vendor-profile-schema";
+import type { VendorSchema } from "@/zod-schema/vendor-profile-schema";
 import { toast } from "@heroui/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext } from "react";
@@ -16,7 +20,7 @@ export const useVendorApplication = () => {
   const userId = data?.user.id;
 
   return useMutation({
-    mutationFn: async (values: StoreSchema) => {
+    mutationFn: async (values: VendorSchema) => {
       const result = await submitVendorApplication(values);
       if (!result.success) throw new Error(result.message);
       return result;
@@ -54,3 +58,26 @@ export const useVendorProfile = (userId?: string) => {
     // enabled: !!userId,
   });
 };
+
+export function useUpdateVendor() {
+  const { data } = authClient.useSession();
+  const queryClient = useQueryClient();
+  const userId = data?.user.id;
+
+  return useMutation({
+    mutationFn: async (values: VendorSchema) => {
+      const result = await updateVendor(values);
+      if (!result.success) throw new Error(result.message);
+      return result.data;
+    },
+    onSuccess: () => {
+      toast.success("Store profile updated");
+      queryClient.invalidateQueries({
+        queryKey: vendorKeys.byUser(userId ?? "no-user"),
+      });
+    },
+    onError: (error: Error) => {
+      toast.danger(error.message);
+    },
+  });
+}
