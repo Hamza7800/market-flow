@@ -2,8 +2,8 @@ import { LinkButton } from "@/components/link-button";
 import { Pencil } from "@gravity-ui/icons";
 import { Button, Tooltip } from "@heroui/react";
 import { Archive, Trash2 } from "lucide-react";
-import DeleteProduct from "./delete-product";
-import ArchiveProduct from "./archive-product";
+import DeleteProduct from "@/app/(dashboard)/vendor/[vendorId]/dashboard/products/_components/delete-product";
+import ArchiveProduct from "@/app/(dashboard)/vendor/[vendorId]/dashboard/products/_components/archive-product";
 
 const ProductActions = ({
   vendorId,

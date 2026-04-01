@@ -46,8 +46,6 @@ import {
   toSortingState,
   type ProductRow,
 } from "@/lib/consts/product";
-import { LinkButton } from "@/components/link-button";
-import { Pencil } from "@gravity-ui/icons";
 import ProductActions from "./product-actions";
 
 const PAGE_SIZE = 20;

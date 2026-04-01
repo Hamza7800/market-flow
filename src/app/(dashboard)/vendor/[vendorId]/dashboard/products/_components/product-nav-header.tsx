@@ -1,7 +1,6 @@
 "use client";
 
-import { LinkButton } from "@/components/link-button";
-import { Button, Card, Chip } from "@heroui/react";
+import { Button } from "@heroui/react";
 import { serverProductParams, type ProductStatus } from "@/lib/nuqs/product";
 import { useQueryStates } from "nuqs";
 import { STATUS_LABELS } from "@/lib/consts/product";

@@ -3,7 +3,7 @@
 import type { SortDescriptor } from "@heroui/react";
 import type { SortingState } from "@tanstack/react-table";
 
-import { Chip, Pagination, Table } from "@heroui/react";
+import { Chip, cn, Pagination, Table } from "@heroui/react";
 import {
   createColumnHelper,
   flexRender,
@@ -17,6 +17,7 @@ import { orderSearchParams, type OrderStatus } from "@/lib/nuqs/nuqs";
 import { useVendorOrders } from "@/hooks/use-orders";
 import type { VendorOrders } from "@/actions/orders";
 import { LoadingState } from "@/components/loading-state";
+import OrderActions from "./order-actions";
 
 // type OrderItem = {
 //   id: string;
@@ -86,26 +87,26 @@ const columns = [
       );
     },
   }),
-  columnHelper.accessor("variant", {
-    header: "Variant",
-    cell: ({ getValue }) => {
-      const variant = getValue();
-      if (!variant) return <Chip>No available</Chip>;
-      let label = variant.name;
+  // columnHelper.accessor("variant", {
+  //   header: "Variant",
+  //   cell: ({ getValue }) => {
+  //     const variant = getValue();
+  //     if (!variant) return <Chip>No available</Chip>;
+  //     let label = variant.name;
 
-      try {
-        const options = JSON.parse(variant.options) as Record<string, string>;
-        const optionText = Object.entries(options)
-          .map(([k, v]) => `${k}: ${v}`)
-          .join(", ");
-        if (optionText) label = `${variant.name} (${optionText})`;
-      } catch {
-        // fall back to variant name only
-      }
+  //     try {
+  //       const options = JSON.parse(variant.options) as Record<string, string>;
+  //       const optionText = Object.entries(options)
+  //         .map(([k, v]) => `${k}: ${v}`)
+  //         .join(", ");
+  //       if (optionText) label = `${variant.name} (${optionText})`;
+  //     } catch {
+  //       // fall back to variant name only
+  //     }
 
-      return <span className="text-sm">{label}</span>;
-    },
-  }),
+  //     return <span className="text-sm">{label}</span>;
+  //   },
+  // }),
   columnHelper.accessor("quantity", {
     header: "Qty",
   }),
@@ -150,6 +151,14 @@ const columns = [
   columnHelper.accessor("createdAt", {
     header: "Created",
     cell: (info) => new Date(info.getValue()).toLocaleDateString(),
+  }),
+  columnHelper.display({
+    id: "actions",
+    header: "Actions",
+    enableSorting: false,
+    cell: ({ row }) => (
+      <OrderActions vendorId={row.original.vendorId} id={row.original.id} />
+    ),
   }),
 ];
 
@@ -233,6 +242,17 @@ export function OrdersTable({
                 id={header.id}
                 allowsSorting={header.column.getCanSort()}
                 isRowHeader={header.id === "productName"}
+                className={cn(
+                  "bg-default-50 text-default-500 text-xs font-semibold tracking-wide uppercase first:pl-5 last:pr-5",
+                  header.id === "productName" && "w-full", // 👈 full width
+                  header.id === "actions" && "min-w-[140px]",
+                  header.id === "status" && "min-w-[100px]",
+                  header.id === "quantity" && "min-w-[50px]",
+                  header.id === "unitPrice" && "min-w-[120px]",
+                  header.id === "totalPrice" && "min-w-[120px]",
+                  header.id === "order" && "min-w-[100px]",
+                  header.id === "createdAt" && "min-w-[100px]",
+                )}
               >
                 {({ sortDirection }) => (
                   <span className="flex items-center justify-between">

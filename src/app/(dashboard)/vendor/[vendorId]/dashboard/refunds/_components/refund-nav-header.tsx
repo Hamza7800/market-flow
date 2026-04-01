@@ -26,19 +26,24 @@ const RefundNavHeader = ({ status }: { status: RefundStatus }) => {
   const activeStatus = urlStatus ?? status;
 
   return (
-    <Card className="">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <Card className="mb-4">
+      {/* <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-2">
           <Chip>Refunds</Chip>
         </div>
-      </div>
+      </div> */}
 
       <div className="flex flex-wrap gap-2">
         {(["pending", "succeeded", "failed"] as const).map((item) => {
           const selected = item === activeStatus;
 
           return (
-            <Button key={item} size="sm" onPress={() => setStatus(item)}>
+            <Button
+              variant={selected ? "secondary" : "primary"}
+              key={item}
+              size="sm"
+              onPress={() => setStatus(item)}
+            >
               {STATUS_LABELS[item]}
             </Button>
           );

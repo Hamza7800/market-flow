@@ -2,9 +2,10 @@ import { animationStyles } from "@/lib/consts/constants";
 import { AlertDialog, Button, Spinner, useOverlayState } from "@heroui/react";
 import { type ReactNode } from "react";
 
-type ConfirmModalProps = {
+type StatusConfirmModalProps = {
   title: string;
   description: string;
+  content: ReactNode;
   confirmText?: string;
   cancelText?: string;
   isLoading?: boolean;
@@ -12,15 +13,16 @@ type ConfirmModalProps = {
   trigger?: ReactNode;
 };
 
-export const ConfirmModal = ({
+export const StatusConfirmModal = ({
   title,
   description,
+  content,
   confirmText = "Confirm",
   cancelText = "Cancel",
   isLoading = false,
   onConfirm,
   trigger,
-}: ConfirmModalProps) => {
+}: StatusConfirmModalProps) => {
   const state = useOverlayState();
 
   return (
@@ -38,11 +40,10 @@ export const ConfirmModal = ({
 
               <AlertDialog.Header>
                 <AlertDialog.Heading>{title}</AlertDialog.Heading>
+                <AlertDialog.Heading>{description}</AlertDialog.Heading>
               </AlertDialog.Header>
 
-              <AlertDialog.Body>
-                <p className="text-sm text-slate-400">{description}</p>
-              </AlertDialog.Body>
+              <AlertDialog.Body>{content}</AlertDialog.Body>
 
               <AlertDialog.Footer>
                 <Button slot="close" variant="tertiary" isPending={isLoading}>

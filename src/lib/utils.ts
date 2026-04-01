@@ -30,7 +30,7 @@ export const returnError = (error: any, message: string) => {
 
 export const formatMoney = (value: string) => `$${Number(value).toFixed(2)}`;
 
-type OrderItemStatus = InferSelectModel<typeof orderItems>["status"];
+export type OrderItemStatus = InferSelectModel<typeof orderItems>["status"];
 type OrderStatus = InferSelectModel<typeof orders>["status"];
 export function deriveOrderStatus(
   itemStatuses: OrderItemStatus[],
@@ -141,3 +141,18 @@ export function monthLabel(f: MonthFilter): string {
 export function fKey(f: MonthFilter) {
   return f ? `${f.year}-${f.month}` : "all";
 }
+
+export const VENDOR_TRANSITIONS: Partial<
+  Record<OrderItemStatus, OrderItemStatus[]>
+> = {
+  pending: ["processing"],
+  processing: ["shipped"],
+  shipped: ["delivered"],
+};
+
+export const canVendorTransitionTo = (
+  from: OrderItemStatus,
+  to: OrderItemStatus,
+): boolean => {
+  return VENDOR_TRANSITIONS[from]?.includes(to) ?? false;
+};

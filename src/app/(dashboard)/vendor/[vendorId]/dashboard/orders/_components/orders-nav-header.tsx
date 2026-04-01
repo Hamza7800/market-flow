@@ -29,14 +29,14 @@ const OrdersNavHeader = ({ status }: { status: OrderStatus }) => {
   const activeStatus = urlStatus ?? status;
 
   return (
-    <Card className="">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <Card className="mb-4">
+      {/* <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-2">
           <Chip>Orders</Chip>
         </div>
-      </div>
+      </div> */}
 
-      <div className="mt-5 flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2">
         {(
           [
             "pending",
