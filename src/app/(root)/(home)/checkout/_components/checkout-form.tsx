@@ -211,8 +211,8 @@ const CheckoutForm = () => {
                     name="country"
                     render={({ field }) => (
                       <Select
-                        selectedKey={field.value}
-                        onSelectionChange={(key) => field.onChange(String(key))}
+                        value={field.value}
+                        onChange={(key) => field.onChange(String(key))}
                         isInvalid={!!errors.country}
                         isRequired
                       >
@@ -242,7 +242,7 @@ const CheckoutForm = () => {
 
                 {/* Save address */}
                 {/* {userId && ( */}
-                <Controller
+                {/* <Controller
                   control={control}
                   name="saveAddress"
                   render={({ field }) => (
@@ -253,15 +253,15 @@ const CheckoutForm = () => {
                       Save this address to my account
                     </Checkbox>
                   )}
-                />
+                /> */}
                 {/* )} */}
               </section>
 
               {/* Discount code */}
-              <DiscountCodeInput
+              {/* <DiscountCodeInput
                 subtotal={summary?.subtotal ?? 0}
                 className="mt-4"
-              />
+              /> */}
 
               <Button
                 type="submit"

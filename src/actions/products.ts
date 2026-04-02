@@ -1,6 +1,6 @@
 "use server";
 import { cacheWrap, cacheDel } from "@/lib/cache-helpers";
-import { productKeys, type ProductFilters } from "@/lib/cache-keys";
+import { productKeys } from "@/lib/cache-keys";
 import { returnError } from "@/lib/utils";
 import { getUser } from "@/server/better-auth/server";
 import { db } from "@/server/db";
@@ -35,123 +35,6 @@ import {
   sql,
 } from "drizzle-orm";
 import { deleteUploadThingFiles } from "./images";
-
-export const getProducts = async (
-  page: number = 1,
-  filters: ProductFilters = {
-    inStock: true,
-  },
-) => {
-  try {
-    const { category, inStock, maxPrice, minPrice, search, sort } = filters;
-
-    const LIMIT = 20;
-    const offset = (page - 1) * LIMIT;
-
-    const data = await cacheWrap(
-      productKeys.tags.list(page, filters),
-      [productKeys.tags.lists(), productKeys.tags.all()],
-      async () => {
-        const conditions = [
-          eq(products.status, "active"),
-          isNull(products.deletedAt),
-          category ? eq(products.categoryId, category) : undefined,
-          minPrice !== undefined
-            ? gte(products.basePrice, minPrice.toString())
-            : undefined,
-
-          maxPrice !== undefined
-            ? lte(products.basePrice, maxPrice.toString())
-            : undefined,
-
-          search
-            ? or(
-                ilike(products.name, `%${search}%`),
-                ilike(products.description, `%${search}%`),
-              )
-            : undefined,
-          inStock
-            ? or(
-                and(eq(products.hasVariants, false), gte(products.stock, 1)),
-                and(
-                  eq(products.hasVariants, true),
-                  inArray(
-                    products.id,
-                    db
-                      .select({ productId: productVariants.productId })
-                      .from(productVariants)
-                      .where(gte(productVariants.stock, 1)),
-                  ),
-                ),
-              )
-            : undefined,
-          // inStock && !products.hasVariants ? gte(products.stock, 1) : undefined,
-        ].filter(Boolean) as any[];
-
-        console.log("DB HIT");
-
-        return db.query.products.findMany({
-          where: and(...conditions),
-          limit: LIMIT,
-          offset,
-          orderBy: buildOrderBy(sort),
-          with: {
-            images: {
-              where: eq(productImages.isPrimary, true),
-              limit: 1,
-            },
-            vendor: {
-              columns: {
-                storeName: true,
-                storeSlug: true,
-                logoUrl: true,
-              },
-            },
-            variants: {
-              where: isNull(productVariants.deletedAt),
-              columns: {
-                id: true,
-                price: true,
-                stock: true,
-                name: true,
-                options: true,
-              },
-            },
-          },
-        });
-      },
-    );
-
-    return {
-      success: true,
-      message: "Products fetched",
-      data,
-      meta: {
-        page,
-        limit: LIMIT,
-        hasMore: data.length === LIMIT,
-      },
-    };
-  } catch (error) {
-    return returnError(error, "Unable to fetch products");
-  }
-};
-
-export type Products = Awaited<ReturnType<typeof getProducts>>["data"];
-
-function buildOrderBy(sort?: ProductFilters["sort"]) {
-  switch (sort) {
-    case "price_asc":
-      return [asc(products.basePrice)];
-    case "price_desc":
-      return [desc(products.basePrice)];
-    case "rating":
-      return [desc(products.averageRating)];
-    case "newest":
-    default:
-      return [desc(products.createdAt)];
-  }
-}
 
 export const getVendorProductById = async (productId: string) => {
   try {

@@ -10,6 +10,7 @@ import {
 } from "@gravity-ui/icons";
 import { Button, Dropdown, Label } from "@heroui/react";
 import { useQueryClient } from "@tanstack/react-query";
+import { Truck } from "lucide-react";
 import { useRouter } from "nextjs-toploader/app";
 
 const UserLinks = () => {
@@ -38,11 +39,11 @@ const UserLinks = () => {
                 onClick={() => {
                   router.push(`/user/${data.user?.id}/orders`);
                 }}
-                id="profile"
-                textValue="Profile"
+                id="my-orders"
+                textValue="My Orders"
               >
-                <Person className="text-muted size-4 shrink-0" />
-                <Label>Profile</Label>
+                <Truck className="text-muted size-4 shrink-0" />
+                <Label>My Orders</Label>
               </Dropdown.Item>
               {isActive ? (
                 <Dropdown.Item

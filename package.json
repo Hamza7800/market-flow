@@ -22,6 +22,7 @@
   "dependencies": {
     "@auth/drizzle-adapter": "^1.7.2",
     "@better-auth/stripe": "^1.5.5",
+    "@faker-js/faker": "^10.4.0",
     "@gravity-ui/icons": "^2.18.0",
     "@heroui/react": "^3.0.1",
     "@heroui/styles": "^3.0.1",
@@ -52,6 +53,7 @@
     "react-hook-form": "^7.71.2",
     "recharts": "^3.8.0",
     "shadcn": "^4.1.0",
+    "slugify": "^1.6.9",
     "stripe": "^20.4.1",
     "tailwind-merge": "^3.5.0",
     "tailwind-variants": "^3.2.2",

@@ -7,6 +7,7 @@ export type ProductFilters = {
   sort?: "newest" | "price_asc" | "price_desc" | "rating";
   search?: string;
   inStock?: boolean;
+  // page?: number;
 };
 
 function filtersToString(filters: ProductFilters): string {
@@ -26,6 +27,11 @@ const productSegments = {
     page.toString(),
     filtersToString(filters),
   ],
+  infinityList: (filters: ProductFilters) => [
+    "products",
+    "list",
+    filtersToString(filters),
+  ],
   detail: (slug: string) => ["products", "detail", slug],
   byVendor: (vendorId: string) => ["products", "vendor", vendorId],
   byCategory: (categoryId: string) => ["products", "category", categoryId],
@@ -43,6 +49,8 @@ export const productKeys = {
   lists: () => productSegments.lists(),
   list: (page: number, filters: ProductFilters) =>
     productSegments.list(page, filters),
+  infinityList: (filters: ProductFilters) =>
+    productSegments.infinityList(filters),
   detail: (productId: string) => productSegments.detail(productId),
   byVendor: (vendorId: string) => productSegments.byVendor(vendorId),
   byCategory: (categoryId: string) => productSegments.byCategory(categoryId),
@@ -54,6 +62,8 @@ export const productKeys = {
     lists: () => toTag(productSegments.lists()),
     list: (page: number, filters: ProductFilters) =>
       toTag(productSegments.list(page, filters)),
+    infinityList: (filters: ProductFilters) =>
+      toTag(productSegments.infinityList(filters)),
     detail: (productId: string) => toTag(productSegments.detail(productId)),
     byVendor: (vendorId: string) => toTag(productSegments.byVendor(vendorId)),
     byCategory: (categoryId: string) =>

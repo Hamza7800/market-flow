@@ -35,7 +35,11 @@ const VendorForm = ({ initialData }: VendorFormProps) => {
   const updateVendor = useUpdateVendor();
   const mutation = isEditMode ? updateVendor : vendorApplication;
 
-  const { handleSubmit, control } = useForm<VendorSchema>({
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<VendorSchema>({
     resolver: zodResolver(vendorSchema),
     defaultValues: initialData
       ? {
@@ -81,9 +85,9 @@ const VendorForm = ({ initialData }: VendorFormProps) => {
                 onChange={field.onChange}
                 disabled={isSubmitting}
               />
-              {fieldState.error && (
+              {errors.banner?.url && (
                 <ErrorMessage className="text-xs text-[--danger]">
-                  {fieldState.error.message}
+                  {errors.banner.url.message}
                 </ErrorMessage>
               )}
             </div>
@@ -96,15 +100,14 @@ const VendorForm = ({ initialData }: VendorFormProps) => {
           name="logo"
           render={({ field, fieldState }) => (
             <div className="flex flex-col gap-1">
+              {/* {console.log(fieldState.invalid)} */}
               <ProfileImageUploader
                 value={field.value}
                 onChange={field.onChange}
                 disabled={isSubmitting}
               />
-              {fieldState.error && (
-                <ErrorMessage className="text-xs text-[--danger]">
-                  {fieldState.error.message}
-                </ErrorMessage>
+              {errors.logo?.url && (
+                <ErrorMessage>{errors.logo.url.message}</ErrorMessage>
               )}
             </div>
           )}

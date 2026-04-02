@@ -123,7 +123,7 @@ export default function ProductsTable({
             p.images?.[0]?.url ??
             "https://picsum.photos/seed/placeholder/120/120";
           return (
-            <div className="flex items-center gap-3">
+            <div className="flex max-w-xs items-center gap-3">
               <div className="border-default-100 bg-default-50 relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg border">
                 <Image
                   src={img}
@@ -328,7 +328,7 @@ export default function ProductsTable({
                 isRowHeader
                 className={cn(
                   "bg-default-50 text-default-500 text-xs font-semibold tracking-wide uppercase first:pl-5 last:pr-5",
-                  header.id === "product" && "w-full", // 👈 full width
+                  // header.id === "product" && "w-full max-w-[150px]", // 👈 full width
                   header.id === "actions" && "min-w-[140px]",
                   header.id === "status" && "min-w-[80px]",
                   header.id === "rating" && "min-w-[150px]",

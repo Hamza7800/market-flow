@@ -25,6 +25,7 @@ export const returnError = (error: any, message: string) => {
     success: false,
     message: errorMessage,
     data: null,
+    meta: null,
   };
 };
 
