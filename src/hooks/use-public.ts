@@ -2,6 +2,7 @@ import {
   getCategories,
   getProductById,
   getProducts,
+  getPublicVendors,
   getVendorById,
   getVendorPublicProducts,
 } from "@/actions/public";
@@ -80,5 +81,18 @@ export function useVendorPublicProducts(vendorId: string, page = 1) {
     enabled: !!vendorId,
     staleTime: 1000 * 60 * 2,
     placeholderData: (prev) => prev,
+  });
+}
+
+export function usePublicVendors() {
+  return useQuery({
+    queryKey: ["vendors", "public-list"],
+    queryFn: async () => {
+      const r = await getPublicVendors();
+      if (!r.success) {
+        throw new Error(r.message);
+      }
+      return r.data;
+    },
   });
 }

@@ -13,6 +13,7 @@ import {
 import { useAddToCart } from "@/hooks/use-cart";
 import type { AddToCartInput } from "@/zod-schema/cart-schema";
 import clsx from "clsx";
+import { ShoppingCart } from "@gravity-ui/icons";
 
 type Variant = {
   id: string;
@@ -48,7 +49,13 @@ export default function AddToCartWithVariant({ variants, productId }: Props) {
 
   return (
     <Modal>
-      <Button>Add to Cart</Button>
+      <Button
+        size="sm"
+        className="bg-primary hover:bg-primary/90 text-primary-foreground group w-full font-semibold"
+      >
+        <ShoppingCart className="mr-2" />
+        Add to Cart
+      </Button>
 
       <Modal.Backdrop>
         <Modal.Container>

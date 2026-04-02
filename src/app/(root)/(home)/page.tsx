@@ -1,4 +1,4 @@
-import { getProducts } from "@/actions/public";
+import { getProducts, getPublicVendors } from "@/actions/public";
 import {
   dehydrate,
   HydrationBoundary,
@@ -9,10 +9,13 @@ import { homeParamsCache } from "@/lib/nuqs/public";
 import { productKeys } from "@/lib/cache-keys";
 import MaxWidthContainer from "@/components/max-w-container";
 import ProductsList from "@/app/(root)/_components/products/products-list";
-import { LinkButton } from "@/components/link-button";
-import { PUBLIC_ROUTES } from "@/lib/consts/constants";
+// import { LinkButton } from "@/components/link-button";
+// import { PUBLIC_ROUTES } from "@/lib/consts/constants";
 import { FiltersContent } from "@/app/(root)/_components/filters-content";
 import CategoriesList from "@/app/(root)/_components/categories-list";
+import { HeroBanner } from "@/app/(root)/_components/hero-banner";
+import { Footer } from "@/app/(root)/_components/footer";
+import Vendors from "@/app/(root)/_components/vendors";
 
 type Props = {
   page: number;
@@ -39,16 +42,28 @@ const ProductsContent = async ({ category, page }: Props) => {
 
   return (
     <HydrationBoundary state={dehydrate(qc)}>
-      <ProductsList filters={filters} category={category} />
-      <LinkButton
-        href={
-          category
-            ? PUBLIC_ROUTES.browseCategory(category)
-            : PUBLIC_ROUTES.browse
-        }
-      >
-        More
-      </LinkButton>
+      <ProductsList isHomePage filters={filters} category={category} />
+    </HydrationBoundary>
+  );
+};
+
+const VendorsContent = async () => {
+  const qc = new QueryClient();
+
+  await qc.prefetchQuery({
+    queryKey: ["vendors", "public-list"],
+    queryFn: async () => {
+      const r = await getPublicVendors();
+      if (!r.success) {
+        throw new Error(r.message);
+      }
+      return r.data;
+    },
+  });
+
+  return (
+    <HydrationBoundary state={dehydrate(qc)}>
+      <Vendors slice={6} />
     </HydrationBoundary>
   );
 };
@@ -62,6 +77,7 @@ const HomePage = async ({
 
   return (
     <MaxWidthContainer>
+      <HeroBanner />
       <Suspense fallback={<h2>Loading Categories....</h2>}>
         <FiltersContent page={page} category={category}>
           <CategoriesList />
@@ -70,6 +86,10 @@ const HomePage = async ({
       <Suspense fallback={<h2>Loading Products....</h2>}>
         <ProductsContent page={page} category={category} />
       </Suspense>
+      <Suspense fallback={<h2>Loading Vendors....</h2>}>
+        <VendorsContent />
+      </Suspense>
+      <Footer />
     </MaxWidthContainer>
   );
 };

@@ -34,6 +34,10 @@ const config = {
       },
       {
         protocol: "https",
+        hostname: "ajax-filters-bc.diviengine.com",
+      },
+      {
+        protocol: "https",
         hostname: "picsum.photos",
         pathname: "/**",
       },

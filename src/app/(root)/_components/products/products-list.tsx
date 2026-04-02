@@ -16,7 +16,7 @@ import { useRouter } from "nextjs-toploader/app";
 import { useQueryStates } from "nuqs";
 import { browseClientParams, browseServerParams } from "@/lib/nuqs/public";
 import { useMemo, useTransition } from "react";
-import { seedProducts } from "seed";
+import { seedStore } from "seed";
 import type { ProductFilters } from "@/lib/cache-keys";
 import { LoadMoreButton } from "./load-more";
 
@@ -24,7 +24,9 @@ const ProductsList = ({
   category,
   // page,
   filters,
+  isHomePage = false,
 }: {
+  isHomePage?: boolean;
   category: string;
   // page: number;
   filters: ProductFilters;
@@ -121,28 +123,36 @@ const ProductsList = ({
     );
   }
 
-  // const safeProducts = (filteredProducts ?? []).filter(
-  //   (p): p is NonNullable<typeof p> => p != null,
-  // );
-
-  console.table(safeProducts);
-
   return (
     <main className="w-full">
       {/* <Button
         onClick={() => {
-          seedProducts();
+          seedStore();
         }}
       >
         Seed
       </Button> */}
       <ProductsGrid products={safeProducts} />
-      <LoadMoreButton
-        // hasMore={products.meta.hasMore} isLoading={isPending}
-        hasMore={hasNextPage}
-        isLoading={isFetchingNextPage}
-        onClick={fetchNextPage}
-      />
+      {isHomePage ? (
+        <div className="mt-10 flex items-center justify-center">
+          <LinkButton
+            href={
+              category
+                ? PUBLIC_ROUTES.browseCategory(category)
+                : PUBLIC_ROUTES.browse
+            }
+          >
+            View All Products
+          </LinkButton>
+        </div>
+      ) : (
+        <LoadMoreButton
+          // hasMore={products.meta.hasMore} isLoading={isPending}
+          hasMore={hasNextPage}
+          isLoading={isFetchingNextPage}
+          onClick={fetchNextPage}
+        />
+      )}
     </main>
   );
 };

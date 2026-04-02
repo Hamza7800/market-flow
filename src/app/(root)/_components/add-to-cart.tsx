@@ -3,6 +3,7 @@
 import { Button } from "@heroui/react";
 import { useAddToCart } from "@/hooks/use-cart";
 import type { AddToCartInput } from "@/zod-schema/cart-schema";
+import { ShoppingCart } from "@gravity-ui/icons";
 
 type AddToCartButtonProps = {
   productId: string;
@@ -37,9 +38,12 @@ export function AddToCartButton({
       fullWidth={fullWidth}
       isDisabled={disabled || isPending}
       onPress={handlePress}
-      className="font-medium"
+      size="sm"
+      className="bg-primary hover:bg-primary/90 text-primary-foreground group w-full font-semibold"
     >
-      {isPending ? "Adding..." : label}
+      <ShoppingCart className="mr-2" />
+      {label}
+      {/* {isPending ? "Adding..." : label} */}
     </Button>
   );
 }

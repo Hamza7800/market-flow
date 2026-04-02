@@ -1334,301 +1334,491 @@
 // //     });
 // // }
 "use server";
+
+import { auth } from "@/server/better-auth";
 import { db } from "@/server/db";
 import {
   categories,
-  tags,
+  vendorProfiles,
   products,
   productImages,
-  productTags,
+  productVariants,
 } from "@/server/db/schema";
+// import { db } from "@/server/db";
+// import {
+//   categories,
+//   tags,
+//   products,
+//   productImages,
+//   productTags,
+// } from "@/server/db/schema";
+// import { faker } from "@faker-js/faker";
+// import slugify from "slugify";
+
+// // --- 1. CONFIGURATION & REALISTIC DATA DICTIONARIES ---
+
+// const VENDORS = [
+//   "0c76469b-cf5f-4aee-a25f-fa49333b2404",
+//   "d61f0fbf-568a-414c-a312-6edb51ea7daa",
+// ];
+
+// const PRODUCTS_PER_VENDOR = 500;
+// const BATCH_SIZE = 100;
+
+// const REAL_CATEGORIES = [
+//   "Electronics",
+//   "Home & Kitchen",
+//   "Men's Clothing",
+//   "Women's Clothing",
+//   "Sports & Outdoors",
+//   "Beauty & Personal Care",
+//   "Books",
+//   "Toys & Games",
+//   "Health & Household",
+//   "Automotive",
+//   "Grocery",
+//   "Pet Supplies",
+//   "Office Products",
+//   "Tools & Home Improvement",
+//   "Garden & Outdoor",
+//   "Baby Products",
+//   "Musical Instruments",
+//   "Industrial & Scientific",
+//   "Arts, Crafts & Sewing",
+//   "Video Games",
+// ];
+
+// const REAL_TAGS = [
+//   "Wireless",
+//   "Bluetooth",
+//   "Smart",
+//   "Eco-Friendly",
+//   "Organic",
+//   "Vegan",
+//   "Handmade",
+//   "Vintage",
+//   "Waterproof",
+//   "Portable",
+//   "Durable",
+//   "Lightweight",
+//   "Ergonomic",
+//   "Bestseller",
+//   "New Arrival",
+//   "Limited Edition",
+//   "Clearance",
+//   "Sale",
+//   "Premium",
+//   "Budget",
+//   "Kids",
+//   "Adults",
+//   "Unisex",
+//   "Mens",
+//   "Womens",
+//   "Tech",
+//   "Gaming",
+//   "Fitness",
+//   "Travel",
+//   "Home",
+// ];
+
+// // Mapping categories to realistic base product names
+// const PRODUCT_TEMPLATES: Record<string, string[]> = {
+//   Electronics: [
+//     "Wireless Headphones",
+//     "4K Smart TV",
+//     "Bluetooth Speaker",
+//     "Gaming Mouse",
+//     "Mechanical Keyboard",
+//     "Smartphone",
+//     "Tablet",
+//     "Power Bank",
+//   ],
+//   "Home & Kitchen": [
+//     "Coffee Maker",
+//     "Air Fryer",
+//     "Blender",
+//     "Robot Vacuum",
+//     "Ceramic Cookware Set",
+//     "Memory Foam Pillow",
+//     "Desk Lamp",
+//   ],
+//   "Men's Clothing": [
+//     "Classic Cotton T-Shirt",
+//     "Slim Fit Jeans",
+//     "Leather Jacket",
+//     "Running Shoes",
+//     "Winter Beanie",
+//     "Polo Shirt",
+//   ],
+//   "Women's Clothing": [
+//     "Floral Summer Dress",
+//     "Yoga Leggings",
+//     "Denim Jacket",
+//     "Ankle Boots",
+//     "Silk Blouse",
+//     "Wool Coat",
+//   ],
+//   "Sports & Outdoors": [
+//     "Yoga Mat",
+//     "Dumbbell Set",
+//     "Camping Tent",
+//     "Sleeping Bag",
+//     "Water Bottle",
+//     "Resistance Bands",
+//     "Hiking Backpack",
+//   ],
+//   "Beauty & Personal Care": [
+//     "Vitamin C Serum",
+//     "Moisturizing Lotion",
+//     "Matte Lipstick",
+//     "Eyeshadow Palette",
+//     "Hair Dryer",
+//     "Beard Oil",
+//   ],
+//   "Video Games": [
+//     "Wireless Controller",
+//     "Gaming Headset",
+//     "Console Charging Station",
+//     "Mechanical Switch Tester",
+//     "VR Headset",
+//   ],
+//   // Fallback for others
+//   default: [
+//     "Premium Product",
+//     "Essential Item",
+//     "Luxury Goods",
+//     "Everyday Basic",
+//     "Pro Edition",
+//   ],
+// };
+
+// // --- 2. HELPER FUNCTIONS ---
+
+// const generateSlug = (name: string) => {
+//   return slugify(`${name}-${faker.string.alphanumeric(6)}`, {
+//     lower: true,
+//     strict: true,
+//   });
+// };
+
+// const getRandomItems = <T>(arr: T[], count: number): T[] => {
+//   const shuffled = [...arr].sort(() => 0.5 - Math.random());
+//   return shuffled.slice(0, count);
+// };
+
+// // --- 3. MAIN SEED FUNCTION ---
+
+// export async function seedProducts() {
+//   console.log("🌱 Starting realistic product seed...");
+
+//   try {
+//     // 1. Seed Categories
+//     console.log("📦 Seeding Categories...");
+//     const categoryInserts = REAL_CATEGORIES.map((name) => ({
+//       name,
+//       slug: generateSlug(name),
+//       sortOrder: faker.number.int({ min: 0, max: 100 }),
+//     }));
+//     const insertedCategories = await db
+//       .insert(categories)
+//       .values(categoryInserts)
+//       .returning({ id: categories.id, name: categories.name })
+//       .onConflictDoNothing();
+
+//     // 2. Seed Tags
+//     console.log("🏷️ Seeding Tags...");
+//     const tagInserts = REAL_TAGS.map((name) => ({
+//       name,
+//       slug: generateSlug(name),
+//     }));
+//     const insertedTags = await db
+//       .insert(tags)
+//       .values(tagInserts)
+//       .returning({ id: tags.id })
+//       .onConflictDoNothing();
+
+//     // 3. Seed Products per Vendor
+//     for (const vendorId of VENDORS) {
+//       console.log(`\n🏪 Seeding products for vendor: ${vendorId}`);
+
+//       let vendorProductCount = 0;
+
+//       // Process in batches to avoid overwhelming the database
+//       while (vendorProductCount < PRODUCTS_PER_VENDOR) {
+//         const batchSize = Math.min(
+//           BATCH_SIZE,
+//           PRODUCTS_PER_VENDOR - vendorProductCount,
+//         );
+
+//         const productsBatch = [];
+//         const imagesBatch = [];
+//         const productTagsBatch = [];
+
+//         // Generate Batch Data
+//         for (let i = 0; i < batchSize; i++) {
+//           const category = faker.helpers.arrayElement(insertedCategories);
+//           const templateList =
+//             PRODUCT_TEMPLATES[category.name] || PRODUCT_TEMPLATES["default"];
+//           const baseName = faker.helpers.arrayElement(templateList);
+
+//           // Make name unique (e.g., "Wireless Headphones V2 Pro")
+//           const adjective = faker.commerce.productAdjective();
+//           const suffix = faker.helpers.arrayElement([
+//             "Pro",
+//             "Max",
+//             "Ultra",
+//             "Lite",
+//             "V2",
+//             "Plus",
+//             "Essential",
+//             "Premium",
+//           ]);
+//           const productName = `${adjective} ${baseName} ${suffix}`;
+
+//           const productId = faker.string.uuid();
+
+//           // Construct Product
+//           productsBatch.push({
+//             id: productId,
+//             vendorId: vendorId,
+//             categoryId: category.id,
+//             name: productName,
+//             slug: generateSlug(productName),
+//             description: faker.commerce.productDescription(),
+//             basePrice: faker.commerce.price({ min: 10, max: 1000, dec: 2 }),
+//             hasVariants: false,
+//             stock: faker.number.int({ min: 0, max: 500 }),
+//             status: "active" as const,
+//             averageRating: faker.number
+//               .float({ min: 3.0, max: 5.0, fractionDigits: 2 })
+//               .toString(),
+//             reviewCount: faker.number.int({ min: 0, max: 200 }),
+//             totalSold: faker.number.int({ min: 0, max: 1000 }),
+//           });
+
+//           // Construct 1-3 Images for this product
+//           const imageCount = faker.number.int({ min: 1, max: 3 });
+//           const keyword = encodeURIComponent(
+//             baseName?.split(" ")[0].toLowerCase(),
+//           );
+//           for (let imgIdx = 0; imgIdx < imageCount; imgIdx++) {
+//             imagesBatch.push({
+//               productId: productId,
+//               // Using loremflickr with a keyword based on the product name for realism
+//               url: `https://loremflickr.com/800/800/${keyword}?lock=${faker.number.int({ min: 1, max: 1000 })}`,
+//               altText: `${productName} image ${imgIdx + 1}`,
+//               sortOrder: imgIdx,
+//               isPrimary: imgIdx === 0,
+//             });
+//           }
+
+//           // Construct 2-4 Tags for this product
+//           const selectedTags = getRandomItems(
+//             insertedTags,
+//             faker.number.int({ min: 2, max: 4 }),
+//           );
+//           for (const tag of selectedTags) {
+//             productTagsBatch.push({
+//               productId: productId,
+//               tagId: tag.id,
+//             });
+//           }
+//         }
+
+//         // Insert Batch into DB sequentially to respect foreign key constraints
+//         await db.insert(products).values(productsBatch);
+//         await db.insert(productImages).values(imagesBatch);
+//         await db.insert(productTags).values(productTagsBatch);
+
+//         vendorProductCount += batchSize;
+//         console.log(
+//           `   ...inserted ${vendorProductCount}/${PRODUCTS_PER_VENDOR} products.`,
+//         );
+//       }
+//     }
+
+//     console.log("\n✅ Seeding completed successfully!");
+//   } catch (error) {
+//     console.error("❌ Error during seeding:", error);
+//   }
+// }
+
 import { faker } from "@faker-js/faker";
 import slugify from "slugify";
 
-// --- 1. CONFIGURATION & REALISTIC DATA DICTIONARIES ---
+// --- 1. THE DATA FROM YOUR CSV ---
+// I've structured this into templates so we can distribute them across 10 vendors
+const STRIPE_ID = "acct_1THHaaQyB1cTpXXd"; // Your ID
 
-const VENDORS = [
-  "0c76469b-cf5f-4aee-a25f-fa49333b2404",
-  "d61f0fbf-568a-414c-a312-6edb51ea7daa",
+const PRODUCT_TEMPLATES = [
+  {
+    name: "Divi Engine String Bag (Big Logo)",
+    category: "Accessories",
+    price: "19.99",
+    description:
+      "This fashionable string bag is made of 100% cotton. It is the perfect size for carrying your everyday essentials.",
+    images: [
+      "https://ajax-filters-bc.diviengine.com/sampledata/images/Bag1.jpg",
+    ],
+    hasVariants: false,
+  },
+  {
+    name: "Divi Engine Tee",
+    category: "Men",
+    price: "14.99",
+    description:
+      "This comfortable cotton t-shirt features the Divi Engine logo. Available in various colors and sizes.",
+    images: [
+      "https://ajax-filters-bc.diviengine.com/sampledata/images/Shirt-3-yellow-front.jpg",
+    ],
+    hasVariants: true,
+    variants: [
+      { name: "Blue / Large", options: "Color: Blue, Size: Large" },
+      { name: "White / Large", options: "Color: White, Size: Large" },
+      { name: "Yellow / Small", options: "Color: Yellow, Size: Small" },
+    ],
+  },
+  {
+    name: "Mens Divi Hoodie",
+    category: "Men",
+    price: "34.99",
+    description:
+      "Soft, comfortable, and durable cotton blend hoodie. Show your Divi pride.",
+    images: [
+      "https://ajax-filters-bc.diviengine.com/sampledata/images/Hoodie-2.jpg",
+    ],
+    hasVariants: true,
+    variants: [
+      { name: "Large", options: "Size: Large" },
+      { name: "Medium", options: "Size: Medium" },
+    ],
+  },
+  {
+    name: "Divi Ninja Tee",
+    category: "Women",
+    price: "12.99",
+    description:
+      "Express your Ninja status with the theme. Perfect for any occasion.",
+    images: [
+      "https://ajax-filters-bc.diviengine.com/sampledata/images/Divi-Ninja.jpg",
+    ],
+    hasVariants: false,
+  },
+  {
+    name: "WooCommerce Zipper Hoodie",
+    category: "Women",
+    price: "29.99",
+    description: "Stay warm and show your WooCommerce pride.",
+    images: [
+      "https://ajax-filters-bc.diviengine.com/sampledata/images/Hoodie-Women-3.jpg",
+    ],
+    hasVariants: false,
+  },
 ];
 
-const PRODUCTS_PER_VENDOR = 500;
-const BATCH_SIZE = 100;
-
-const REAL_CATEGORIES = [
+const TOP_LEVEL_CATEGORIES = [
+  "Accessories",
+  "Men",
+  "Women",
   "Electronics",
-  "Home & Kitchen",
-  "Men's Clothing",
-  "Women's Clothing",
-  "Sports & Outdoors",
-  "Beauty & Personal Care",
-  "Books",
-  "Toys & Games",
-  "Health & Household",
-  "Automotive",
-  "Grocery",
-  "Pet Supplies",
-  "Office Products",
-  "Tools & Home Improvement",
-  "Garden & Outdoor",
-  "Baby Products",
-  "Musical Instruments",
-  "Industrial & Scientific",
-  "Arts, Crafts & Sewing",
-  "Video Games",
+  "Gifts",
 ];
 
-const REAL_TAGS = [
-  "Wireless",
-  "Bluetooth",
-  "Smart",
-  "Eco-Friendly",
-  "Organic",
-  "Vegan",
-  "Handmade",
-  "Vintage",
-  "Waterproof",
-  "Portable",
-  "Durable",
-  "Lightweight",
-  "Ergonomic",
-  "Bestseller",
-  "New Arrival",
-  "Limited Edition",
-  "Clearance",
-  "Sale",
-  "Premium",
-  "Budget",
-  "Kids",
-  "Adults",
-  "Unisex",
-  "Mens",
-  "Womens",
-  "Tech",
-  "Gaming",
-  "Fitness",
-  "Travel",
-  "Home",
-];
+// --- 2. HELPERS ---
+const generateSlug = (name: string) =>
+  slugify(`${name}-${faker.string.alpha(3)}`, { lower: true, strict: true });
 
-// Mapping categories to realistic base product names
-const PRODUCT_TEMPLATES: Record<string, string[]> = {
-  Electronics: [
-    "Wireless Headphones",
-    "4K Smart TV",
-    "Bluetooth Speaker",
-    "Gaming Mouse",
-    "Mechanical Keyboard",
-    "Smartphone",
-    "Tablet",
-    "Power Bank",
-  ],
-  "Home & Kitchen": [
-    "Coffee Maker",
-    "Air Fryer",
-    "Blender",
-    "Robot Vacuum",
-    "Ceramic Cookware Set",
-    "Memory Foam Pillow",
-    "Desk Lamp",
-  ],
-  "Men's Clothing": [
-    "Classic Cotton T-Shirt",
-    "Slim Fit Jeans",
-    "Leather Jacket",
-    "Running Shoes",
-    "Winter Beanie",
-    "Polo Shirt",
-  ],
-  "Women's Clothing": [
-    "Floral Summer Dress",
-    "Yoga Leggings",
-    "Denim Jacket",
-    "Ankle Boots",
-    "Silk Blouse",
-    "Wool Coat",
-  ],
-  "Sports & Outdoors": [
-    "Yoga Mat",
-    "Dumbbell Set",
-    "Camping Tent",
-    "Sleeping Bag",
-    "Water Bottle",
-    "Resistance Bands",
-    "Hiking Backpack",
-  ],
-  "Beauty & Personal Care": [
-    "Vitamin C Serum",
-    "Moisturizing Lotion",
-    "Matte Lipstick",
-    "Eyeshadow Palette",
-    "Hair Dryer",
-    "Beard Oil",
-  ],
-  "Video Games": [
-    "Wireless Controller",
-    "Gaming Headset",
-    "Console Charging Station",
-    "Mechanical Switch Tester",
-    "VR Headset",
-  ],
-  // Fallback for others
-  default: [
-    "Premium Product",
-    "Essential Item",
-    "Luxury Goods",
-    "Everyday Basic",
-    "Pro Edition",
-  ],
-};
-
-// --- 2. HELPER FUNCTIONS ---
-
-const generateSlug = (name: string) => {
-  return slugify(`${name}-${faker.string.alphanumeric(6)}`, {
-    lower: true,
-    strict: true,
-  });
-};
-
-const getRandomItems = <T>(arr: T[], count: number): T[] => {
-  const shuffled = [...arr].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
-};
-
-// --- 3. MAIN SEED FUNCTION ---
-
-export async function seedProducts() {
-  console.log("🌱 Starting realistic product seed...");
+// --- 3. SEED FUNCTION ---
+export async function seedStore() {
+  console.log("🚀 Starting Real-Data Portfolio Seed...");
 
   try {
-    // 1. Seed Categories
-    console.log("📦 Seeding Categories...");
-    const categoryInserts = REAL_CATEGORIES.map((name) => ({
-      name,
-      slug: generateSlug(name),
-      sortOrder: faker.number.int({ min: 0, max: 100 }),
-    }));
-    const insertedCategories = await db
-      .insert(categories)
-      .values(categoryInserts)
-      .returning({ id: categories.id, name: categories.name })
-      .onConflictDoNothing();
+    // 1. Create Categories
+    console.log("📂 Creating Categories...");
+    const categoryMap: Record<string, string> = {};
+    for (const catName of TOP_LEVEL_CATEGORIES) {
+      const [inserted] = await db
+        .insert(categories)
+        .values({
+          name: catName,
+          slug: slugify(catName, { lower: true }),
+        })
+        .returning();
+      categoryMap[catName] = inserted.id;
+    }
 
-    // 2. Seed Tags
-    console.log("🏷️ Seeding Tags...");
-    const tagInserts = REAL_TAGS.map((name) => ({
-      name,
-      slug: generateSlug(name),
-    }));
-    const insertedTags = await db
-      .insert(tags)
-      .values(tagInserts)
-      .returning({ id: tags.id })
-      .onConflictDoNothing();
+    // 2. Create 10 Users and 10 Vendors
+    for (let i = 0; i < 10; i++) {
+      const email = `vendor${i + 1}@example.com`;
+      const vendorName = faker.person.firstName();
 
-    // 3. Seed Products per Vendor
-    for (const vendorId of VENDORS) {
-      console.log(`\n🏪 Seeding products for vendor: ${vendorId}`);
+      console.log(`👤 Creating Vendor: ${email}`);
 
-      let vendorProductCount = 0;
+      const userRes = await auth.api.signUpEmail({
+        body: { email, password: "password123", name: `${vendorName} Store` },
+      });
 
-      // Process in batches to avoid overwhelming the database
-      while (vendorProductCount < PRODUCTS_PER_VENDOR) {
-        const batchSize = Math.min(
-          BATCH_SIZE,
-          PRODUCTS_PER_VENDOR - vendorProductCount,
-        );
+      if (!userRes?.user) continue;
 
-        const productsBatch = [];
-        const imagesBatch = [];
-        const productTagsBatch = [];
+      const [vendor] = await db
+        .insert(vendorProfiles)
+        .values({
+          userId: userRes.user.id,
+          storeName: `${vendorName}'s Official Gear`,
+          storeSlug: generateSlug(`${vendorName} gear`),
+          // stripeAccountId: STRIPE_ID + 's',
+          // stripeOnboardingComplete: true,
+          status: "active",
+        })
+        .returning();
 
-        // Generate Batch Data
-        for (let i = 0; i < batchSize; i++) {
-          const category = faker.helpers.arrayElement(insertedCategories);
-          const templateList =
-            PRODUCT_TEMPLATES[category.name] || PRODUCT_TEMPLATES["default"];
-          const baseName = faker.helpers.arrayElement(templateList);
+      // 3. Create 20 items for this vendor by cycling through templates
+      for (let p = 0; p < 20; p++) {
+        const template = PRODUCT_TEMPLATES[p % PRODUCT_TEMPLATES.length];
+        const productId = faker.string.uuid();
+        const finalName = `${template.name} - ${faker.commerce.productAdjective()}`;
 
-          // Make name unique (e.g., "Wireless Headphones V2 Pro")
-          const adjective = faker.commerce.productAdjective();
-          const suffix = faker.helpers.arrayElement([
-            "Pro",
-            "Max",
-            "Ultra",
-            "Lite",
-            "V2",
-            "Plus",
-            "Essential",
-            "Premium",
-          ]);
-          const productName = `${adjective} ${baseName} ${suffix}`;
+        await db.insert(products).values({
+          id: productId,
+          vendorId: vendor.id,
+          categoryId:
+            categoryMap[template.category] || categoryMap["Accessories"],
+          name: finalName,
+          slug: generateSlug(finalName),
+          description: template.description,
+          basePrice: template.price,
+          hasVariants: template.hasVariants,
+          stock: template.hasVariants ? 0 : 50,
+          status: "active",
+        });
 
-          const productId = faker.string.uuid();
+        // Add Product Images
+        await db.insert(productImages).values({
+          productId: productId,
+          url: template.images[0],
+          isPrimary: true,
+        });
 
-          // Construct Product
-          productsBatch.push({
-            id: productId,
-            vendorId: vendorId,
-            categoryId: category.id,
-            name: productName,
-            slug: generateSlug(productName),
-            description: faker.commerce.productDescription(),
-            basePrice: faker.commerce.price({ min: 10, max: 1000, dec: 2 }),
-            hasVariants: false,
-            stock: faker.number.int({ min: 0, max: 500 }),
-            status: "active" as const,
-            averageRating: faker.number
-              .float({ min: 3.0, max: 5.0, fractionDigits: 2 })
-              .toString(),
-            reviewCount: faker.number.int({ min: 0, max: 200 }),
-            totalSold: faker.number.int({ min: 0, max: 1000 }),
-          });
-
-          // Construct 1-3 Images for this product
-          const imageCount = faker.number.int({ min: 1, max: 3 });
-          const keyword = encodeURIComponent(
-            baseName?.split(" ")[0].toLowerCase(),
-          );
-          for (let imgIdx = 0; imgIdx < imageCount; imgIdx++) {
-            imagesBatch.push({
+        // 4. Add Variants if applicable
+        if (template.hasVariants && template.variants) {
+          for (const v of template.variants) {
+            await db.insert(productVariants).values({
               productId: productId,
-              // Using loremflickr with a keyword based on the product name for realism
-              url: `https://loremflickr.com/800/800/${keyword}?lock=${faker.number.int({ min: 1, max: 1000 })}`,
-              altText: `${productName} image ${imgIdx + 1}`,
-              sortOrder: imgIdx,
-              isPrimary: imgIdx === 0,
-            });
-          }
-
-          // Construct 2-4 Tags for this product
-          const selectedTags = getRandomItems(
-            insertedTags,
-            faker.number.int({ min: 2, max: 4 }),
-          );
-          for (const tag of selectedTags) {
-            productTagsBatch.push({
-              productId: productId,
-              tagId: tag.id,
+              name: v.name,
+              options: v.options,
+              price: template.price,
+              stock: 10,
+              sku: faker.string.alphanumeric(8).toUpperCase(),
             });
           }
         }
-
-        // Insert Batch into DB sequentially to respect foreign key constraints
-        await db.insert(products).values(productsBatch);
-        await db.insert(productImages).values(imagesBatch);
-        await db.insert(productTags).values(productTagsBatch);
-
-        vendorProductCount += batchSize;
-        console.log(
-          `   ...inserted ${vendorProductCount}/${PRODUCTS_PER_VENDOR} products.`,
-        );
       }
     }
 
-    console.log("\n✅ Seeding completed successfully!");
-  } catch (error) {
-    console.error("❌ Error during seeding:", error);
+    console.log(
+      "✅ Seed Success: 10 Better-Auth Users, 10 Vendors, 200 Real-ish Products!",
+    );
+  } catch (err) {
+    console.error("❌ Seed Error:", err);
   }
 }

@@ -28,6 +28,7 @@ import {
   isNull,
   lte,
   or,
+  sql,
 } from "drizzle-orm";
 
 const LIMIT = 20;
@@ -73,35 +74,42 @@ export const getProducts = async (
         : undefined,
     ].filter(Boolean);
 
-    const data = await db.query.products.findMany({
-      where: and(...conditions),
-      orderBy: buildOrderBy(sort),
-      with: {
-        images: {
-          where: eq(productImages.isPrimary, true),
-          limit: 1,
-        },
-        vendor: {
-          columns: {
-            storeName: true,
-            storeSlug: true,
-            logoUrl: true,
+    const data = await cacheWrap(
+      productKeys.tags.list(page, filters),
+      [productKeys.tags.lists(), productKeys.tags.all()],
+      async () => {
+        return await db.query.products.findMany({
+          where: and(...conditions),
+          orderBy: buildOrderBy(sort),
+          with: {
+            images: {
+              where: eq(productImages.isPrimary, true),
+              limit: 1,
+            },
+            vendor: {
+              columns: {
+                storeName: true,
+                storeSlug: true,
+                logoUrl: true,
+              },
+            },
+            variants: {
+              where: isNull(productVariants.deletedAt),
+              columns: {
+                id: true,
+                price: true,
+                stock: true,
+                name: true,
+                options: true,
+              },
+            },
           },
-        },
-        variants: {
-          where: isNull(productVariants.deletedAt),
-          columns: {
-            id: true,
-            price: true,
-            stock: true,
-            name: true,
-            options: true,
-          },
-        },
+          limit: LIMIT + 1,
+          offset,
+        });
       },
-      limit: LIMIT + 1,
-      offset,
-    });
+      120,
+    );
 
     const hasMore = data.length > LIMIT;
     const pageData = hasMore ? data.slice(0, LIMIT) : data;
@@ -125,16 +133,17 @@ export type ProductSort = "newest" | "oldest" | "price-asc" | "price-desc";
 function buildOrderBy(sort?: ProductFilters["sort"]) {
   switch (sort) {
     case "price_asc":
-      return [asc(products.basePrice)];
+      return [asc(products.basePrice), asc(products.id)]; // tiebreaker
     case "price_desc":
-      return [desc(products.basePrice)];
+      return [desc(products.basePrice), asc(products.id)]; // tiebreaker
     case "rating":
-      return [desc(products.averageRating)];
+      return [desc(products.averageRating), asc(products.id)]; // tiebreaker
     case "newest":
     default:
-      return [desc(products.createdAt)];
+      return [desc(products.createdAt), asc(products.id)]; // tiebreaker
   }
 }
+export type Products = Awaited<ReturnType<typeof getProducts>>["data"];
 
 export async function getCategories() {
   try {
@@ -339,3 +348,47 @@ export async function getVendorPublicProducts(vendorId: string, page = 1) {
     return returnError(error, "Unable to fetch vendor products");
   }
 }
+
+export const getPublicVendors = async () => {
+  try {
+    const ratingExpr = sql<number>`ROUND(AVG(CAST(${products.averageRating} AS FLOAT))::numeric, 1)`;
+    const countExpr = sql<number>`COUNT(${products.id})`;
+
+    const data = await db
+      .select({
+        id: vendorProfiles.id,
+        storeName: vendorProfiles.storeName,
+        description: vendorProfiles.description,
+        rating: ratingExpr,
+        productCount: countExpr,
+        logo: vendorProfiles.logoUrl,
+      })
+      .from(vendorProfiles)
+      .leftJoin(
+        products,
+        and(
+          eq(products.vendorId, vendorProfiles.id),
+          eq(products.status, "active"),
+        ),
+      )
+      .where(eq(vendorProfiles.status, "active"))
+      .groupBy(
+        vendorProfiles.id,
+        vendorProfiles.storeName,
+        vendorProfiles.description,
+      )
+      .orderBy(desc(ratingExpr));
+
+    return {
+      data: data.map((v) => ({
+        ...v,
+        rating: Number(v.rating) || 0,
+        productCount: Number(v.productCount) || 0,
+      })),
+      message: "Vendors",
+      success: true,
+    };
+  } catch (error) {
+    return returnError(error, "Unable to get Vendors");
+  }
+};
