@@ -38,7 +38,7 @@ export function AddToCartButton({
       fullWidth={fullWidth}
       isDisabled={disabled || isPending}
       onPress={handlePress}
-      size="sm"
+      // size="sm"
       className="bg-primary hover:bg-primary/90 text-primary-foreground group w-full font-semibold"
     >
       <ShoppingCart className="mr-2" />

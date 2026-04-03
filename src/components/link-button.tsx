@@ -7,7 +7,7 @@ import { tv } from "tailwind-variants";
 import { useRouter } from "nextjs-toploader/app";
 
 const myButtonVariants = tv({
-  base: "text-md font-semibold shadow-md text-shadow-lg data-[pending=true]:opacity-40",
+  base: "text-md font-semibold data-[pending=true]:opacity-40",
   defaultVariants: {
     radius: "lg",
     variant: "primary",

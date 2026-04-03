@@ -26,9 +26,14 @@ type Variant = {
 type Props = {
   variants: Variant[];
   productId: string;
+  quantity?: number;
 };
 
-export default function AddToCartWithVariant({ variants, productId }: Props) {
+export default function AddToCartWithVariant({
+  variants,
+  productId,
+  quantity = 1,
+}: Props) {
   const [selected, setSelected] = useState<string | null>(null);
   const { mutate: addToCart, isPending } = useAddToCart();
 
@@ -39,7 +44,7 @@ export default function AddToCartWithVariant({ variants, productId }: Props) {
     const input: AddToCartInput = {
       productId,
       variantId: selectedVariant.id ?? null,
-      quantity: 1,
+      quantity,
     };
 
     addToCart(input);
@@ -50,11 +55,11 @@ export default function AddToCartWithVariant({ variants, productId }: Props) {
   return (
     <Modal>
       <Button
-        size="sm"
+        // size="sm"
         className="bg-primary hover:bg-primary/90 text-primary-foreground group w-full font-semibold"
       >
         <ShoppingCart className="mr-2" />
-        Add to Cart
+        Select Variant
       </Button>
 
       <Modal.Backdrop>

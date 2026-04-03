@@ -11,6 +11,7 @@ import {
   Separator,
   Skeleton,
   TextField,
+  Card,
 } from "@heroui/react";
 import { PaymentElement } from "@stripe/react-stripe-js";
 import {
@@ -60,14 +61,13 @@ const CheckoutForm = () => {
   const isPaymentStep = step === "payment" || step === "processing";
 
   return (
-    <div className="px-4 py-10">
-      <div className="mb-8">
+    <div className="pt-3 pb-20">
+      <div className="mb-6">
         <Link
-          href="/cart"
-          className="text-default-500 hover:text-foreground mb-4 inline-flex items-center gap-1.5 text-sm"
+          href="/cart-details"
+          className="text-accent mb-6 flex w-fit items-center gap-2 text-sm hover:underline"
         >
-          <ArrowLeftIcon className="h-3.5 w-3.5" />
-          Back to cart
+          <ArrowLeftIcon size={13} /> Back to cart
         </Link>
         <h1 className="text-2xl font-semibold tracking-tight">Checkout</h1>
       </div>
@@ -108,7 +108,7 @@ const CheckoutForm = () => {
           {/* ── Step 1: Shipping ──────────────────────────────────────── */}
           {!isPaymentStep && (
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
-              <section className="border-divider bg-content1 space-y-5 rounded-2xl border p-6">
+              <Card className="border p-4">
                 <h2 className="flex items-center gap-2 text-base font-semibold">
                   <span className="bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold">
                     1
@@ -255,26 +255,26 @@ const CheckoutForm = () => {
                   )}
                 /> */}
                 {/* )} */}
-              </section>
+              </Card>
 
               {/* Discount code */}
               {/* <DiscountCodeInput
                 subtotal={summary?.subtotal ?? 0}
                 className="mt-4"
               /> */}
-
-              <Button
-                type="submit"
-                size="lg"
-                fullWidth
-                // isLoading={isCreatingIntent}
-                className="mt-6 font-semibold"
-                // startContent={!isCreatingIntent && <LockIcon className="h-4 w-4" />}
-              >
-                {isCreatingIntent
-                  ? "Preparing payment..."
-                  : "Continue to payment"}
-              </Button>
+              <Card.Footer>
+                <Button
+                  type="submit"
+                  size="lg"
+                  // isLoading={isCreatingIntent}
+                  className="mt-6 w-full font-semibold sm:w-fit"
+                  // startContent={!isCreatingIntent && <LockIcon className="h-4 w-4" />}
+                >
+                  {isCreatingIntent
+                    ? "Preparing payment..."
+                    : "Continue to payment"}
+                </Button>
+              </Card.Footer>
             </form>
           )}
 
@@ -329,20 +329,22 @@ const CheckoutForm = () => {
 
         {/* ── Right — Order Summary ─────────────────────────────────── */}
         <aside className="space-y-4">
-          <div className="border-divider bg-content1 rounded-2xl border p-5">
-            <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
-              <ShoppingBagIcon className="h-4 w-4" />
-              Order summary
-              {summary && (
-                <Chip
-                  size="sm"
-                  // variant="flat"
-                  className="ml-auto h-5 text-xs"
-                >
-                  {summary.itemCount} item{summary.itemCount !== 1 ? "s" : ""}
-                </Chip>
-              )}
-            </h3>
+          <Card className="border">
+            <Card.Header>
+              <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
+                <ShoppingBagIcon className="h-4 w-4" />
+                Order summary
+                {summary && (
+                  <Chip
+                    size="sm"
+                    // variant="flat"
+                    className="ml-auto h-5 text-xs"
+                  >
+                    {summary.itemCount} item{summary.itemCount !== 1 ? "s" : ""}
+                  </Chip>
+                )}
+              </h3>
+            </Card.Header>
 
             {summaryLoading ? (
               <div className="space-y-3">
@@ -406,8 +408,8 @@ const CheckoutForm = () => {
             <Separator className="my-4" />
 
             {/* Totals */}
-            <div className="space-y-1.5 text-sm">
-              <div className="flex justify-between">
+            <Card.Footer className="w-full flex-col items-start space-y-1.5 text-sm">
+              <div className="flex w-full justify-between">
                 <span className="text-default-500">Subtotal</span>
                 <span>
                   {summaryLoading ? (
@@ -419,7 +421,7 @@ const CheckoutForm = () => {
               </div>
 
               {(orderTotals?.discountAmount ?? 0) > 0 && (
-                <div className="text-success flex justify-between">
+                <div className="text-success flex w-full justify-between">
                   <span className="flex items-center gap-1">
                     <TagIcon className="h-3 w-3" />
                     Discount
@@ -428,7 +430,7 @@ const CheckoutForm = () => {
                 </div>
               )}
 
-              <div className="flex justify-between">
+              <div className="flex w-full justify-between">
                 <span className="text-default-500">Shipping</span>
                 <span className="text-success">
                   {(orderTotals?.shippingAmount ?? 0) === 0
@@ -439,14 +441,14 @@ const CheckoutForm = () => {
 
               <Separator className="my-2" />
 
-              <div className="flex justify-between font-semibold">
+              <div className="flex w-full items-center justify-between font-semibold">
                 <span>Total</span>
                 <span className="text-lg">
                   ${(orderTotals?.total ?? summary?.subtotal ?? 0).toFixed(2)}
                 </span>
               </div>
-            </div>
-          </div>
+            </Card.Footer>
+          </Card>
         </aside>
       </div>
     </div>

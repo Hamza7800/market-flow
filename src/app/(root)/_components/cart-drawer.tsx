@@ -5,25 +5,25 @@ import { LinkButton } from "@/components/link-button";
 import {
   getCartItemCount,
   getCartSubtotal,
-  getItemPrice,
-  getItemTotal,
+  // getItemPrice,
+  // getItemTotal,
   useCart,
-  useRemoveCartItem,
-  useUpdateCartItems,
+  // useRemoveCartItem,
+  // useUpdateCartItems,
 } from "@/hooks/use-cart";
 import { useCartStore } from "@/zustand/cart-store";
 import Image from "next/image";
 import { MinusIcon, PlusIcon, ShoppingBagIcon, Trash2Icon } from "lucide-react";
-import type { CartItem } from "@/lib/types";
+// import type { CartItem } from "@/lib/types";
 import Link from "next/link";
-import { CartItemRow } from "./cart-item";
+import CartItemRow from "./cart-item";
 
 const CartDrawer = () => {
   const { isOpen, closeCart, setIsOpen } = useCartStore();
   const { data: cart, isLoading } = useCart();
 
-  const updateItem = useUpdateCartItems();
-  const removeItem = useRemoveCartItem();
+  // const updateItem = useUpdateCartItems();
+  // const removeItem = useRemoveCartItem();
 
   const items = cart?.items ?? [];
   const subtotal = getCartSubtotal(items);
@@ -98,14 +98,15 @@ const CartDrawer = () => {
                     <CartItemRow
                       key={item.id}
                       item={item}
-                      onUpdate={(qty) =>
-                        updateItem.mutate({
-                          cartItemId: item.id,
-                          quantity: qty,
-                        })
-                      }
-                      onRemove={() => removeItem.mutate(item.id)}
-                      isPending={updateItem.isPending || removeItem.isPending}
+                      variant="drawer"
+                      // onUpdate={(qty) =>
+                      //   updateItem.mutate({
+                      //     cartItemId: item.id,
+                      //     quantity: qty,
+                      //   })
+                      // }
+                      // onRemove={() => removeItem.mutate(item.id)}
+                      // isPending={updateItem.isPending || removeItem.isPending}
                     />
                   ))}
                 </div>

@@ -14,7 +14,6 @@ import ProductsList from "@/app/(root)/_components/products/products-list";
 import { FiltersContent } from "@/app/(root)/_components/filters-content";
 import CategoriesList from "@/app/(root)/_components/categories-list";
 import { HeroBanner } from "@/app/(root)/_components/hero-banner";
-import { Footer } from "@/app/(root)/_components/footer";
 import Vendors from "@/app/(root)/_components/vendors";
 
 type Props = {
@@ -89,7 +88,6 @@ const HomePage = async ({
       <Suspense fallback={<h2>Loading Vendors....</h2>}>
         <VendorsContent />
       </Suspense>
-      <Footer />
     </MaxWidthContainer>
   );
 };

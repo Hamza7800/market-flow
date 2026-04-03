@@ -5,7 +5,7 @@ import {
   HydrationBoundary,
   dehydrate,
 } from "@tanstack/react-query";
-import CategoriesList from "./categories-list";
+// import CategoriesList from "./categories-list";
 import type { ReactNode } from "react";
 
 type Props = {

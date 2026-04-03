@@ -38,15 +38,15 @@ const ProductFilters = () => {
   );
 
   const [searchInput, setSearchInput] = useState(search ?? "");
-  const searchTimer = useRef<ReturnType<typeof setTimeout>>();
+  // const searchTimer = useRef<ReturnType<typeof setTimeout>>();
 
-  useEffect(() => {
-    clearTimeout(searchTimer.current);
-    searchTimer.current = setTimeout(() => {
-      setClientState({ search: searchInput || "" });
-    }, 400);
-    return () => clearTimeout(searchTimer.current);
-  }, [searchInput]);
+  // useEffect(() => {
+  //   clearTimeout(searchTimer.current);
+  //   searchTimer.current = setTimeout(() => {
+  //     setClientState({ search: searchInput || "" });
+  //   }, 400);
+  //   return () => clearTimeout(searchTimer.current);
+  // }, [searchInput]);
 
   const [isPending, startTransition] = useTransition();
 
@@ -61,24 +61,24 @@ const ProductFilters = () => {
 
   // const hasMore = true;
 
-  const resetAll = () => {
-    startTransition(() => {
-      setServerState({
-        category: "",
-        sort: "newest",
-        inStock: "true",
-        page: 1,
-      });
-      setClientState({ minPrice: 0, maxPrice: 0, search: "" });
-      setSearchInput("");
-    });
-  };
+  // const resetAll = () => {
+  //   startTransition(() => {
+  //     setServerState({
+  //       category: "",
+  //       sort: "newest",
+  //       inStock: "true",
+  //       page: 1,
+  //     });
+  //     setClientState({ minPrice: 0, maxPrice: 0, search: "" });
+  //     setSearchInput("");
+  //   });
+  // };
 
   return (
-    <div className="w-full space-y-6">
+    <div className="mb-6 w-full">
       {/* ── Search ──────────────────────────────────────────────────────── */}
       <div className="flex w-full items-end gap-2">
-        <div className="w-full">
+        {/* <div className="w-full">
           <Label className="text-default-500 mb-1.5 block text-xs font-semibold tracking-wide uppercase">
             Search
           </Label>
@@ -86,15 +86,11 @@ const ProductFilters = () => {
             placeholder="Search products..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            // isClearable
-            // onClear={() => {
-            //   setSearchInput("");
-            //   setClientState({ search: "" });
-            // }}
+        
             className="w-full"
           />
-        </div>
-        <div className="w-full">
+        </div> */}
+        {/* <div className="w-full max-w-sm">
           <Select
             fullWidth
             value={sort ?? "newest"}
@@ -120,7 +116,7 @@ const ProductFilters = () => {
               </ListBox>
             </Select.Popover>
           </Select>
-        </div>
+        </div> */}
 
         {/* <div className="w-full">
           <NumberField
@@ -155,18 +151,13 @@ const ProductFilters = () => {
             </NumberField.Group>
           </NumberField>
         </div> */}
-        <Button
+        {/* <Button
           isDisabled={activeFiltersCount < 0}
-          // variant="flat"
-          // color="danger"
           size="sm"
-          // fullWidth
           onPress={resetAll}
-          // startContent={<XIcon className="h-3.5 w-3.5" />}
         >
           Clear filters
-          {/* {activeFiltersCount > 1 ? "s" : ""} */}
-        </Button>
+        </Button> */}
       </div>
 
       {/* ── Categories ──────────────────────────────────────────────────── */}
@@ -175,7 +166,7 @@ const ProductFilters = () => {
           Category
         </Label> */}
         {catsLoading ? (
-          <div className="flex flex-wrap gap-1.5">
+          <div className="mb-4 flex flex-wrap gap-1.5">
             {[1, 2, 3, 4].map((i) => (
               <Skeleton key={i} className="h-7 w-20 rounded-full" />
             ))}
@@ -183,6 +174,7 @@ const ProductFilters = () => {
         ) : (
           <TagGroup
             aria-label="Categories"
+            className="mb-4"
             selectionMode="single"
             selectedKeys={category ? new Set([category]) : new Set(["all"])}
             onSelectionChange={(keys) => {

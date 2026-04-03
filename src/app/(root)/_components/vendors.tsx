@@ -1,13 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowRight, Star, Store } from "lucide-react";
 import { LinkButton } from "@/components/link-button";
 import { usePublicVendors } from "@/hooks/use-public";
+import { Card, Separator } from "@heroui/react";
 
-const Vendors = ({ slice = 6 }: { slice: number }) => {
+const Vendors = ({ slice }: { slice?: number }) => {
   const { data: vendors } = usePublicVendors();
-  console.log(vendors);
+  const v = slice ? vendors?.slice(0, slice) : vendors;
   return (
     <section className="py-16">
       <div className="">
@@ -23,11 +23,11 @@ const Vendors = ({ slice = 6 }: { slice: number }) => {
 
         {/* VENDORS GRID */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {vendors?.slice(0, slice)?.map((vendor) => (
+          {v?.map((vendor) => (
             <div key={vendor.id} className="group">
-              <div className="bg-surface border-border flex h-full flex-col overflow-hidden rounded-lg border transition-all duration-300 hover:shadow-lg">
+              <Card className="flex h-full border transition-all duration-300">
                 {/* VENDOR HEADER */}
-                <div className="border-border border-b p-6">
+                <Card.Header className="">
                   <div className="flex items-start gap-4">
                     <div className="bg-accent/10 flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-lg">
                       {vendor.logo ? (
@@ -45,10 +45,11 @@ const Vendors = ({ slice = 6 }: { slice: number }) => {
                       </p>
                     </div>
                   </div>
-                </div>
+                </Card.Header>
+                <Separator />
 
                 {/* STATS */}
-                <div className="border-border grid grid-cols-2 gap-4 border-b px-6 py-4">
+                <Card.Content className="grid grid-cols-2 gap-4 px-6">
                   <div className="text-center">
                     <div className="text-foreground text-lg font-bold">
                       {vendor.rating}
@@ -70,12 +71,12 @@ const Vendors = ({ slice = 6 }: { slice: number }) => {
                     </div>
                     <span className="text-muted text-xs">Followers</span>
                   </div> */}
-                </div>
+                </Card.Content>
 
-                {/* CTA */}
-                <div className="flex flex-1 items-end p-6">
+                <Separator />
+                <Card.Footer className="flex flex-1 items-end">
                   <LinkButton
-                    href={`/vendor/${vendor.id}`}
+                    href={`/vendors/${vendor.id}`}
                     className="bg-accent hover:bg-accent/90 text-accent-foreground group/btn w-full cursor-pointer font-medium"
                   >
                     Visit Store
@@ -84,23 +85,25 @@ const Vendors = ({ slice = 6 }: { slice: number }) => {
                       className="ml-2 transition-transform group-hover/btn:translate-x-1"
                     />
                   </LinkButton>
-                </div>
-              </div>
+                </Card.Footer>
+              </Card>
             </div>
           ))}
         </div>
 
         {/* VIEW ALL LINK */}
-        <div className="mt-12 text-center">
-          <LinkButton
-            href="/vendors"
-            variant="outline"
-            className="inline-flex items-center gap-2 font-semibold transition-all hover:gap-3"
-          >
-            Browse All Vendors
-            <ArrowRight size={20} />
-          </LinkButton>
-        </div>
+        {slice && (
+          <div className="mt-12 text-center">
+            <LinkButton
+              href="/vendors"
+              variant="outline"
+              className="inline-flex items-center gap-2 font-semibold transition-all hover:gap-3"
+            >
+              Browse All Vendors
+              <ArrowRight size={20} />
+            </LinkButton>
+          </div>
+        )}
       </div>
     </section>
   );
