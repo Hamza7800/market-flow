@@ -114,7 +114,7 @@ export const getProducts = async (
     const hasMore = data.length > LIMIT;
     const pageData = hasMore ? data.slice(0, LIMIT) : data;
     return {
-      success: true as const,
+      success: true,
       message: "Products fetched",
       data: pageData,
       meta: {
@@ -306,9 +306,9 @@ export async function getVendorById(vendorId: string) {
   }
 }
 
-export async function getVendorPublicProducts(vendorId: string, page = 1) {
+export async function getVendorPublicProducts(vendorId: string, page = 0) {
   const LIMIT = 20;
-  const offset = (page - 1) * LIMIT;
+  const offset = page * LIMIT;
 
   try {
     const data = await cacheWrap(
@@ -321,7 +321,7 @@ export async function getVendorPublicProducts(vendorId: string, page = 1) {
             eq(products.status, "active"),
             isNull(products.deletedAt),
           ),
-          limit: LIMIT,
+          limit: LIMIT + 1,
           offset,
           orderBy: [desc(products.createdAt)],
           with: {
@@ -339,9 +339,17 @@ export async function getVendorPublicProducts(vendorId: string, page = 1) {
       120,
     );
 
+    const hasMore = data.length > LIMIT;
+    const pageData = hasMore ? data.slice(0, LIMIT) : data;
+
     return {
       success: true,
-      data,
+      data: pageData,
+      meta: {
+        page,
+        limit: LIMIT,
+        hasMore,
+      },
       message: "Vendor products",
     };
   } catch (error) {

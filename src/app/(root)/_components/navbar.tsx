@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Header from "@/app/(root)/_components/header";
 import MaxWidthContainer from "@/components/max-w-container";
 import { cn } from "@/lib/utils";
@@ -38,7 +38,9 @@ export default function Navbar() {
       // className="fixed left-0 top-0 z-50 flex h-[10vh] w-full items-center border-b border-b-app-border-primary bg-app-bg-primary"
     >
       <MaxWidthContainer>
-        <Header />
+        <Suspense>
+          <Header />
+        </Suspense>
       </MaxWidthContainer>
     </div>
   );

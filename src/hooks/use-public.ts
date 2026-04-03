@@ -70,17 +70,22 @@ export function useVendorPublic(vendorId: string) {
   });
 }
 
-export function useVendorPublicProducts(vendorId: string, page = 1) {
-  return useQuery({
-    queryKey: [...productKeys.byVendor(vendorId), "public", page],
-    queryFn: async () => {
-      const r = await getVendorPublicProducts(vendorId, page);
+export function useVendorPublicProducts(vendorId: string) {
+  return useInfiniteQuery({
+    queryKey: [...productKeys.byVendor(vendorId), "public"],
+    queryFn: async ({ pageParam }) => {
+      const r = await getVendorPublicProducts(vendorId, pageParam);
       if (!r.success) throw new Error(r.message);
-      return r.data;
+      return r;
     },
-    enabled: !!vendorId,
+    getNextPageParam: (lastPage) => {
+      if (!lastPage.meta?.hasMore) return undefined;
+      return lastPage.meta.page + 1;
+    },
+    // enabled: !!vendorId,
     staleTime: 1000 * 60 * 2,
-    placeholderData: (prev) => prev,
+    initialPageParam: 0,
+    // placeholderData: (prev) => prev,
   });
 }
 

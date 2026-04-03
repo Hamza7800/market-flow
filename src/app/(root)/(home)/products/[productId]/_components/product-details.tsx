@@ -200,7 +200,7 @@ const ProductDetails = ({ productId }: { productId: string }) => {
               <div>
                 <NumberField
                   minValue={1}
-                  className={"w-full"}
+                  className={"w-full shadow-none"}
                   name="quantity"
                   value={quantity}
                   onChange={(value) => {
@@ -208,7 +208,9 @@ const ProductDetails = ({ productId }: { productId: string }) => {
                   }}
                 >
                   <Label>Quantity</Label>
-                  <NumberField.Group>
+                  <NumberField.Group
+                    className={"border-border border shadow-none"}
+                  >
                     <NumberField.DecrementButton />
                     <NumberField.Input />
                     <NumberField.IncrementButton />

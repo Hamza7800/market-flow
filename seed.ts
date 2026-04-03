@@ -1,4 +1,4 @@
-// // // @ts-nocheck
+// @ts-nocheck
 // // "use server";
 // // /**
 // //  * seed.ts  —  Multi-vendor ecom dev seed

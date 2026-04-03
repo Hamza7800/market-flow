@@ -216,7 +216,6 @@ export function OrdersTable({
   const sortDescriptor = useMemo(() => toSortDescriptor(sorting), [sorting]);
 
   const activePage = page;
-  // @ts-expect-error no meta data on orders
   const hasMore = orders?.meta?.hasMore ?? false;
 
   const setPage = (nextPage: number) => {
