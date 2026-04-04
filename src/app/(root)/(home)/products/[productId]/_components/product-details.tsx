@@ -6,8 +6,6 @@ import { useProductDetail } from "@/hooks/use-public";
 import { RotateCcw, Star, Truck } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { ProductVariants } from "./product-variants";
-import { ShoppingCart } from "@gravity-ui/icons";
 import ProductVendorCard from "./product-vendor";
 import ProductReviews from "./product-reviews";
 import ProductsList from "@/app/(root)/_components/products/products-list";
@@ -16,15 +14,21 @@ import { AddToCartButton } from "@/app/(root)/_components/add-to-cart";
 import { EmptyState } from "@/components/empty-state";
 import { Card, Label, NumberField, Separator } from "@heroui/react";
 import Link from "next/link";
+import { authClient } from "@/server/better-auth/client";
+import { LinkButton } from "@/components/link-button";
+import { usePathname } from "next/navigation";
 
 // TODO: FIX UI
 const ProductDetails = ({ productId }: { productId: string }) => {
+  const pathname = usePathname();
   const { data, isPending, isError, error, refetch } =
     useProductDetail(productId);
+
   const [selectedVariant, setSelectedVariant] = useState<any>(null);
   const [mainImage, setMainImage] = useState(data?.images[0]);
-  // const [quantity, setQuantity] = useState(1);
   const [quantity, setQuantity] = useState(1);
+  const { data: userAuth } = authClient.useSession();
+  const userId = userAuth?.user.id;
 
   const displayPrice = selectedVariant
     ? Number(selectedVariant.price)
@@ -160,9 +164,9 @@ const ProductDetails = ({ productId }: { productId: string }) => {
             </div>
 
             {/* PRICE */}
-            <div className="bg-surface border-border rounded-lg border p-4">
-              <p className="text-muted mb-2 text-sm">Price</p>
-              <div className="flex items-baseline gap-3">
+            <div className="bg-surface border-border flex items-start justify-between rounded-lg border p-4">
+              <div className="flex flex-col items-baseline gap-3">
+                <p className="text-muted text-sm">Price</p>
                 <span className="text-accent text-3xl font-bold">
                   ${displayPrice.toFixed(2)}
                 </span>
@@ -172,18 +176,6 @@ const ProductDetails = ({ productId }: { productId: string }) => {
                   </span>
                 )}
               </div>
-            </div>
-
-            {/* VARIANTS */}
-            {/* <ProductVariants
-              variants={data?.variants || []}
-              hasVariants={data?.hasVariants}
-              basePrice={data?.basePrice}
-              onVariantSelect={setSelectedVariant}
-            /> */}
-
-            {/* STOCK STATUS */}
-            <div className="bg-surface border-border rounded-lg border p-4">
               <div
                 className={`inline-block rounded-full px-3 py-1 text-sm font-semibold ${
                   totalStock > 0
@@ -195,42 +187,64 @@ const ProductDetails = ({ productId }: { productId: string }) => {
               </div>
             </div>
 
-            {/* QUANTITY AND CTA */}
-            <div className="flex items-end gap-3">
-              <div>
-                <NumberField
-                  minValue={1}
-                  className={"w-full shadow-none"}
-                  name="quantity"
-                  value={quantity}
-                  onChange={(value) => {
-                    setQuantity(Math.min(totalStock, Math.max(1, value || 1)));
-                  }}
-                >
-                  <Label>Quantity</Label>
-                  <NumberField.Group
-                    className={"border-border border shadow-none"}
-                  >
-                    <NumberField.DecrementButton />
-                    <NumberField.Input />
-                    <NumberField.IncrementButton />
-                  </NumberField.Group>
-                </NumberField>
-              </div>
+            {/* VARIANTS */}
+            {/* <ProductVariants
+              variants={data?.variants || []}
+              hasVariants={data?.hasVariants}
+              basePrice={data?.basePrice}
+              onVariantSelect={setSelectedVariant}
+            /> */}
 
-              <div className="pt-0">
-                {!!totalStock &&
-                  (data.hasVariants ? (
-                    <AddToCartWithVariant
-                      quantity={quantity}
-                      productId={data.id}
-                      variants={data.variants}
-                    />
-                  ) : (
-                    <AddToCartButton quantity={quantity} productId={data.id} />
-                  ))}
+            {userId ? (
+              <div className="flex items-end gap-3">
+                <div>
+                  <NumberField
+                    minValue={1}
+                    className={"w-full shadow-none"}
+                    name="quantity"
+                    value={quantity}
+                    onChange={(value) => {
+                      setQuantity(
+                        Math.min(totalStock, Math.max(1, value || 1)),
+                      );
+                    }}
+                  >
+                    <Label>Quantity</Label>
+                    <NumberField.Group
+                      className={"border-border border shadow-none"}
+                    >
+                      <NumberField.DecrementButton />
+                      <NumberField.Input />
+                      <NumberField.IncrementButton />
+                    </NumberField.Group>
+                  </NumberField>
+                </div>
+
+                <div className="pt-0">
+                  {!!totalStock &&
+                    (data.hasVariants ? (
+                      <AddToCartWithVariant
+                        quantity={quantity}
+                        productId={data.id}
+                        variants={data.variants}
+                      />
+                    ) : (
+                      <AddToCartButton
+                        quantity={quantity}
+                        productId={data.id}
+                      />
+                    ))}
+                </div>
               </div>
-            </div>
+            ) : (
+              <LinkButton
+                className="w-full"
+                size="sm"
+                href={`/sign-in?redirect=${encodeURIComponent(pathname)}`}
+              >
+                Sign In
+              </LinkButton>
+            )}
 
             {/* TRUST BADGES */}
             <div className="border-border space-y-3 border-t pt-4">
@@ -245,6 +259,8 @@ const ProductDetails = ({ productId }: { productId: string }) => {
                 <span className="text-muted">30-day money-back guarantee</span>
               </div>
             </div>
+            <Separator />
+            <ProductVendorCard vendor={data?.vendor} />
           </Card>
         </div>
       </section>
@@ -287,9 +303,9 @@ const ProductDetails = ({ productId }: { productId: string }) => {
             </div>
 
             {/* VENDOR CARD */}
-            <div>
-              <ProductVendorCard vendor={data?.vendor} />
-            </div>
+            {/* <div>
+            
+            </div> */}
           </div>
         </div>
       </section>

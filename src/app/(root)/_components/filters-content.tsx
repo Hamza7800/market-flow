@@ -9,12 +9,12 @@ import {
 import type { ReactNode } from "react";
 
 type Props = {
-  page: number;
-  category: string;
+  // page: number;
+  // category: string;
   children: ReactNode;
 };
 
-export const FiltersContent = async ({ category, page, children }: Props) => {
+export const FiltersContent = async ({ children }: Props) => {
   // await new Promise((res) => setTimeout(res, 2000));
   const qc = new QueryClient();
   await qc.prefetchQuery({

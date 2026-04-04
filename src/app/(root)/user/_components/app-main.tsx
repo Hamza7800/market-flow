@@ -17,11 +17,11 @@ const items = [
     url: "orders",
     icon: Truck,
   },
-  {
-    title: "Settings",
-    url: "settings",
-    icon: Settings,
-  },
+  // {
+  //   title: "Settings",
+  //   url: "settings",
+  //   icon: Settings,
+  // },
 ];
 
 export function NavMain() {

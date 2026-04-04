@@ -11,32 +11,47 @@ import {
   ArrowRight,
   AlertCircle,
   ArrowLeft,
+  AlertCircleIcon,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "nextjs-toploader/app";
-import {
-  useCart,
-  useClearCart,
-  useRemoveCartItem,
-  useUpdateCartItems,
-  getItemPrice,
-  getItemTotal,
-} from "@/hooks/use-cart";
+import { useCart, useClearCart, getItemTotal } from "@/hooks/use-cart";
 import { LoadingState } from "@/components/loading-state";
 import { Button, Card } from "@heroui/react";
 import { LinkButton } from "@/components/link-button";
 import CartItemRow from "../../_components/cart-item";
+import { authClient } from "@/server/better-auth/client";
+import { EmptyState } from "@/components/empty-state";
+import { usePathname } from "next/navigation";
 
 export default function CartDetails() {
   const router = useRouter();
+  const pathname = usePathname();
+  const { data: userAuth, isPending: userPending } = authClient.useSession();
+
   const { data: cart, isPending } = useCart();
   const clearItems = useClearCart();
-  // const updateItem = useUpdateCartItems();
-  // const removeItem = useRemoveCartItem();
 
-  // const [promoCode, setPromoCode] = useState("");
-  // const [showPromoInput, setShowPromoInput] = useState(false);
+  const userId = userAuth?.user.id;
+
+  if (!userPending && !userId) {
+    return (
+      <div className="flex h-dvh items-center justify-center">
+        <EmptyState
+          icon={AlertCircleIcon}
+          title="Login"
+          className="border"
+          description="Please login to continue"
+          action={{
+            label: "Sign In",
+            onClick: () =>
+              router.push(`/sign-in?${encodeURIComponent(pathname)}`),
+          }}
+        />
+      </div>
+    );
+  }
 
   // Loading State
   if (isPending) {

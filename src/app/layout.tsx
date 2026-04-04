@@ -4,6 +4,7 @@ import { type Metadata } from "next";
 import { Geist, Inter } from "next/font/google";
 import Providers from "@/app/providers";
 import { cn } from "@/lib/utils";
+import ScrollToTop from "@/components/scroll-to-top";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -24,7 +25,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn(geist.variable, "font-sans", inter.variable)}>
       <body cz-shortcut-listen="true">
+        <ScrollToTop />
+        {/* <Suspense> */}
         <Providers>{children}</Providers>
+        {/* </Suspense> */}
       </body>
     </html>
   );

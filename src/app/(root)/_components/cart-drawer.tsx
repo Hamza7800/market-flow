@@ -13,12 +13,27 @@ import {
 } from "@/hooks/use-cart";
 import { useCartStore } from "@/zustand/cart-store";
 import Image from "next/image";
-import { MinusIcon, PlusIcon, ShoppingBagIcon, Trash2Icon } from "lucide-react";
+import {
+  AlertCircleIcon,
+  MinusIcon,
+  PlusIcon,
+  ShoppingBagIcon,
+  Trash2Icon,
+} from "lucide-react";
 // import type { CartItem } from "@/lib/types";
 import Link from "next/link";
 import CartItemRow from "./cart-item";
+import { useRouter } from "nextjs-toploader/app";
+import { usePathname } from "next/navigation";
+import { authClient } from "@/server/better-auth/client";
+import { EmptyState } from "@/components/empty-state";
 
 const CartDrawer = () => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { data: userAuth, isPending } = authClient.useSession();
+  const userId = userAuth?.user.id;
+
   const { isOpen, closeCart, setIsOpen } = useCartStore();
   const { data: cart, isLoading } = useCart();
 
@@ -28,6 +43,53 @@ const CartDrawer = () => {
   const items = cart?.items ?? [];
   const subtotal = getCartSubtotal(items);
   const isEmpty = items.length === 0;
+
+  const drawerBody = () => {
+    if (!isPending && !userId) {
+      return (
+        <EmptyState
+          icon={AlertCircleIcon}
+          title="Login"
+          className="h-full"
+          description="Please login to continue"
+          action={{
+            label: "Sign In",
+            onClick: () =>
+              router.push(`/sign-in?${encodeURIComponent(pathname)}`),
+          }}
+        />
+      );
+    }
+
+    if (!isLoading && isEmpty) {
+      return (
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 py-16 text-center">
+          <div className="bg-default-100 flex h-16 w-16 items-center justify-center rounded-full">
+            <ShoppingBagIcon className="text-default-400 h-7 w-7" />
+          </div>
+          <div>
+            <p className="text-foreground font-medium">Your cart is empty</p>
+            <p className="text-default-400 mt-1 text-sm">
+              Add something to get started
+            </p>
+          </div>
+          <Button size="sm" onPress={closeCart}>
+            Browse products
+          </Button>
+        </div>
+      );
+    }
+
+    if (!isLoading && !isEmpty) {
+      return (
+        <div className="divide-divider divide-y">
+          {items.map((item) => (
+            <CartItemRow key={item.id} item={item} variant="drawer" />
+          ))}
+        </div>
+      );
+    }
+  };
 
   return (
     <Drawer isOpen={isOpen} onOpenChange={setIsOpen}>
@@ -73,70 +135,40 @@ const CartDrawer = () => {
                 </div>
               )}
 
-              {!isLoading && isEmpty && (
-                <div className="flex flex-1 flex-col items-center justify-center gap-4 py-16 text-center">
-                  <div className="bg-default-100 flex h-16 w-16 items-center justify-center rounded-full">
-                    <ShoppingBagIcon className="text-default-400 h-7 w-7" />
-                  </div>
-                  <div>
-                    <p className="text-foreground font-medium">
-                      Your cart is empty
-                    </p>
-                    <p className="text-default-400 mt-1 text-sm">
-                      Add something to get started
-                    </p>
-                  </div>
-                  <Button size="sm" onPress={closeCart}>
-                    Browse products
-                  </Button>
-                </div>
-              )}
-
-              {!isLoading && !isEmpty && (
-                <div className="divide-divider divide-y">
-                  {items.map((item) => (
-                    <CartItemRow
-                      key={item.id}
-                      item={item}
-                      variant="drawer"
-                      // onUpdate={(qty) =>
-                      //   updateItem.mutate({
-                      //     cartItemId: item.id,
-                      //     quantity: qty,
-                      //   })
-                      // }
-                      // onRemove={() => removeItem.mutate(item.id)}
-                      // isPending={updateItem.isPending || removeItem.isPending}
-                    />
-                  ))}
-                </div>
-              )}
+              {drawerBody()}
             </Drawer.Body>
-            <Drawer.Footer className="flex-col items-start">
-              <div className="flex w-full items-center justify-between gap-3 text-sm">
-                <span className="text-default-500">Subtotal</span>
-                <span className="text-lg font-semibold">
-                  ${subtotal.toFixed(2)}
-                </span>
-              </div>
-              <p className="text-default-400 text-xs">
+            {userId && (
+              <Drawer.Footer className="flex-col items-start">
+                <div className="flex w-full items-center justify-between gap-3 text-sm">
+                  <span className="text-default-500">Subtotal</span>
+                  <span className="text-lg font-semibold">
+                    ${subtotal.toFixed(2)}
+                  </span>
+                </div>
+                {/* <p className="text-default-400 text-xs">
                 Taxes and shipping calculated at checkout
-              </p>
-              {/* <Button fullWidth variant="secondary">
-                Checkout
-              </Button> */}
-              {/* <Button size="sm" fullWidth onPress={() => clearItems.mutate()}>
-                Clear cart
-              </Button> */}
-              <LinkButton
-                href="/cart-details"
-                onClick={closeCart}
-                size="md"
-                fullWidth
-              >
-                View full cart
-              </LinkButton>
-            </Drawer.Footer>
+              </p> */}
+                <div className="flex w-full items-center gap-2">
+                  <LinkButton
+                    href="/cart-details"
+                    onClick={closeCart}
+                    size="md"
+                    fullWidth
+                    variant="outline"
+                  >
+                    View cart
+                  </LinkButton>
+                  <LinkButton
+                    href="/checkout"
+                    onClick={closeCart}
+                    size="md"
+                    fullWidth
+                  >
+                    Checkout
+                  </LinkButton>
+                </div>
+              </Drawer.Footer>
+            )}
           </Drawer.Dialog>
         </Drawer.Content>
       </Drawer.Backdrop>

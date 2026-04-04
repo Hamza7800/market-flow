@@ -17,9 +17,13 @@ import {
   toast,
 } from "@heroui/react";
 import { useRouter } from "nextjs-toploader/app";
+import { useSearchParams } from "next/navigation";
 
 const SignUser = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/";
+
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const form = useForm<SignInSchemaType>({
     resolver: zodResolver(SignInSchema),
@@ -55,7 +59,7 @@ const SignUser = () => {
 
       toast.success("Login Success");
       setIsSubmitting(false);
-      router.push("/");
+      router.push(redirect);
     } catch (error: any) {
       setIsSubmitting(false);
       toast.danger(error.message);
@@ -125,7 +129,10 @@ const SignUser = () => {
           <p className="text-sm">
             Don't have an account?{" "}
             <button
-              onClick={() => router.push("/sign-up")}
+              onClick={() =>
+                // router.push("/sign-up")
+                router.push(`/sign-up?redirect=${encodeURIComponent(redirect)}`)
+              }
               className="font-medium"
             >
               Sign up

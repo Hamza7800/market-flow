@@ -24,7 +24,7 @@ export const EmptyState = ({
     <Card
       variant="transparent"
       className={cn(
-        "flex flex-1 flex-col items-center justify-center p-8 text-center duration-300",
+        "mx-auto flex max-w-sm flex-1 flex-col items-center justify-center p-8 text-center duration-300",
         className,
       )}
     >

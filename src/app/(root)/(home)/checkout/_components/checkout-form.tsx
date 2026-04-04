@@ -17,6 +17,7 @@ import { PaymentElement } from "@stripe/react-stripe-js";
 import {
   AlertCircleIcon,
   ArrowLeftIcon,
+  Box,
   LockIcon,
   PackageIcon,
   ShoppingBagIcon,
@@ -32,8 +33,17 @@ import {
   useValidateDiscount,
 } from "@/hooks/use-checkout";
 import { COUNTRIES } from "@/zod-schema/checkout-schema";
+import { EmptyState } from "@/components/empty-state";
+import { useRouter } from "nextjs-toploader/app";
+import { usePathname } from "next/navigation";
+import { authClient } from "@/server/better-auth/client";
 
 const CheckoutForm = () => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { data: userAuth, isPending: userPending } = authClient.useSession();
+  const userId = userAuth?.user.id;
+
   const {
     form,
     onSubmit,
@@ -54,11 +64,45 @@ const CheckoutForm = () => {
     register,
     control,
     handleSubmit,
-    watch,
     formState: { errors },
   } = form;
 
   const isPaymentStep = step === "payment" || step === "processing";
+
+  if (!userPending && !userId) {
+    return (
+      <div className="h-dvh">
+        <EmptyState
+          icon={AlertCircleIcon}
+          title="Login"
+          className="h-full"
+          description="Please login to continue"
+          action={{
+            label: "Sign In",
+            onClick: () =>
+              router.push(`/sign-in?${encodeURIComponent(pathname)}`),
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (!summaryLoading && !summary?.itemCount) {
+    return (
+      <div className="h-dvh">
+        <EmptyState
+          icon={Box}
+          title="Empty Cart"
+          className="h-full"
+          description="Continue Shopping"
+          action={{
+            label: "Products",
+            onClick: () => router.push(`/products`),
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="pt-3 pb-20">
@@ -73,7 +117,6 @@ const CheckoutForm = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
-        {/* ── Left — Form ──────────────────────────────────────────────── */}
         <div className="space-y-6">
           {serverError && (
             <Alert status="danger">
@@ -99,13 +142,8 @@ const CheckoutForm = () => {
                 Retry
               </Button>
             </Alert>
-
-            // <Alert color="danger" >
-
-            // </Alert>
           )}
 
-          {/* ── Step 1: Shipping ──────────────────────────────────────── */}
           {!isPaymentStep && (
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
               <Card className="border p-4">

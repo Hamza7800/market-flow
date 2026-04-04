@@ -21,11 +21,11 @@ type Props = {
   category: string;
 };
 
-const ProductsContent = async ({ category, page }: Props) => {
+const ProductsContent = async () => {
   // await new Promise((res) => setTimeout(res, 5000));
   const qc = new QueryClient();
   const filters = {
-    category: category || undefined,
+    category: undefined,
     inStock: true as const,
   };
 
@@ -41,7 +41,7 @@ const ProductsContent = async ({ category, page }: Props) => {
 
   return (
     <HydrationBoundary state={dehydrate(qc)}>
-      <ProductsList isHomePage filters={filters} category={category} />
+      <ProductsList isHomePage filters={filters} category={""} />
     </HydrationBoundary>
   );
 };
@@ -67,23 +67,17 @@ const VendorsContent = async () => {
   );
 };
 
-const HomePage = async ({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string>>;
-}) => {
-  const { category, page } = homeParamsCache.parse(await searchParams);
-
+const HomePage = () => {
   return (
     <MaxWidthContainer>
       <HeroBanner />
       <Suspense fallback={<h2>Loading Categories....</h2>}>
-        <FiltersContent page={page} category={category}>
+        <FiltersContent>
           <CategoriesList />
         </FiltersContent>
       </Suspense>
       <Suspense fallback={<h2>Loading Products....</h2>}>
-        <ProductsContent page={page} category={category} />
+        <ProductsContent />
       </Suspense>
       <Suspense fallback={<h2>Loading Vendors....</h2>}>
         <VendorsContent />

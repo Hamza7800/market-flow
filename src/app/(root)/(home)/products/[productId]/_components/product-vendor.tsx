@@ -22,7 +22,7 @@ const ProductVendorCard = ({ vendor }: ProductVendorCardProps) => {
   const rating = Number(4.5);
 
   return (
-    <Card className="border">
+    <Card className="mt-4 p-0 pb-1 shadow-none">
       <Card.Header>
         <h3 className="text-foreground text-lg font-semibold">Seller Info</h3>
       </Card.Header>

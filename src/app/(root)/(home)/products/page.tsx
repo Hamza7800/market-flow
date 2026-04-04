@@ -52,7 +52,7 @@ const ProductsPage = async ({
   return (
     <MaxWidthContainer className="flex flex-col px-5 py-5">
       <Suspense fallback={<h2>Loading ....</h2>}>
-        <FiltersContent page={params.page} category={params.category}>
+        <FiltersContent>
           <ProductFilters />
         </FiltersContent>
       </Suspense>

@@ -49,7 +49,6 @@ export function NavUser() {
           aria-label="User menu"
           onAction={(key) => console.log(key)}
         >
-          {/* USER INFO */}
           <Dropdown.Item id="profile" textValue="profile" className="gap-2">
             <div className="flex items-center gap-2">
               {/* <Avatar src={user.avatar} name={user.name} size="sm" /> */}
@@ -61,38 +60,6 @@ export function NavUser() {
               </div>
             </div>
           </Dropdown.Item>
-
-          <Dropdown.Section>
-            <Dropdown.Item id="upgrade">
-              <div className="flex items-center gap-2">
-                <Sparkles size={16} />
-                <Label>Upgrade to Pro</Label>
-              </div>
-            </Dropdown.Item>
-          </Dropdown.Section>
-
-          <Dropdown.Section>
-            <Dropdown.Item id="account">
-              <div className="flex items-center gap-2">
-                <BadgeCheck size={16} />
-                <Label>Account</Label>
-              </div>
-            </Dropdown.Item>
-
-            <Dropdown.Item id="billing">
-              <div className="flex items-center gap-2">
-                <CreditCard size={16} />
-                <Label>Billing</Label>
-              </div>
-            </Dropdown.Item>
-
-            <Dropdown.Item id="notifications">
-              <div className="flex items-center gap-2">
-                <Bell size={16} />
-                <Label>Notifications</Label>
-              </div>
-            </Dropdown.Item>
-          </Dropdown.Section>
 
           <Dropdown.Item
             onClick={async () => {

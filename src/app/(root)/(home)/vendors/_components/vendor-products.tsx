@@ -6,14 +6,16 @@ import { EmptyState } from "@/components/empty-state";
 import { ErrorState } from "@/components/error-state";
 import { LinkButton } from "@/components/link-button";
 import { LoadingState } from "@/components/loading-state";
-import { useVendorPublicProducts } from "@/hooks/use-public";
+import { useVendorPublic, useVendorPublicProducts } from "@/hooks/use-public";
 import { PUBLIC_ROUTES } from "@/lib/consts/constants";
 import { Box } from "@gravity-ui/icons";
-import { BoxIcon } from "lucide-react";
+import { BoxIcon, Store } from "lucide-react";
 import { useRouter } from "nextjs-toploader/app";
 
 const VendorProducts = ({ vendorId }: { vendorId: string }) => {
+  const { data: vendor, isError: vendorError } = useVendorPublic(vendorId);
   const router = useRouter();
+
   const {
     data,
     isError,
@@ -56,8 +58,28 @@ const VendorProducts = ({ vendorId }: { vendorId: string }) => {
     );
   }
 
+  if (vendorError) {
+    return null;
+  }
+
+  if (!vendor) {
+    return (
+      <EmptyState
+        icon={Store}
+        title="Vendor not found"
+        action={{
+          label: "Back to vendors",
+          onClick: () => router.push("/vendors"),
+        }}
+      />
+    );
+  }
+
   return (
     <main className="w-full">
+      <h2 className="text-foreground mb-5 text-3xl font-bold md:text-4xl">
+        Featured Products
+      </h2>
       <ProductsGrid
         // @ts-expect-error type error
         products={safeProducts}

@@ -36,20 +36,20 @@ export function HeroBanner() {
         {/* CTA BUTTONS */}
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
           <LinkButton
+            className="w-full max-w-[200px]"
             // className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 cursor-pointer"
             href="/products"
           >
             Shop Now
             <ArrowRight size={20} className="ml-2" />
           </LinkButton>
-          <LinkButton
+          {/* <LinkButton
             variant="outline"
             size="lg"
             href="#categories"
-            // className="border-primary text-primary hover:bg-primary/5 cursor-pointer border-2 px-8 font-semibold"
           >
             Explore Categories
-          </LinkButton>
+          </LinkButton> */}
         </div>
 
         {/* TRUST INDICATORS */}

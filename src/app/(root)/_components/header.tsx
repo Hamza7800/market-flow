@@ -26,8 +26,8 @@ const Header = () => {
       <div className="flex w-full items-center justify-between lg:hidden">
         <MobileDrawer />
         <Link href="/" className="text-3xl font-bold">
-          LOGO
-          <span className="sr-only">LOGO</span>
+          SHOP
+          <span className="sr-only">SHOP</span>
         </Link>
         <div className="w-8" />
       </div>
@@ -35,8 +35,8 @@ const Header = () => {
       {/* ── Desktop Navigation ── */}
       <nav className="mx-auto hidden w-full items-center justify-between gap-2 lg:flex">
         <Link href="/" className="mr-6 text-xl font-bold">
-          LOGO
-          <span className="sr-only">LOGO</span>
+          SHOP
+          <span className="sr-only">SHOP</span>
         </Link>
 
         <div className="flex w-full items-center justify-center gap-2">
