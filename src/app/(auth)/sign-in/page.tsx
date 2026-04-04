@@ -18,8 +18,11 @@ import {
 } from "@heroui/react";
 import { useRouter } from "nextjs-toploader/app";
 import { useSearchParams } from "next/navigation";
+import { QueryClient } from "@tanstack/react-query";
+import { vendorKeys } from "@/lib/cache-keys";
 
 const SignUser = () => {
+  const qc = new QueryClient();
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "/";
@@ -49,6 +52,10 @@ const SignUser = () => {
     if (res.error) {
       throw new Error(res.error.message || "User Not Found");
     }
+    qc.refetchQueries({
+      type: "all",
+      queryKey: vendorKeys.byUser(res.data.user.id),
+    });
     return res.data;
   };
 
@@ -59,6 +66,7 @@ const SignUser = () => {
 
       toast.success("Login Success");
       setIsSubmitting(false);
+
       router.push(redirect);
     } catch (error: any) {
       setIsSubmitting(false);

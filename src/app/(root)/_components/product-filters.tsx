@@ -1,5 +1,6 @@
 "use client";
 
+import ProductFiltersSkeleton from "@/components/loading-skeletons/filters-loading";
 import { useCategories } from "@/hooks/use-public";
 import {
   browseClientParams,
@@ -73,6 +74,10 @@ const ProductFilters = () => {
   //     setSearchInput("");
   //   });
   // };
+
+  if (catsLoading) {
+    return <ProductFiltersSkeleton />;
+  }
 
   return (
     <div className="mb-6 w-full">

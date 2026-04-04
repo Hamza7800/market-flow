@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { Suspense } from "react";
 import AllVendors from "./_components/allvendors";
+import PublicVendorsLoading from "@/components/loading-skeletons/public-vendors-loading";
 
 const VendorsContent = async () => {
   const qc = new QueryClient();
@@ -32,7 +33,7 @@ const VendorsContent = async () => {
 const VendorsPage = () => {
   return (
     <MaxWidthContainer>
-      <Suspense fallback={<h2>Loading Vendors....</h2>}>
+      <Suspense fallback={<PublicVendorsLoading />}>
         <VendorsContent />
       </Suspense>
     </MaxWidthContainer>

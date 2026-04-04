@@ -37,6 +37,7 @@ import { EmptyState } from "@/components/empty-state";
 import { useRouter } from "nextjs-toploader/app";
 import { usePathname } from "next/navigation";
 import { authClient } from "@/server/better-auth/client";
+import CheckoutSkeleton from "@/components/loading-skeletons/checkout-loading";
 
 const CheckoutForm = () => {
   const router = useRouter();
@@ -85,6 +86,10 @@ const CheckoutForm = () => {
         />
       </div>
     );
+  }
+
+  if (summaryLoading || userPending) {
+    return <CheckoutSkeleton />;
   }
 
   if (!summaryLoading && !summary?.itemCount) {
@@ -146,7 +151,7 @@ const CheckoutForm = () => {
 
           {!isPaymentStep && (
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
-              <Card className="border p-4">
+              <Card className="border p-4 shadow-none">
                 <h2 className="flex items-center gap-2 text-base font-semibold">
                   <span className="bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold">
                     1
@@ -165,6 +170,7 @@ const CheckoutForm = () => {
                     <Input
                       {...register("email")}
                       type="email"
+                      className={"border-border border shadow-none"}
                       placeholder="you@example.com"
                     />
                     <FieldError>{errors.email?.message}</FieldError>
@@ -183,6 +189,7 @@ const CheckoutForm = () => {
                     <Input
                       {...register("phone")}
                       type="tel"
+                      className={"border-border border shadow-none"}
                       placeholder="+1 555 000 0000"
                     />
                     <FieldError>{errors.phone?.message}</FieldError>
@@ -199,7 +206,11 @@ const CheckoutForm = () => {
                     className="sm:col-span-2"
                   >
                     <Label>Full name</Label>
-                    <Input {...register("fullName")} placeholder="Jane Smith" />
+                    <Input
+                      {...register("fullName")}
+                      className={"border-border border shadow-none"}
+                      placeholder="Jane Smith"
+                    />
                     <FieldError>{errors.fullName?.message}</FieldError>
                   </TextField>
 
@@ -211,6 +222,7 @@ const CheckoutForm = () => {
                     <Label>Address</Label>
                     <Input
                       {...register("line1")}
+                      className={"border-border border shadow-none"}
                       placeholder="123 Main Street"
                     />
                     <FieldError>{errors.line1?.message}</FieldError>
@@ -223,24 +235,40 @@ const CheckoutForm = () => {
                         (optional)
                       </span>
                     </Label>
-                    <Input {...register("line2")} placeholder="Apt 4B" />
+                    <Input
+                      {...register("line2")}
+                      className={"border-border border shadow-none"}
+                      placeholder="Apt 4B"
+                    />
                   </TextField>
 
                   <TextField isInvalid={!!errors.city} isRequired>
                     <Label>City</Label>
-                    <Input {...register("city")} placeholder="Brooklyn" />
+                    <Input
+                      {...register("city")}
+                      className={"border-border border shadow-none"}
+                      placeholder="Brooklyn"
+                    />
                     <FieldError>{errors.city?.message}</FieldError>
                   </TextField>
 
                   <TextField isInvalid={!!errors.state}>
                     <Label>State / Province</Label>
-                    <Input {...register("state")} placeholder="NY" />
+                    <Input
+                      {...register("state")}
+                      className={"border-border border shadow-none"}
+                      placeholder="NY"
+                    />
                     <FieldError>{errors.state?.message}</FieldError>
                   </TextField>
 
                   <TextField isInvalid={!!errors.postalCode} isRequired>
                     <Label>Postal code</Label>
-                    <Input {...register("postalCode")} placeholder="10001" />
+                    <Input
+                      {...register("postalCode")}
+                      className={"border-border border shadow-none"}
+                      placeholder="10001"
+                    />
                     <FieldError>{errors.postalCode?.message}</FieldError>
                   </TextField>
 
@@ -255,7 +283,9 @@ const CheckoutForm = () => {
                         isRequired
                       >
                         <Label>Country</Label>
-                        <Select.Trigger>
+                        <Select.Trigger
+                          className={"border-border border shadow-none"}
+                        >
                           <Select.Value />
                           <Select.Indicator />
                         </Select.Trigger>

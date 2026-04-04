@@ -72,7 +72,7 @@ export const useCheckout = () => {
   const form = useForm<CheckoutSchema>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: checkoutDefaults,
-    mode: "onBlur",
+    mode: "onChange",
   });
 
   const intentMutation = useMutation({

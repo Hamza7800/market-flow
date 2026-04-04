@@ -17,6 +17,7 @@ import Link from "next/link";
 import { authClient } from "@/server/better-auth/client";
 import { LinkButton } from "@/components/link-button";
 import { usePathname } from "next/navigation";
+import ProductDetailsSkeleton from "@/components/loading-skeletons/product-details-loading";
 
 // TODO: FIX UI
 const ProductDetails = ({ productId }: { productId: string }) => {
@@ -41,7 +42,7 @@ const ProductDetails = ({ productId }: { productId: string }) => {
     : data?.stock || 0;
 
   if (isPending) {
-    return <LoadingState />;
+    return <ProductDetailsSkeleton />;
   }
 
   if (isError) {

@@ -19,6 +19,7 @@ import { useMemo, useTransition } from "react";
 import { seedStore } from "seed";
 import type { ProductFilters } from "@/lib/cache-keys";
 import { LoadMoreButton } from "./load-more";
+import PublicProductsLoading from "@/components/loading-skeletons/public-products-loading";
 
 const ProductsList = ({
   category,
@@ -88,7 +89,7 @@ const ProductsList = ({
   // }, [products, search, minPrice, maxPrice]);
 
   if (isPending) {
-    return <LoadingState />;
+    return <PublicProductsLoading />;
   }
 
   if (isError) {
@@ -102,36 +103,20 @@ const ProductsList = ({
 
   if (!safeProducts?.length) {
     return (
-      <>
-        {/* <Button
-          onClick={() => {
-            seedProducts();
-          }}
-        >
-          Seed
-        </Button> */}
-        <EmptyState
-          icon={Box}
-          title="No Products"
-          description="No products available yet"
-          action={{
-            label: "Home",
-            onClick: () => router.push("/"),
-          }}
-        />
-      </>
+      <EmptyState
+        icon={Box}
+        title="No Products"
+        description="No products available yet"
+        action={{
+          label: "Home",
+          onClick: () => router.push("/"),
+        }}
+      />
     );
   }
 
   return (
     <main className="w-full">
-      {/* <Button
-        onClick={() => {
-          seedStore();
-        }}
-      >
-        Seed
-      </Button> */}
       <ProductsGrid products={safeProducts} />
       {isHomePage ? (
         <div className="mt-10 flex items-center justify-center">

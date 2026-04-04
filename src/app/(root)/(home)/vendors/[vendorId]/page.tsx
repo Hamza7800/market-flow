@@ -11,6 +11,8 @@ import { getVendorById, getVendorPublicProducts } from "@/actions/public";
 import VendorProducts from "../_components/vendor-products";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import PublicProductsLoading from "@/components/loading-skeletons/public-products-loading";
+import VendorHeaderSkeleton from "@/components/loading-skeletons/vendor-header-loading";
 
 const VendorContent = async ({ vendorId }: { vendorId: string }) => {
   const qc = new QueryClient();
@@ -58,10 +60,10 @@ const VendorDetailsPage = async ({ params }: Props) => {
   return (
     <>
       <MaxWidthContainer>
-        <Suspense fallback={<h2>Loading....vendor</h2>}>
+        <Suspense fallback={<VendorHeaderSkeleton />}>
           <VendorContent vendorId={vendorId} />
         </Suspense>
-        <Suspense fallback={<h2>Loading....products</h2>}>
+        <Suspense fallback={<PublicProductsLoading />}>
           <VendorProductsContent vendorId={vendorId} />
         </Suspense>
       </MaxWidthContainer>

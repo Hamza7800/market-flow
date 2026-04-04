@@ -4,15 +4,20 @@ import { ArrowRight, Star, Store } from "lucide-react";
 import { LinkButton } from "@/components/link-button";
 import { usePublicVendors } from "@/hooks/use-public";
 import { Card, Separator } from "@heroui/react";
+import PublicVendorsLoading from "@/components/loading-skeletons/public-vendors-loading";
 
 const Vendors = ({ slice }: { slice?: number }) => {
-  const { data: vendors } = usePublicVendors();
+  const { data: vendors, isPending } = usePublicVendors();
   const v = slice ? vendors?.slice(0, slice) : vendors;
+
+  if (isPending) {
+    return <PublicVendorsLoading />;
+  }
+
   return (
-    <section className="py-16">
+    <section className="py-4 pb-14">
       <div className="">
-        {/* HEADER */}
-        <div className="mb-12">
+        <div className="mb-8">
           <h2 className="text-foreground mb-3 text-3xl font-bold md:text-4xl">
             Featured Vendors
           </h2>

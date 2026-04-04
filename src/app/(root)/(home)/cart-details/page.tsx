@@ -1,11 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import {
   ShoppingCart,
-  Trash2,
-  Plus,
-  Minus,
   Ship,
   Lock,
   ArrowRight,
@@ -14,16 +10,15 @@ import {
   AlertCircleIcon,
 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "nextjs-toploader/app";
 import { useCart, useClearCart, getItemTotal } from "@/hooks/use-cart";
-import { LoadingState } from "@/components/loading-state";
 import { Button, Card } from "@heroui/react";
 import { LinkButton } from "@/components/link-button";
-import CartItemRow from "../../_components/cart-item";
+import CartItemRow from "@/app/(root)/_components/cart-item";
 import { authClient } from "@/server/better-auth/client";
 import { EmptyState } from "@/components/empty-state";
 import { usePathname } from "next/navigation";
+import CartSkeleton from "@/components/loading-skeletons/cart-details-loading";
 
 export default function CartDetails() {
   const router = useRouter();
@@ -53,13 +48,8 @@ export default function CartDetails() {
     );
   }
 
-  // Loading State
   if (isPending) {
-    return (
-      <div className="flex h-dvh items-center justify-center">
-        <LoadingState />
-      </div>
-    );
+    return <CartSkeleton />;
   }
 
   const items = cart?.items || [];

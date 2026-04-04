@@ -11,6 +11,8 @@ import { Suspense } from "react";
 import ProductsList from "@/app/(root)/_components/products/products-list";
 import { FiltersContent } from "@/app/(root)/_components/filters-content";
 import ProductFilters from "@/app/(root)/_components/product-filters";
+import PublicProductsLoading from "@/components/loading-skeletons/public-products-loading";
+import ProductFiltersSkeleton from "@/components/loading-skeletons/filters-loading";
 
 const Content = async ({ params }: { params: BrowseParams }) => {
   const p = params;
@@ -51,12 +53,12 @@ const ProductsPage = async ({
 
   return (
     <MaxWidthContainer className="flex flex-col px-5 py-5">
-      <Suspense fallback={<h2>Loading ....</h2>}>
+      <Suspense fallback={<ProductFiltersSkeleton />}>
         <FiltersContent>
           <ProductFilters />
         </FiltersContent>
       </Suspense>
-      <Suspense fallback={<h2>Loading Products....</h2>}>
+      <Suspense fallback={<PublicProductsLoading />}>
         <Content params={params} />
       </Suspense>
     </MaxWidthContainer>

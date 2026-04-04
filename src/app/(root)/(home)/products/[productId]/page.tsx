@@ -8,6 +8,7 @@ import {
 import { Suspense } from "react";
 import ProductDetails from "./_components/product-details";
 import MaxWidthContainer from "@/components/max-w-container";
+import ProductDetailsSkeleton from "@/components/loading-skeletons/product-details-loading";
 
 const Content = async ({ productId }: { productId: string }) => {
   const qc = new QueryClient();
@@ -34,7 +35,7 @@ const ProductDetailsPage = async ({ params }: Props) => {
   const { productId } = await params;
   return (
     <MaxWidthContainer>
-      <Suspense fallback={<h2>Loading...</h2>}>
+      <Suspense fallback={<ProductDetailsSkeleton />}>
         <Content productId={productId} />
       </Suspense>
     </MaxWidthContainer>

@@ -2,6 +2,7 @@
 
 import { EmptyState } from "@/components/empty-state";
 import { ErrorState } from "@/components/error-state";
+import VendorHeaderSkeleton from "@/components/loading-skeletons/vendor-header-loading";
 import { LoadingState } from "@/components/loading-state";
 import { useVendorPublic } from "@/hooks/use-public";
 import { ArrowLeft, Clock, Mail, RotateCcw, Store } from "lucide-react";
@@ -20,7 +21,7 @@ const VendorDetails = ({ vendorId }: { vendorId: string }) => {
   const router = useRouter();
 
   if (isPending) {
-    return <LoadingState />;
+    return <VendorHeaderSkeleton />;
   }
 
   if (isError) {

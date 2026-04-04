@@ -15,6 +15,9 @@ import { FiltersContent } from "@/app/(root)/_components/filters-content";
 import CategoriesList from "@/app/(root)/_components/categories-list";
 import { HeroBanner } from "@/app/(root)/_components/hero-banner";
 import Vendors from "@/app/(root)/_components/vendors";
+import HomeCategoriesLoading from "@/components/loading-skeletons/home-categories-loading";
+import PublicProductsLoading from "@/components/loading-skeletons/public-products-loading";
+import PublicVendorsLoading from "@/components/loading-skeletons/public-vendors-loading";
 
 type Props = {
   page: number;
@@ -71,16 +74,18 @@ const HomePage = () => {
   return (
     <MaxWidthContainer>
       <HeroBanner />
-      <Suspense fallback={<h2>Loading Categories....</h2>}>
+      <Suspense fallback={<HomeCategoriesLoading />}>
         <FiltersContent>
           <CategoriesList />
         </FiltersContent>
       </Suspense>
-      <Suspense fallback={<h2>Loading Products....</h2>}>
+      <Suspense fallback={<PublicProductsLoading />}>
         <ProductsContent />
       </Suspense>
-      <Suspense fallback={<h2>Loading Vendors....</h2>}>
-        <VendorsContent />
+      <Suspense fallback={<PublicVendorsLoading />}>
+        <div className="py-16">
+          <VendorsContent />
+        </div>
       </Suspense>
     </MaxWidthContainer>
   );

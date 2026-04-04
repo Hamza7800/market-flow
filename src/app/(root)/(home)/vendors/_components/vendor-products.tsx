@@ -5,6 +5,7 @@ import { ProductsGrid } from "@/app/(root)/_components/products/product-card";
 import { EmptyState } from "@/components/empty-state";
 import { ErrorState } from "@/components/error-state";
 import { LinkButton } from "@/components/link-button";
+import PublicProductsLoading from "@/components/loading-skeletons/public-products-loading";
 import { LoadingState } from "@/components/loading-state";
 import { useVendorPublic, useVendorPublicProducts } from "@/hooks/use-public";
 import { PUBLIC_ROUTES } from "@/lib/consts/constants";
@@ -32,7 +33,7 @@ const VendorProducts = ({ vendorId }: { vendorId: string }) => {
   );
 
   if (isPending) {
-    return <LoadingState />;
+    return <PublicProductsLoading />;
   }
 
   if (isError) {

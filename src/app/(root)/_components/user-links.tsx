@@ -36,6 +36,7 @@ const UserLinks = () => {
           {isAuthenticated ? (
             <>
               <Dropdown.Item
+                key="my-orders"
                 onClick={() => {
                   router.push(`/user/${data.user?.id}/orders`);
                 }}
@@ -45,8 +46,10 @@ const UserLinks = () => {
                 <Truck className="text-muted size-4 shrink-0" />
                 <Label>My Orders</Label>
               </Dropdown.Item>
+
               {isActive ? (
                 <Dropdown.Item
+                  key="dashboard"
                   onClick={() => {
                     router.push(`/vendor/${profile?.id}/dashboard`);
                   }}
@@ -58,6 +61,7 @@ const UserLinks = () => {
                 </Dropdown.Item>
               ) : (
                 <Dropdown.Item
+                  key="become-a-vendor"
                   id="become-a-vendor"
                   textValue="Become a vendor"
                   onClick={() => {
@@ -68,7 +72,9 @@ const UserLinks = () => {
                   <Label>Become a vendor</Label>
                 </Dropdown.Item>
               )}
+
               <Dropdown.Item
+                key="logout-user"
                 onClick={handleSignOut}
                 id="logout-user"
                 textValue="Logout user"
@@ -81,6 +87,7 @@ const UserLinks = () => {
           ) : (
             <>
               <Dropdown.Item
+                key="login"
                 id="login"
                 textValue="Login"
                 onClick={() => {
@@ -90,18 +97,6 @@ const UserLinks = () => {
                 <ArrowRightFromSquare className="text-muted size-4 shrink-0" />
                 <Label>Login</Label>
               </Dropdown.Item>
-              {/* <NavLink
-                href="/sign-in"
-                className="text-md hover:border-app-text-quaternary hover:text-app-text-primary flex h-[40px] items-center justify-center rounded-[12px] border border-transparent bg-transparent px-[20px] py-6 font-medium transition-all duration-200 hover:bg-[#2c2c2c]/50"
-              >
-                Login
-              </NavLink>
-              <NavLink
-                href="/register"
-                className="text-md flex h-[40px] items-center justify-center rounded-[12px] border border-t-white/20 border-l-white/20 bg-white px-[20px] py-6 font-medium text-black transition-all duration-200 hover:bg-[#e7e7e7] hover:text-black"
-              >
-                Create Account
-              </NavLink> */}
             </>
           )}
         </Dropdown.Menu>

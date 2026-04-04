@@ -12,9 +12,9 @@ import CartDrawer from "./cart-drawer";
 import UserLinks from "./user-links";
 
 const navLinks = [
-  { href: "/items", label: "Items" },
-  { href: "/shirts", label: "Shirts" },
-  { href: "/support", label: "Support" },
+  { href: "/products", label: "Products" },
+  { href: "/vendors", label: "Vendors" },
+  // { href: "/support", label: "Support" },
 ];
 
 const Header = () => {

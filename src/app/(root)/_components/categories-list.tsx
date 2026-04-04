@@ -1,63 +1,9 @@
 "use client";
 import { useCategories } from "@/hooks/use-public";
-import { browseServerParams } from "@/lib/nuqs/public";
-import { Card, Tag, TagGroup } from "@heroui/react";
-import { useQueryStates } from "nuqs";
-
-// const CategoriesList = () => {
-// const { data, isLoading } = useCategories();
-// const [{ category, page }, setServerState] = useQueryStates(
-//   browseServerParams,
-//   {
-//     history: "push",
-//     shallow: false,
-//   },
-// );
-
-//   return (
-//     <div>
-//       <TagGroup aria-label="Categories" selectionMode="single">
-//         <TagGroup.List>
-//           <Tag
-//             id="all"
-//             textValue="All"
-//             onClick={() => {
-//               setServerState({ category: "" });
-//             }}
-//           >
-//             All
-//           </Tag>
-//           {data?.map((c) => (
-//             <Tag
-//               key={c.id}
-//               id={c.id}
-//               onClick={() => {
-//                 setServerState({
-//                   category: c.id,
-//                 });
-//               }}
-//               textValue={c.name}
-//             >
-//               {c.name}
-//             </Tag>
-//           ))}
-//         </TagGroup.List>
-//       </TagGroup>
-//     </div>
-//   );
-// };
-
-// export default CategoriesList;
-
-import { useState } from "react";
+import { Card } from "@heroui/react";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-}
+import HomeCategoriesLoading from "@/components/loading-skeletons/home-categories-loading";
 
 const categoryColors = [
   { bg: "bg-surface", text: "text-foreground", border: "border-border" },
@@ -69,24 +15,19 @@ const categoryColors = [
 ];
 
 const CategoriesList = () => {
-  const { data: categories } = useCategories();
-  // const [{ category, page }, setServerState] = useQueryStates(
-  //   browseServerParams,
-  //   {
-  //     history: "push",
-  //     shallow: false,
-  //   },
-  // );
+  const { data: categories, isPending } = useCategories();
 
-  if (!categories) return null;
+  if (isPending) {
+    return <HomeCategoriesLoading />;
+  }
 
-  // const [hoveredId, setHoveredId] = useState<string | null>(null);
+  if (!categories?.length) return null;
 
   return (
     <section className="py-10">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto">
         {/* HEADER */}
-        <div className="mb-12">
+        <div className="mb-8">
           <h2 className="text-foreground mb-3 text-3xl font-bold md:text-4xl">
             Explore Categories
           </h2>
