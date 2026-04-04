@@ -55,7 +55,6 @@ export const useAddToCart = () => {
   return useMutation({
     mutationFn: async (input: AddToCartInput) => {
       const result = await addToCart(input);
-      // console.log(result);
       if (!result.success) {
         throw new Error(result.message);
       }
@@ -71,7 +70,7 @@ export const useAddToCart = () => {
 
         const existingIndex = old.items.findIndex(
           (i) =>
-            i.id === input.productId &&
+            i.productId === input.productId &&
             i.variantId === (input.variantId ?? null),
         );
 
@@ -114,7 +113,6 @@ export const useAddToCart = () => {
       return { snapshot };
     },
     onError: (_err, _input, ctx) => {
-      console.error(_err);
       if (ctx?.snapshot !== undefined) {
         qc.setQueryData(cartKey, ctx.snapshot);
       }

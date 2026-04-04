@@ -184,7 +184,9 @@ export const useUpdateProductStatus = (
           context.snapshot,
         );
       }
-      toast.danger(err.message);
+      toast.danger(err.message, {
+        timeout: 20000,
+      });
     },
   });
 };

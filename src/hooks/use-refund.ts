@@ -96,7 +96,7 @@ export const useApproveItemRefund = () => {
         [...REFUND_REQUESTS_KEY, vendorId],
         (old: any[]) => old?.filter((r) => r.id !== refundId) ?? [],
       );
-      console.log(snapshot);
+
       return { snapshot };
     },
 
@@ -146,7 +146,7 @@ export function useRejectItemRefund() {
         [...REFUND_REQUESTS_KEY, vendorId],
         (old: any[]) => old?.filter((r) => r.id !== refundId) ?? [],
       );
-      console.log(snapshot);
+
       return { snapshot };
     },
 

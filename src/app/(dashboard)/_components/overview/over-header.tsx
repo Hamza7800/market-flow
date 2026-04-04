@@ -43,12 +43,12 @@ export const OverviewHeader = ({
           className="w-36"
           aria-label="Select month"
         >
-          <Select.Trigger className="border-default-200 bg-background rounded-xl border px-3 text-sm">
+          <Select.Trigger className="border-border rounded-xl border px-3 py-3 text-sm shadow-none">
             <Select.Value />
             <Select.Indicator />
           </Select.Trigger>
           <Select.Popover>
-            <ListBox>
+            <ListBox className="w-[200px]">
               <ListBox.Item key="all" id="all" textValue="All time">
                 <Label>All time</Label>
               </ListBox.Item>
@@ -67,7 +67,6 @@ export const OverviewHeader = ({
         <LinkButton
           href={`/vendor/${vendorId}/dashboard/products/form`}
           size="sm"
-          className="rounded-xl font-semibold"
         >
           New Product
         </LinkButton>

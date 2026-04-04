@@ -23,13 +23,23 @@ import {
   type VendorSchema,
 } from "@/zod-schema/vendor-profile-schema";
 import type { VendorRow } from "@/actions/vendor";
+import { authClient } from "@/server/better-auth/client";
+import { EmptyState } from "./empty-state";
+import { User } from "lucide-react";
+import { useRouter } from "nextjs-toploader/app";
+import { usePathname } from "next/navigation";
 
 interface VendorFormProps {
   initialData?: VendorRow | null;
 }
 
 const VendorForm = ({ initialData }: VendorFormProps) => {
+  const router = useRouter();
+  const pathname = usePathname();
+
   const isEditMode = !!initialData;
+  const { data, isPending } = authClient.useSession();
+  const userId = data?.user.id;
 
   const vendorApplication = useVendorApplication();
   const updateVendor = useUpdateVendor();
@@ -71,6 +81,20 @@ const VendorForm = ({ initialData }: VendorFormProps) => {
     mutation.mutate(values);
   };
 
+  if (!userId && !isPending) {
+    return (
+      <EmptyState
+        icon={User}
+        title="Login"
+        description="Please login to submit your application "
+        action={{
+          label: "Sign In",
+          onClick: () => router.push(`/sign-in?redirect=${pathname}`),
+        }}
+      />
+    );
+  }
+
   return (
     <Card className="shadow-none">
       <Form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
@@ -100,7 +124,6 @@ const VendorForm = ({ initialData }: VendorFormProps) => {
           name="logo"
           render={({ field, fieldState }) => (
             <div className="flex flex-col gap-1">
-              {/* {console.log(fieldState.invalid)} */}
               <ProfileImageUploader
                 value={field.value}
                 onChange={field.onChange}
@@ -222,20 +245,22 @@ const VendorForm = ({ initialData }: VendorFormProps) => {
           )}
         />
 
-        <Button isPending={isSubmitting} type="submit" fullWidth>
-          {({ isPending }) => (
-            <span className="flex items-center justify-center gap-2">
-              {isPending && <Spinner color="current" size="sm" />}
-              {isPending
-                ? isEditMode
-                  ? "Saving..."
-                  : "Submitting..."
-                : isEditMode
-                  ? "Save Changes"
-                  : "Submit Application"}
-            </span>
-          )}
-        </Button>
+        <div className="mt-4 flex items-center justify-end">
+          <Button isPending={isSubmitting} type="submit">
+            {({ isPending }) => (
+              <span className="flex items-center justify-center gap-2">
+                {isPending && <Spinner color="current" size="sm" />}
+                {isPending
+                  ? isEditMode
+                    ? "Saving..."
+                    : "Submitting..."
+                  : isEditMode
+                    ? "Save Changes"
+                    : "Submit Application"}
+              </span>
+            )}
+          </Button>
+        </div>
       </Form>
     </Card>
   );

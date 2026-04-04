@@ -39,9 +39,7 @@ const CartItemRow = ({
     return (
       <div
         key={item.id}
-        className={`border-border flex items-start gap-3 border-b py-4 transition-all last:border-b-0 ${
-          isItemPending ? "pointer-events-none opacity-60" : ""
-        }`}
+        className={`border-border flex items-start gap-3 border-b py-4 transition-all last:border-b-0`}
       >
         {/* PRODUCT IMAGE (Shrunken for Drawer) */}
         <div className="bg-muted border-border relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border">
@@ -84,7 +82,7 @@ const CartItemRow = ({
               variant="danger-soft"
               className="hover:bg-danger-50 h-7 w-7 min-w-7"
               onClick={() => removeItem.mutate(item.id)}
-              isDisabled={isItemPending}
+              // isDisabled={isItemPending}
               aria-label="Remove item"
             >
               <Trash2 size={14} />
@@ -101,7 +99,7 @@ const CartItemRow = ({
                 variant="outline"
                 className="h-6 w-6 min-w-6 rounded-[4px]"
                 onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
-                isDisabled={isItemPending}
+                // isDisabled={isItemPending}
                 aria-label="Decrease quantity"
               >
                 <MinusIcon size={12} className="text-foreground" />
@@ -118,7 +116,7 @@ const CartItemRow = ({
                 size="sm"
                 className="h-6 w-6 min-w-6 rounded-[4px]"
                 onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
-                isDisabled={isItemPending}
+                // isDisabled={isItemPending}
                 aria-label="Increase quantity"
               >
                 <PlusIcon size={12} className="text-foreground" />

@@ -36,9 +36,10 @@ const ProductNavHeader = ({
 
           return (
             <Button
-              variant={selected ? "primary" : "secondary"}
+              variant={selected ? "primary" : "outline"}
               key={item}
               size="sm"
+              className={"text-sm"}
               onPress={() => setStatus(item)}
             >
               {STATUS_LABELS[item]}

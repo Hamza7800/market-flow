@@ -24,8 +24,6 @@ const getStatusColor = (status: string) => {
 const OrderDetails = () => {
   const { data, isPending, isError, error, refetch } = useUserOrdersDetails();
 
-  console.log(data);
-
   if (isPending) {
     return <LoadingState />;
   }

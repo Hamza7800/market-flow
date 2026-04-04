@@ -4,11 +4,11 @@ import { useState } from "react";
 import {
   Button,
   Modal,
-  Chip,
   RadioGroup,
   Label,
   Radio,
   Description,
+  Spinner,
 } from "@heroui/react";
 import { useAddToCart } from "@/hooks/use-cart";
 import type { AddToCartInput } from "@/zod-schema/cart-schema";
@@ -37,6 +37,8 @@ export default function AddToCartWithVariant({
   const [selected, setSelected] = useState<string | null>(null);
   const { mutate: addToCart, isPending } = useAddToCart();
 
+  const selectedVariant = variants.find((v) => v.id === selected);
+
   const handlePress = () => {
     if (!selectedVariant) {
       return;
@@ -50,14 +52,9 @@ export default function AddToCartWithVariant({
     addToCart(input);
   };
 
-  const selectedVariant = variants.find((v) => v.id === selected);
-
   return (
     <Modal>
-      <Button
-        // size="sm"
-        className="bg-primary hover:bg-primary/90 text-primary-foreground group w-full font-semibold"
-      >
+      <Button className="bg-primary hover:bg-primary/90 text-primary-foreground group w-full font-semibold transition-all">
         <ShoppingCart className="mr-2" />
         Select Variant
       </Button>
@@ -68,11 +65,17 @@ export default function AddToCartWithVariant({
             <Modal.CloseTrigger />
 
             <Modal.Header>
-              <Modal.Heading>Select Variant</Modal.Heading>
+              <Modal.Heading className="text-xl font-bold">
+                Select Variant
+              </Modal.Heading>
             </Modal.Header>
 
-            <Modal.Body>
-              <RadioGroup value={selected ?? undefined} onChange={setSelected}>
+            <Modal.Body className="">
+              <RadioGroup
+                value={selected ?? undefined}
+                onChange={setSelected}
+                className=""
+              >
                 {variants.map((variant) => {
                   const isOutOfStock = variant.stock <= 0;
 
@@ -82,36 +85,50 @@ export default function AddToCartWithVariant({
                       value={variant.id}
                       isDisabled={isOutOfStock}
                       className={clsx(
-                        "group bg-surface relative flex-col gap-4 rounded-xl border px-5 py-4 transition-all",
-                        "data-[selected=true]:border-accent data-[selected=true]:bg-accent/10",
-                        "data-[focus-visible=true]:border-accent data-[focus-visible=true]:bg-accent/10",
-                        isOutOfStock && "opacity-50",
+                        "group relative flex w-full cursor-pointer flex-col rounded-xl border-2 px-5 py-4 shadow-sm transition-all",
+                        "border-border bg-surface hover:border-default-400 hover:bg-default-50/50",
+                        "data-[selected=true]:border-accent data-[selected=true]:bg-accent/5 data-[selected=true]:shadow-md",
+                        "data-[focus-visible=true]:ring-accent data-[focus-visible=true]:ring-2 data-[focus-visible=true]:ring-offset-2",
+                        isOutOfStock &&
+                          "hover:border-border hover:bg-surface cursor-not-allowed opacity-50 grayscale",
                       )}
                     >
-                      {/* radio indicator */}
-                      <Radio.Control className="absolute top-3 right-4 size-5">
+                      <Radio.Control className="absolute top-5 right-5 size-5">
                         <Radio.Indicator />
                       </Radio.Control>
 
-                      {/* content */}
-                      <Radio.Content className="flex flex-col gap-3">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Label>{variant.name}</Label>
-                          </div>
-
-                          <div className="text-right"></div>
-                        </div>
-                        <Description>{variant.options}</Description>
-
-                        {/* stock */}
-                        <div className="text-default-500 flex items-center gap-3 text-xs">
-                          {isOutOfStock
-                            ? "Out of stock"
-                            : `${variant.stock} in stock`}
-                          <p className="text-sm font-semibold">
+                      <Radio.Content className="flex w-full flex-col gap-1 pr-8">
+                        <div className="flex w-full items-start justify-between">
+                          <Label className="text-foreground cursor-pointer text-base font-semibold tracking-tight">
+                            {variant.name}
+                          </Label>
+                          <span className="text-foreground text-lg font-bold">
                             ${variant.price ?? "—"}
-                          </p>
+                          </span>
+                        </div>
+
+                        <Description className="text-muted-foreground text-sm">
+                          {variant.options}
+                        </Description>
+
+                        <div className="mt-2 flex items-center gap-2 text-sm font-medium">
+                          <span
+                            className={clsx(
+                              "size-2 rounded-full",
+                              isOutOfStock ? "bg-danger" : "bg-emerald-500",
+                            )}
+                          />
+                          <span
+                            className={
+                              isOutOfStock
+                                ? "text-danger"
+                                : "text-emerald-600 dark:text-emerald-500"
+                            }
+                          >
+                            {isOutOfStock
+                              ? "Out of stock"
+                              : `${variant.stock} in stock`}
+                          </span>
                         </div>
                       </Radio.Content>
                     </Radio>
@@ -121,23 +138,38 @@ export default function AddToCartWithVariant({
             </Modal.Body>
 
             {/* FOOTER */}
-            <Modal.Footer className="flex items-center justify-between">
-              <div className="text-default-500 text-sm">
+            <Modal.Footer className="border-border bg-default-50/50 flex items-center justify-between border-t py-4">
+              <div className="text-muted-foreground text-sm">
                 {selectedVariant ? (
-                  <>
-                    Selected:{" "}
-                    <span className="font-medium">{selectedVariant.name}</span>
-                  </>
+                  <div className="flex flex-col">
+                    <span className="text-xs tracking-wider uppercase">
+                      Total
+                    </span>
+                    <span className="text-foreground text-lg font-bold">
+                      ${selectedVariant.price ?? "—"}
+                    </span>
+                  </div>
                 ) : (
-                  "Select a variant"
+                  "Select a variant to continue"
                 )}
               </div>
 
               <Button
                 isDisabled={!selectedVariant || isPending}
                 onPress={handlePress}
+                className={clsx(
+                  "font-semibold",
+                  selectedVariant
+                    ? "bg-accent text-accent-foreground hover:bg-accent/90 shadow-md"
+                    : "bg-default-200 text-default-500",
+                )}
               >
-                Add to Cart
+                {isPending ? (
+                  <Spinner color="current" size="sm" />
+                ) : (
+                  <ShoppingCart className="mr-2 size-4" />
+                )}
+                {isPending ? "Adding..." : "Add to Cart"}
               </Button>
             </Modal.Footer>
           </Modal.Dialog>

@@ -1,5 +1,4 @@
 "use client";
-import { useProductForm } from "@/hooks/use-product-form";
 import {
   createProductDefaults,
   createProductSchema,
@@ -31,17 +30,10 @@ import {
   TextField,
 } from "@heroui/react";
 import {
-  AlertCircleIcon,
   ArchiveIcon,
+  ArrowLeft,
   CheckCircleIcon,
   ClockIcon,
-  EyeIcon,
-  LayersIcon,
-  PackageIcon,
-  SaveIcon,
-  SendIcon,
-  TagIcon,
-  Trash2Icon,
 } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { VariantBuilder } from "./variant-builder";
@@ -56,10 +48,8 @@ import {
 } from "@/hooks/use-product";
 import { MultiImageUploader } from "@/components/image-upload";
 import DeleteProduct from "./delete-product";
-import { LinkButton } from "@/components/link-button";
 
 export type Category = { id: string; name: string; parentId?: string | null };
-// type TagType = { id: string; name: string; slug: string };
 
 type CreateProps = {
   mode: "create";
@@ -130,7 +120,6 @@ const ProductForm = (props: Props) => {
   const hasVariants = watch("hasVariants");
 
   const onSubmit = async (values: CreateProductSchema) => {
-    console.log(values);
     if (isEdit && updateMutation) {
       const result = await updateMutation.mutateAsync(
         values as unknown as UpdateProductSchema,
@@ -167,7 +156,10 @@ const ProductForm = (props: Props) => {
   //     : undefined;
 
   const isSubmitting =
-    createMutation.isPending || (updateMutation?.isPending ?? false);
+    createMutation.isPending ||
+    (updateMutation?.isPending ?? false) ||
+    statusMutation?.isPending ||
+    false;
 
   const currentStatus = isEdit ? props.currentStatus : "draft";
   const statusCfg = STATUS_CONFIG[currentStatus];
@@ -180,11 +172,12 @@ const ProductForm = (props: Props) => {
   //     : null;
 
   return (
-    <div className="space-y-6 pb-24">
-      <LinkButton href="" onClick={() => router.back()}>
-        Back
-      </LinkButton>
-      <Surface className="flex items-center justify-between p-4">
+    <div className="pb-24">
+      <div className="flex flex-col gap-3">
+        <Button variant="outline" onClick={() => router.back()}>
+          <ArrowLeft />
+          Back
+        </Button>
         <div>
           <h1 className="text-foreground text-2xl font-semibold tracking-tight">
             {isEdit ? "Edit product" : "New product"}
@@ -195,7 +188,8 @@ const ProductForm = (props: Props) => {
               : "Products start as drafts. Publish when ready."}
           </p>
         </div>
-
+      </div>
+      <Surface className="flex items-center justify-between p-4">
         {isEdit && (
           <div className="flex items-center gap-2">
             <Chip>{statusCfg.label}</Chip>
@@ -262,6 +256,7 @@ const ProductForm = (props: Props) => {
               name="basePrice"
               render={({ field, fieldState }) => (
                 <NumberField
+                  variant="secondary"
                   fullWidth
                   value={field.value}
                   onChange={field.onChange}
@@ -297,6 +292,7 @@ const ProductForm = (props: Props) => {
                   name="stock"
                   render={({ field, fieldState }) => (
                     <NumberField
+                      variant="secondary"
                       fullWidth
                       value={field.value}
                       onChange={field.onChange}
@@ -343,7 +339,7 @@ const ProductForm = (props: Props) => {
           />
 
           {hasVariants && (
-            <Alert color="primary">
+            <Alert color="primary" className="border-border border shadow-none">
               Stock and pricing are managed per variant
             </Alert>
           )}
@@ -376,22 +372,50 @@ const ProductForm = (props: Props) => {
                     {currentStatus !== "active" && (
                       <Button
                         size="sm"
+                        variant="tertiary"
+                        isPending={isSubmitting}
                         onPress={() => onStatusChange("active")}
                       >
-                        Publish
+                        {({ isPending }) => (
+                          <>
+                            {isPending ? (
+                              <Spinner color="accent" size="sm" />
+                            ) : null}
+                            Publish
+                          </>
+                        )}
                       </Button>
                     )}
                     {currentStatus === "active" && (
-                      <Button size="sm" onPress={() => onStatusChange("draft")}>
-                        Unpublish
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        isPending={isSubmitting}
+                        onPress={() => onStatusChange("draft")}
+                      >
+                        {({ isPending }) => (
+                          <>
+                            {isPending ? (
+                              <Spinner color="accent" size="sm" />
+                            ) : null}
+                            Unpublish
+                          </>
+                        )}
                       </Button>
                     )}
                     {currentStatus !== "archived" && (
                       <Button
                         size="sm"
+                        variant="outline"
+                        isPending={isSubmitting}
                         onPress={() => onStatusChange("archived")}
                       >
-                        Archive
+                        {({ isPending }) => (
+                          <>
+                            {isPending ? <Spinner size="sm" /> : null}
+                            Archive
+                          </>
+                        )}
                       </Button>
                     )}
                   </>
@@ -406,7 +430,7 @@ const ProductForm = (props: Props) => {
                     vendorId={props.vendorId}
                     status={props.currentStatus}
                     trigger={
-                      <Button fullWidth variant="danger-soft">
+                      <Button fullWidth size="sm" variant="danger-soft">
                         Delete Product
                       </Button>
                     }
@@ -416,9 +440,15 @@ const ProductForm = (props: Props) => {
                 <Button
                   type="submit"
                   size="sm"
+                  isPending={isSubmitting}
                   // isDisabled={false || (!isDirty && isEdit)}
                 >
-                  {isEdit ? "Save changes" : "Create product"}
+                  {({ isPending }) => (
+                    <>
+                      {isPending ? <Spinner color="warning" size="sm" /> : null}
+                      {isEdit ? "Save changes" : "Create product"}
+                    </>
+                  )}
                 </Button>
               </div>
             </div>

@@ -87,7 +87,6 @@ export const VariantBuilder = ({ control, setValue }: Props) => {
             //   }) || `Variant ${index + 1}`;
             const variantName = variants[index]?.name || `Variant ${index + 1}`;
             const variantError = variantErrors?.[index];
-            console.log(variantError);
 
             return (
               <div
@@ -122,11 +121,11 @@ export const VariantBuilder = ({ control, setValue }: Props) => {
                   </button>
 
                   <Button
-                    variant="ghost"
+                    variant="danger-soft"
                     size="sm"
                     isIconOnly
                     onPress={() => onRemove(index)}
-                    className="text-muted-foreground hover:text-danger h-7 w-7 shrink-0"
+                    // className="text-muted-foreground hover:text-danger h-7 w-7 shrink-0"
                     aria-label={`Remove variant ${index + 1}`}
                   >
                     <TrashIcon className="h-3.5 w-3.5" />
@@ -180,6 +179,7 @@ export const VariantBuilder = ({ control, setValue }: Props) => {
                         name={`variants.${index}.price`}
                         render={({ field }) => (
                           <NumberField
+                            variant="secondary"
                             value={Number(field.value) ?? undefined}
                             onChange={(v) => field.onChange(Number(v))}
                             isInvalid={!!variantError?.price}
@@ -193,9 +193,9 @@ export const VariantBuilder = ({ control, setValue }: Props) => {
                           >
                             <Label>Price ($)</Label>
                             <NumberField.Group>
-                              <NumberField.IncrementButton />
-                              <NumberField.Input placeholder="0.00" />
                               <NumberField.DecrementButton />
+                              <NumberField.Input placeholder="0.00" />
+                              <NumberField.IncrementButton />
                             </NumberField.Group>
                             <FieldError>
                               {variantError?.price?.message}
@@ -209,6 +209,7 @@ export const VariantBuilder = ({ control, setValue }: Props) => {
                         name={`variants.${index}.stock`}
                         render={({ field }) => (
                           <NumberField
+                            variant="secondary"
                             value={field.value ?? 0}
                             onChange={field.onChange}
                             isInvalid={!!variantError?.stock}
@@ -246,7 +247,7 @@ export const VariantBuilder = ({ control, setValue }: Props) => {
                       />
                     </div>
 
-                    <Controller
+                    {/* <Controller
                       control={control}
                       name={`variants.${index}.imageUrl`}
                       render={({ field, fieldState }) => (
@@ -260,7 +261,7 @@ export const VariantBuilder = ({ control, setValue }: Props) => {
                           </FieldError>
                         </TextField>
                       )}
-                    />
+                    /> */}
                   </div>
                 </>
                 {/* )} */}
@@ -352,6 +353,7 @@ function OptionPairs({
         {pairs.map(([key, val], i) => (
           <div key={i} className="flex items-center gap-2">
             <Input
+              variant="secondary"
               value={key}
               onChange={(e) => updateKey(i, e.target.value)}
               placeholder="Color"
@@ -360,6 +362,7 @@ function OptionPairs({
             />
             <span className="text-muted-foreground">:</span>
             <Input
+              variant="secondary"
               value={val}
               onChange={(e) => updateValue(i, e.target.value)}
               placeholder="Red"
@@ -367,11 +370,11 @@ function OptionPairs({
               aria-label="Option value"
             />
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
               isIconOnly
               onPress={() => removePair(i)}
-              className="text-muted-foreground hover:text-danger h-7 w-7 shrink-0"
+              // className="text-muted-foreground hover:text-danger h-7 w-7 shrink-0"
               isDisabled={pairs.length === 1}
               aria-label="Remove option"
             >
@@ -381,7 +384,7 @@ function OptionPairs({
         ))}
       </div>
       <Button
-        variant="ghost"
+        variant="outline"
         size="sm"
         onPress={addPair}
         className="text-muted-foreground h-7 text-xs"

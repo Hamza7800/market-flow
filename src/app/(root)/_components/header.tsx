@@ -4,12 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@heroui/react";
-import { MenuIcon, X } from "lucide-react";
+import { MenuIcon, SearchIcon, X } from "lucide-react";
 import { authClient } from "@/server/better-auth/client";
 import NavLink from "@/app/(root)/_components/nav-link";
 import MobileDrawer from "./mobile-drawer";
 import CartDrawer from "./cart-drawer";
 import UserLinks from "./user-links";
+import { LinkButton } from "@/components/link-button";
 
 const navLinks = [
   { href: "/products", label: "Products" },
@@ -87,6 +88,15 @@ const Header = () => {
           )} */}
         </div>
         <div className="flex items-center gap-2">
+          {/* <LinkButton
+            href="/search"
+            isIconOnly
+            size="sm"
+            className="h-[36px] w-7 rounded-3xl"
+            variant="outline"
+          >
+            <SearchIcon />
+          </LinkButton> */}
           <CartDrawer />
           <UserLinks />
         </div>

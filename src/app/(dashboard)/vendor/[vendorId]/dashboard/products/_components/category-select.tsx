@@ -59,6 +59,7 @@ const CategorySelect = ({ value, onChange }: Props) => {
       aria-label="category"
       className="w-auto"
       value={current?.id}
+      variant="secondary"
       onChange={(key) => {
         // const val = Array.from(key)[0] as string;
         onChange(key as string);

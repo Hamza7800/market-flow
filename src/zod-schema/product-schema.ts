@@ -87,13 +87,29 @@ export type CreateProductSchema = z.infer<typeof createProductSchema>;
 export const createProductDefaults: CreateProductSchema = {
   name: "",
   description: "",
-  categoryId: undefined,
+  categoryId: "",
   basePrice: 0,
   hasVariants: false,
   stock: 0,
-  images: [],
-  variants: [],
-  tagIds: [],
+  images: [
+    {
+      url: "",
+      altText: "",
+      isPrimary: false,
+      key: "",
+      sortOrder: 0,
+    },
+  ],
+  variants: [
+    {
+      name: "",
+      options: {},
+      stock: 0,
+      price: 0,
+      sku: "",
+    },
+  ],
+  tagIds: [""],
 };
 
 export const updateProductSchema = z

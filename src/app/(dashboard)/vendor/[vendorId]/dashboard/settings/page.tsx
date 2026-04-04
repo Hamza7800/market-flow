@@ -7,8 +7,6 @@ const StoreSettings = () => {
   const { data } = useVendorProfile();
   if (!data) return null;
 
-  console.log(data);
-
   return (
     <div>
       <VendorForm initialData={data} />

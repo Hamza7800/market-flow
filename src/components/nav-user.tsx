@@ -45,10 +45,7 @@ export function NavUser() {
 
       {/* CONTENT */}
       <Dropdown.Popover className="min-w-64">
-        <Dropdown.Menu
-          aria-label="User menu"
-          onAction={(key) => console.log(key)}
-        >
+        <Dropdown.Menu aria-label="User menu">
           <Dropdown.Item id="profile" textValue="profile" className="gap-2">
             <div className="flex items-center gap-2">
               {/* <Avatar src={user.avatar} name={user.name} size="sm" /> */}

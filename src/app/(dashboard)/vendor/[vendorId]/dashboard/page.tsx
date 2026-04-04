@@ -35,7 +35,6 @@ function parseMonthFilter(
   return null;
 }
 
-// TODO: CACHE CLEAR ANALYTICS
 // TODO: Reduce Stock By One WHEN SHIPPED
 
 async function Content({

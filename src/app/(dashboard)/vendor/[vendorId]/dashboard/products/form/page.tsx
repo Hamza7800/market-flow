@@ -14,9 +14,11 @@ const ProductFormPage = async ({
 
   if (productId) {
     const product = await getVendorProductById(productId);
+
     if (!product) {
       return <EmptyState title={"Product Not found"} />;
     }
+
     return (
       <ProductForm
         currentStatus={product.data?.status ?? "draft"}

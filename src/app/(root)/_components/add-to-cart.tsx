@@ -36,11 +36,21 @@ export function AddToCartButton({
   return (
     <Button
       fullWidth={fullWidth}
-      isDisabled={disabled || isPending}
+      isDisabled={disabled}
       onPress={handlePress}
       // size="sm"
       className="bg-primary hover:bg-primary/90 text-primary-foreground group w-full font-semibold"
     >
+      {/* {({ isPending }) => (
+        <>
+          {isPending ? (
+            <Spinner color="current" size="sm" />
+          ) : (
+            <ShoppingCart className="mr-2" />
+          )}
+          {label}
+        </>
+      )} */}
       <ShoppingCart className="mr-2" />
       {label}
       {/* {isPending ? "Adding..." : label} */}

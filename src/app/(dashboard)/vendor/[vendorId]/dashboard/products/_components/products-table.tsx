@@ -303,8 +303,6 @@ export default function ProductsTable({
     );
   }
 
-  console.log(filteredData);
-
   return (
     <Table className="w-full">
       <Table.ScrollContainer>
