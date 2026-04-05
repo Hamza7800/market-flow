@@ -4,11 +4,36 @@ import { Button, Card, Chip, Separator } from "@heroui/react";
 import Image from "next/image";
 import { UpdateOrderItemStatus } from "./update-order-item-status";
 import { defaultImage } from "@/lib/consts/constants";
+import { LoadingState } from "@/components/loading-state";
+import { EmptyState } from "@/components/empty-state";
+import { useRouter } from "nextjs-toploader/app";
+import { Box } from "lucide-react";
 
 const OderDetails = ({ vendorId, id }: { vendorId: string; id: string }) => {
-  const { data } = useOrderItemDetails(id);
+  const { data, isPending } = useOrderItemDetails(id);
+  const router = useRouter();
 
-  if (!data) return;
+  if (isPending) {
+    return (
+      <div className="h-dvh">
+        <LoadingState />
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <EmptyState
+        icon={Box}
+        title="No Product"
+        description="Order not found"
+        action={{
+          label: "Go Back",
+          onClick: () => router.push(`/vendor/${vendorId}/dashboard/orders`),
+        }}
+      />
+    );
+  }
 
   return (
     <div className="grid gap-6 p-6 lg:grid-cols-3">
@@ -64,12 +89,12 @@ const OderDetails = ({ vendorId, id }: { vendorId: string; id: string }) => {
         <Card.Content className="flex flex-col gap-4">
           <h3 className="font-semibold">Order Info</h3>
 
-          <div className="flex justify-between text-sm">
+          {/* <div className="flex justify-between text-sm">
             <span className="text-default-500">Payment</span>
             <Chip color={data.order.isPaid ? "success" : "warning"} size="sm">
               {data.order.isPaid ? "Paid" : "Pending"}
             </Chip>
-          </div>
+          </div> */}
 
           <div className="flex justify-between text-sm">
             <span className="text-default-500">Created</span>

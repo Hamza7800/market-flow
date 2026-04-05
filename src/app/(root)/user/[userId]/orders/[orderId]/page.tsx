@@ -7,6 +7,7 @@ import { formatMoney } from "@/lib/utils";
 import { Button, Card, Chip, Separator } from "@heroui/react";
 import { AlertCircle } from "lucide-react";
 import CancelOrder from "@/app/(root)/user/_components/cancel-order";
+import { OrderItemReview } from "@/components/review-components";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -24,6 +25,8 @@ const getStatusColor = (status: string) => {
 const OrderDetails = () => {
   const { data, isPending, isError, error, refetch } = useUserOrdersDetails();
 
+  console.log(data);
+
   if (isPending) {
     return <LoadingState />;
   }
@@ -35,6 +38,9 @@ const OrderDetails = () => {
   }
 
   if (!data) {
+    if (isPending) {
+      return;
+    }
     return (
       <EmptyState
         icon={AlertCircle}
@@ -50,6 +56,8 @@ const OrderDetails = () => {
 
   const address = JSON.parse(data.shippingAddressSnapshot);
 
+  console.log(data);
+
   return (
     <div className="space-y-6">
       {/* ---------------- ORDER HEADER ---------------- */}
@@ -58,9 +66,9 @@ const OrderDetails = () => {
           <div className="flex gap-2">
             {/* <Chip variant="primary">{data?.isPaid ? "paid" : "unpaid"}</Chip> */}
 
-            <Chip color={data?.isPaid ? "success" : "warning"} variant="soft">
+            {/* <Chip color={data?.isPaid ? "success" : "warning"} variant="soft">
               {data?.isPaid ? "paid" : "unpaid"}
-            </Chip>
+            </Chip> */}
           </div>
         </Card.Header>
 
@@ -90,9 +98,9 @@ const OrderDetails = () => {
 
         <Card.Content className="space-y-4">
           {data.items.map((item: any) => {
-            const options = item.variant?.options
-              ? JSON.parse(item.variant.options)
-              : {};
+            const options = item.variant?.options;
+            // ? JSON.parse(item?.variant?.options)
+            // : {};
 
             return (
               <div
@@ -110,13 +118,13 @@ const OrderDetails = () => {
                   <p className="text-default-500 text-sm">{item.variantName}</p>
 
                   {/* Variant options */}
-                  <div className="mt-1 flex flex-wrap gap-2">
+                  {/* <div className="mt-1 flex flex-wrap gap-2">
                     {Object.entries(options).map(([k, v]) => (
                       <Chip key={k} size="sm" variant="soft">
                         {k}: {String(v)}
                       </Chip>
                     ))}
-                  </div>
+                  </div> */}
 
                   <p className="text-default-500 mt-2 text-sm">
                     Qty: {item.quantity}
@@ -128,7 +136,7 @@ const OrderDetails = () => {
                   <p className="text-default-500 text-xs">
                     {formatMoney(item.unitPrice)} each
                   </p>
-                  <p>{item.id}</p>
+                  {/* <p>{item.id}</p> */}
                   <Chip size="sm" variant="soft" className="my-2">
                     {item.status}
                   </Chip>
@@ -137,6 +145,15 @@ const OrderDetails = () => {
                       <CancelOrder orderId={data.id} orderItemId={item.id} />
                     )}
                 </div>
+                {item.status === "delivered" && (
+                  <OrderItemReview
+                    orderItemId={item.id}
+                    productId={item.productId}
+                    productName={item.productName}
+                    orderId={data.id}
+                    // userId={session.user.id}
+                  />
+                )}
               </div>
             );
           })}

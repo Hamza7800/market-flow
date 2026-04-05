@@ -56,7 +56,7 @@ export function ImageManager({
                 ].join(" ")}
               >
                 {/* Preview thumbnail */}
-                <div className="border-border bg-muted relative mt-0.5 h-16 w-16 shrink-0 overflow-hidden rounded-lg border">
+                <div className="border-border relative mt-0.5 h-16 w-16 shrink-0 overflow-hidden rounded-lg border">
                   {imageUrl ? (
                     <img
                       src={imageUrl}

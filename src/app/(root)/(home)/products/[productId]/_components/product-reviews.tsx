@@ -4,6 +4,7 @@ import type { ProductDetail } from "@/actions/public";
 import { EmptyState } from "@/components/empty-state";
 import { Avatar } from "@heroui/react";
 import { Star } from "lucide-react";
+import { useMemo } from "react";
 
 // interface Review {
 //   id: string;
@@ -27,8 +28,22 @@ const ProductReviews = ({
   averageRating,
   reviewCount,
 }: ProductReviewsProps) => {
+  console.log(reviews);
+  console.log(averageRating);
+  console.log(reviewCount);
   const rating = Number(averageRating ?? 0);
   const totalReviews = reviewCount ?? 0;
+
+  const ratingCounts = useMemo(() => {
+    return [5, 4, 3, 2, 1].map((star) => {
+      const count = reviews.filter((r) => r.rating === star).length;
+      const percentage = totalReviews
+        ? Math.round((count / totalReviews) * 100)
+        : 0;
+
+      return { star, count, percentage };
+    });
+  }, [reviews, totalReviews]);
 
   if (!reviews || reviews.length === 0) {
     return (
@@ -81,27 +96,19 @@ const ProductReviews = ({
 
           {/* RATING DISTRIBUTION */}
           <div className="space-y-2">
-            {[5, 4, 3, 2, 1].map((stars) => (
-              <div key={stars} className="flex items-center gap-2">
-                <span className="text-muted w-12 text-sm">{stars} star</span>
+            {ratingCounts.map(({ star, percentage }) => (
+              <div key={star} className="flex items-center gap-2">
+                <span className="text-muted w-12 text-sm">{star} star</span>
+
                 <div className="bg-border h-2 flex-1 overflow-hidden rounded-full">
                   <div
-                    className="bg-accent h-full"
-                    style={{
-                      width: `${
-                        stars === 5
-                          ? 70
-                          : stars === 4
-                            ? 20
-                            : stars === 3
-                              ? 5
-                              : 3
-                      }%`,
-                    }}
+                    className="bg-accent h-full transition-all duration-500"
+                    style={{ width: `${percentage}%` }}
                   />
                 </div>
+
                 <span className="text-muted w-8 text-right text-sm">
-                  {stars === 5 ? 70 : stars === 4 ? 20 : stars === 3 ? 5 : 3}%
+                  {percentage}%
                 </span>
               </div>
             ))}
@@ -120,7 +127,7 @@ const ProductReviews = ({
             <div className="mb-3 flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <Avatar className="h-10 w-10">
-                  <Avatar.Fallback className="bg-accent/10 text-accent font-semibold">
+                  <Avatar.Fallback className="text-accent bg-white/10 font-semibold">
                     {review.user.name ||
                       review.user.name
                         .split(" ")

@@ -155,7 +155,7 @@ export default function AddToCartWithVariant({
               </div>
 
               <Button
-                isDisabled={!selectedVariant || isPending}
+                // isDisabled={!selectedVariant || isPending}
                 onPress={handlePress}
                 className={clsx(
                   "font-semibold",
@@ -164,12 +164,13 @@ export default function AddToCartWithVariant({
                     : "bg-default-200 text-default-500",
                 )}
               >
-                {isPending ? (
+                Add to Cart
+                {/* {isPending ? (
                   <Spinner color="current" size="sm" />
                 ) : (
                   <ShoppingCart className="mr-2 size-4" />
                 )}
-                {isPending ? "Adding..." : "Add to Cart"}
+                {isPending ? "Adding..." : "Add to Cart"} */}
               </Button>
             </Modal.Footer>
           </Modal.Dialog>

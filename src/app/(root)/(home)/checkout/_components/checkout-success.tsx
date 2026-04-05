@@ -1,8 +1,12 @@
 "use client";
 
 import { LinkButton } from "@/components/link-button";
-import { Button, Chip } from "@heroui/react";
-import { CheckCircleIcon, PackageIcon, ShoppingBagIcon } from "lucide-react";
+// import { Button, Chip } from "@heroui/react";
+import {
+  CheckCircleIcon,
+  // PackageIcon,
+  // ShoppingBagIcon
+} from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
 export const CheckoutSuccess = () => {
@@ -23,11 +27,11 @@ export const CheckoutSuccess = () => {
         shortly.
       </p>
 
-      {orderId && (
+      {/* {orderId && (
         <Chip size="sm" className="mt-4 font-mono text-xs">
           Order #{orderId.slice(-8).toUpperCase()}
         </Chip>
-      )}
+      )} */}
 
       <div className="mt-8 flex w-full flex-col gap-3">
         {orderId && (

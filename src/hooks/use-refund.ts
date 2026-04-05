@@ -45,7 +45,9 @@ export const useRequestItemRefund = (orderId: string) => {
     onError: (error, _id, ctx) => {
       if (ctx?.snapshot !== undefined) {
         qc.setQueryData(orderKeys.detail(orderId), ctx.snapshot);
-        toast.danger(error.message);
+        toast.danger(error.message, {
+          timeout: 10000,
+        });
       }
     },
     onSettled: () => {

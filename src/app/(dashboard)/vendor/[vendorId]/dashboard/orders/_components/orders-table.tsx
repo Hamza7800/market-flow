@@ -112,11 +112,11 @@ const columns = [
   }),
   columnHelper.accessor("unitPrice", {
     header: "Unit Price",
-    cell: (info) => `Rs ${info.getValue()}`,
+    cell: (info) => `$ ${info.getValue()}`,
   }),
   columnHelper.accessor("totalPrice", {
     header: "Total",
-    cell: (info) => `Rs ${info.getValue()}`,
+    cell: (info) => `$ ${info.getValue()}`,
   }),
   columnHelper.accessor("status", {
     header: "Status",

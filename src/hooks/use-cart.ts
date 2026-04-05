@@ -246,9 +246,12 @@ export function useClearCart() {
     },
 
     onSettled: () => {
-      qc.setQueryData<Cart | null>(cartKey, null);
-      qc.setQueryData<Cart | null>([...cartKey, "checkout-summary"], null);
       qc.invalidateQueries({ queryKey: cartKey });
+      qc.setQueryData<Cart | null>(cartKey, null);
+      qc.setQueryData<Cart | null>(
+        [...cartKeys.byUser(userId ?? "guest"), "checkout-summary"],
+        null,
+      );
     },
   });
 }

@@ -41,7 +41,13 @@ const OrderItemDetails = async ({ params, searchParams }: PageProps) => {
 
   return (
     <div>
-      <Suspense fallback={<LoadingState />}>
+      <Suspense
+        fallback={
+          <div className="h-dvh">
+            <LoadingState />
+          </div>
+        }
+      >
         <Content vendorId={vendorId} id={id as string} />
       </Suspense>
     </div>

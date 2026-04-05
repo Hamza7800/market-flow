@@ -67,6 +67,8 @@ export function UpdateOrderItemStatus({
       return;
     }
 
+    close();
+
     await mutateAsync({
       orderItemId,
       // @ts-expect-error no valid Status
@@ -82,7 +84,6 @@ export function UpdateOrderItemStatus({
     setTrackingNumber("");
     setTrackingUrl("");
     setError(null);
-    close();
   };
 
   return (

@@ -89,7 +89,7 @@ const ProductDetails = ({ productId }: { productId: string }) => {
           {/* LEFT: IMAGES */}
           <div className="space-y-4 lg:col-span-2">
             {/* MAIN IMAGE */}
-            <div className="bg-muted relative aspect-square overflow-hidden rounded-lg">
+            <div className="relative aspect-square overflow-hidden rounded-lg bg-white/20">
               <Image
                 src={
                   mainImage?.url || "https://picsum.photos/seed/product/400/400"
@@ -322,6 +322,12 @@ const ProductDetails = ({ productId }: { productId: string }) => {
           />
         </div>
         <Separator />
+        {/* <ProductReviewsForm
+          productId={data.id}
+          averageRating={Number(data.averageRating)}
+          reviewCount={data.reviewCount}
+          // currentUserId={session?.user?.id}
+        /> */}
       </section>
 
       {/* SIMILAR PRODUCTS */}

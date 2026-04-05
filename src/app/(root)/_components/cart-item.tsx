@@ -42,7 +42,7 @@ const CartItemRow = ({
         className={`border-border flex items-start gap-3 border-b py-4 transition-all last:border-b-0`}
       >
         {/* PRODUCT IMAGE (Shrunken for Drawer) */}
-        <div className="bg-muted border-border relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border">
+        <div className="border-border relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border bg-white/30">
           <Image
             src={
               image?.url ?? "https://picsum.photos/seed/artisan-banner/1200/400"
@@ -143,7 +143,7 @@ const CartItemRow = ({
       >
         <Card.Content className="flex gap-6 p-6 sm:flex-row">
           {/* PRODUCT IMAGE */}
-          <div className="bg-muted relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg">
+          <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-white/30">
             <Image
               src={
                 image?.url ??

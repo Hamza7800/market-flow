@@ -35,7 +35,7 @@ export function ProductCard({
         <div className="flex h-full flex-col overflow-hidden rounded-lg transition-all duration-300 hover:shadow-lg">
           {/* IMAGE SECTION */}
           <div
-            className="bg-muted relative aspect-square flex-shrink-0 overflow-hidden"
+            className="relative aspect-square flex-shrink-0 overflow-hidden bg-white/40"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
