@@ -74,6 +74,22 @@ const SignUser = () => {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setIsSubmitting(true);
+    try {
+      await loginAction({
+        email: "vendor1@example.com",
+        password: "password123",
+      });
+
+      toast.success("Demo Login Success");
+      router.push(redirect);
+    } catch (error: any) {
+      setIsSubmitting(false);
+      toast.danger(error.message);
+    }
+  };
+
   return (
     <div className="relative flex min-h-screen items-center justify-center p-6">
       <div className="relative w-full max-w-sm">
@@ -127,6 +143,19 @@ const SignUser = () => {
                 <span className="flex items-center justify-center gap-2">
                   {isPending && <Spinner color="current" size="sm" />}
                   {isPending ? "Signing in..." : "Sign in"}
+                </span>
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              isPending={isSubmitting}
+              onClick={handleDemoLogin}
+              fullWidth
+            >
+              {({ isPending }) => (
+                <span className="flex items-center justify-center gap-2">
+                  {isPending && <Spinner color="current" size="sm" />}
+                  {isPending ? "Signing in..." : "Demo Login"}
                 </span>
               )}
             </Button>
