@@ -3,7 +3,7 @@ import { LinkButton } from "@/components/link-button";
 
 export function HeroBanner() {
   return (
-    <section className="relative flex h-screen min-h-[600px] w-full items-center justify-center overflow-hidden pt-10 pb-20">
+    <section className="relative flex w-full items-start justify-center overflow-hidden pt-5 pb-20 sm:h-screen sm:min-h-[600px] sm:items-center sm:pt-10">
       {/* BACKGROUND DECORATIVE ELEMENTS */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Gradient orbs */}
@@ -17,13 +17,13 @@ export function HeroBanner() {
       {/* CONTENT */}
       <div className="relative z-10 mx-auto max-w-4xl px-4 text-center md:px-8">
         {/* BADGE */}
-        <div className="bg-secondary/60 border-primary/20 text-foreground mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium">
+        <div className="border-primary/20 mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium">
           <Sparkles size={16} className="text-primary" />
           Welcome to Premium Shopping
         </div>
 
         {/* HEADLINE */}
-        <h1 className="text-foreground mb-6 text-5xl leading-tight font-bold text-balance md:text-7xl">
+        <h1 className="mb-6 text-5xl leading-tight font-bold text-balance md:text-7xl">
           Discover Curated Excellence
         </h1>
 
@@ -55,15 +55,15 @@ export function HeroBanner() {
         {/* TRUST INDICATORS */}
         <div className="mx-auto mt-16 grid max-w-2xl grid-cols-3 gap-8">
           <div className="text-center">
-            <p className="text-foreground text-2xl font-bold">1000+</p>
+            <p className="text-2xl font-bold">200+</p>
             <p className="text-muted-foreground text-sm">Premium Products</p>
           </div>
           <div className="text-center">
-            <p className="text-foreground text-2xl font-bold">50+</p>
+            <p className="text-2xl font-bold">10+</p>
             <p className="text-muted-foreground text-sm">Trusted Vendors</p>
           </div>
           <div className="text-center">
-            <p className="text-foreground text-2xl font-bold">4.8★</p>
+            <p className="text-2xl font-bold">4.8★</p>
             <p className="text-muted-foreground text-sm">Customer Rating</p>
           </div>
         </div>

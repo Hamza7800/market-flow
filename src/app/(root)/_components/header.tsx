@@ -1,16 +1,17 @@
 "use client";
 
-import { useState } from "react";
+// import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "@heroui/react";
-import { MenuIcon, SearchIcon, X } from "lucide-react";
-import { authClient } from "@/server/better-auth/client";
+// import { Button } from "@heroui/react";
+// import { MenuIcon, SearchIcon, X } from "lucide-react";
+// import { authClient } from "@/server/better-auth/client";
 import NavLink from "@/app/(root)/_components/nav-link";
 import MobileDrawer from "./mobile-drawer";
 import CartDrawer from "./cart-drawer";
 import UserLinks from "./user-links";
-import { LinkButton } from "@/components/link-button";
+// import { LinkButton } from "@/components/link-button";
+// import ThemeSwitch from "@/components/theme-switcher";
 
 const navLinks = [
   { href: "/products", label: "Products" },
@@ -23,14 +24,17 @@ const Header = () => {
 
   return (
     <header className="flex h-full w-full items-center">
-      {/* ── Mobile ── */}
-      <div className="flex w-full items-center justify-between lg:hidden">
+      <div className="grid w-full grid-cols-3 items-center lg:hidden">
         <MobileDrawer />
         <Link href="/" className="text-3xl font-bold">
           SHOP
           <span className="sr-only">SHOP</span>
         </Link>
-        <div className="w-8" />
+        <div className="ml-auto flex gap-2">
+          {/* <div className="w-0.5" /> */}
+          <CartDrawer />
+          <UserLinks />
+        </div>
       </div>
 
       {/* ── Desktop Navigation ── */}
@@ -99,6 +103,7 @@ const Header = () => {
           </LinkButton> */}
           <CartDrawer />
           <UserLinks />
+          {/* <ThemeSwitch /> */}
         </div>
       </nav>
     </header>

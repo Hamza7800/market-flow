@@ -49,7 +49,7 @@ const VendorDetails = ({ vendorId }: { vendorId: string }) => {
   return (
     <section className="pb-16">
       {/* BANNER AREA */}
-      <div className="relative h-48 w-full overflow-hidden rounded-2xl border bg-white md:h-64 lg:h-80">
+      <div className="bg-background relative h-48 w-full overflow-hidden rounded-2xl border md:h-64 lg:h-80">
         {vendor.bannerUrl ? (
           <Image
             src={vendor.bannerUrl}
@@ -66,12 +66,12 @@ const VendorDetails = ({ vendorId }: { vendorId: string }) => {
         )}
 
         {/* BACK BUTTON (Floating over banner) */}
-        <div className="absolute top-6 left-1/2 container -translate-x-1/2 px-4">
+        <div className="absolute top-2 left-1/2 container -translate-x-1/2 px-4">
           <Link
             href="/vendors"
             className="text-foreground hover:bg-background inline-flex items-center gap-2 rounded-full border bg-white px-4 py-2 text-xs font-medium backdrop-blur-md transition-all"
           >
-            <ArrowLeft size={14} /> Back to Vendors
+            <ArrowLeft size={14} /> Back
           </Link>
         </div>
       </div>
@@ -80,7 +80,7 @@ const VendorDetails = ({ vendorId }: { vendorId: string }) => {
       <div className="container mx-auto px-4">
         <div className="relative flex flex-col items-start gap-6 md:flex-row">
           {/* OVERLAPPING LOGO */}
-          <div className="border-background relative -mt-12 h-32 w-32 shrink-0 overflow-hidden rounded-2xl border-2 bg-white shadow-lg md:-mt-16 md:h-40 md:w-40">
+          <div className="border-border relative -mt-12 h-32 w-32 shrink-0 overflow-hidden rounded-2xl border md:-mt-16 md:h-40 md:w-40">
             {vendor.logoUrl ? (
               <Image
                 src={vendor.logoUrl}
@@ -89,7 +89,7 @@ const VendorDetails = ({ vendorId }: { vendorId: string }) => {
                 className="object-cover"
               />
             ) : (
-              <div className="text-accent flex h-full w-full items-center justify-center bg-white">
+              <div className="text-accent bg-background flex h-full w-full items-center justify-center">
                 <Store size={48} />
               </div>
             )}

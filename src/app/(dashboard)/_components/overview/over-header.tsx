@@ -25,7 +25,7 @@ export const OverviewHeader = ({
   };
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
       <div>
         <h1 className="text-foreground text-[22px] font-bold tracking-tight">
           Dashboard

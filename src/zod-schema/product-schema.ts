@@ -91,23 +91,24 @@ export const createProductDefaults: CreateProductSchema = {
   basePrice: 0,
   hasVariants: false,
   stock: 0,
-  images: [
-    {
-      url: "",
-      altText: "",
-      isPrimary: false,
-      key: "",
-      sortOrder: 0,
-    },
-  ],
+  images: [],
+  // images: [
+  //   {
+  //     url: "",
+  //     altText: "",
+  //     isPrimary: false,
+  //     key: "",
+  //     sortOrder: 0,
+  //   },
+  // ],
   variants: [
-    {
-      name: "",
-      options: {},
-      stock: 0,
-      price: 0,
-      sku: "",
-    },
+    // {
+    //   name: "",
+    //   options: {},
+    //   stock: 0,
+    //   price: 0,
+    //   sku: "",
+    // },
   ],
   tagIds: [""],
 };

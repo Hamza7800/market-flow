@@ -36,7 +36,7 @@ export function Footer() {
                 </div>
                 <div className="text-muted flex items-center gap-3 text-sm">
                   <Mail size={18} className="text-accent flex-shrink-0" />
-                  <span>support@shophub.com</span>
+                  <span>support@shopforge.com</span>
                 </div>
               </div>
             </div>

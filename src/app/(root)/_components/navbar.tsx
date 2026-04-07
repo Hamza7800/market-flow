@@ -37,7 +37,7 @@ export default function Navbar() {
       )}
       // className="fixed left-0 top-0 z-50 flex h-[10vh] w-full items-center border-b border-b-app-border-primary bg-app-bg-primary"
     >
-      <MaxWidthContainer>
+      <MaxWidthContainer className="p-0">
         <Suspense>
           <Header />
         </Suspense>

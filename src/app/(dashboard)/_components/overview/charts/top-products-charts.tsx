@@ -69,7 +69,7 @@ export function TopProductsChart({
   }
 
   return (
-    <Card className="lg:col-span-2">
+    <Card className="border-border border shadow-none lg:col-span-2">
       <Card.Header>
         <Card.Title>Top Selling Products</Card.Title>
         <Card.Description>By revenue</Card.Description>

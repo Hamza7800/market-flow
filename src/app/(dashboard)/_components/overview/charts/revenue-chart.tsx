@@ -74,7 +74,7 @@ export const RevenueChart = ({ vendorId }: { vendorId: string }) => {
   }
 
   return (
-    <Card className="h-full">
+    <Card className="border-border h-full border shadow-none">
       <Card.Header>
         <Card.Title>Revenue Chart</Card.Title>
         <Card.Description>Monthly orders and revenue</Card.Description>

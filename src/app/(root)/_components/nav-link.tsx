@@ -19,7 +19,7 @@ const NavLink = ({ href, className, children, asChild = false }: Props) => {
       //   className,
       // )}
       className={cn(
-        "text-md hover:border-app-text-quaternary hover:text-app-text-primary flex h-[40px] items-center justify-center rounded-[12px] border border-transparent bg-transparent px-[20px] py-6 font-medium transition-all duration-200 hover:bg-[#2c2c2c]/10",
+        "text-md hover:border-app-text-quaternary hover:text-app-text-primary flex h-[40px] items-center justify-center rounded-[12px] border border-transparent bg-transparent px-[20px] py-6 font-medium duration-200 hover:bg-[#2c2c2c]/10",
         // hover:bg-app-bg-secondary
         className,
       )}

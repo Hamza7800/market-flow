@@ -1,5 +1,12 @@
 "use client";
-import { Badge, Button, Chip, Drawer, Skeleton } from "@heroui/react";
+import {
+  Badge,
+  Button,
+  Chip,
+  Drawer,
+  Skeleton,
+  useOverlayState,
+} from "@heroui/react";
 import { ShoppingBag } from "@gravity-ui/icons";
 import { LinkButton } from "@/components/link-button";
 import {
@@ -30,11 +37,12 @@ import { EmptyState } from "@/components/empty-state";
 
 const CartDrawer = () => {
   const router = useRouter();
+  const state = useOverlayState();
   const pathname = usePathname();
   const { data: userAuth, isPending } = authClient.useSession();
   const userId = userAuth?.user.id;
 
-  const { isOpen, closeCart, setIsOpen } = useCartStore();
+  // const { isOpen, closeCart, setIsOpen } = useCartStore();
   const { data: cart, isLoading } = useCart();
 
   // const updateItem = useUpdateCartItems();
@@ -73,7 +81,7 @@ const CartDrawer = () => {
               Add something to get started
             </p>
           </div>
-          <Button size="sm" onPress={closeCart}>
+          <Button size="sm" onPress={state.close}>
             Browse products
           </Button>
         </div>
@@ -84,7 +92,12 @@ const CartDrawer = () => {
       return (
         <div className="divide-divider divide-y">
           {items.map((item) => (
-            <CartItemRow key={item.id} item={item} variant="drawer" />
+            <CartItemRow
+              onClick={state.close}
+              key={item.id}
+              item={item}
+              variant="drawer"
+            />
           ))}
         </div>
       );
@@ -92,7 +105,7 @@ const CartDrawer = () => {
   };
 
   return (
-    <Drawer isOpen={isOpen} onOpenChange={setIsOpen}>
+    <Drawer isOpen={state.isOpen} onOpenChange={state.setOpen}>
       <Badge.Anchor>
         <Button variant="outline">
           <ShoppingBag />
@@ -151,7 +164,7 @@ const CartDrawer = () => {
                 <div className="flex w-full items-center gap-2">
                   <LinkButton
                     href="/cart-details"
-                    onClick={closeCart}
+                    onClick={state.close}
                     size="md"
                     fullWidth
                     variant="outline"
@@ -160,7 +173,7 @@ const CartDrawer = () => {
                   </LinkButton>
                   <LinkButton
                     href="/checkout"
-                    onClick={closeCart}
+                    onClick={state.close}
                     size="md"
                     fullWidth
                   >

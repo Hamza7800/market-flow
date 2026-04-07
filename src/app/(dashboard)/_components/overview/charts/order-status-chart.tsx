@@ -133,7 +133,7 @@ export function OrderStatusChart({
   });
 
   return (
-    <Card>
+    <Card className="border-border border shadow-none">
       <Card.Content className="">
         <p className="text-foreground mb-1 text-sm font-semibold">
           Order Breakdown

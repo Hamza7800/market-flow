@@ -82,7 +82,7 @@ export function RecentOrdersTable({
   }
 
   return (
-    <Card className="h-full">
+    <Card className="border-border h-full border shadow-none">
       <Card.Content className="">
         <div className="mb-5 flex items-center justify-between">
           <div>

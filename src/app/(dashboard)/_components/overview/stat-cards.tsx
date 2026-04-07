@@ -39,7 +39,7 @@ function StatCard({
   const isUp = (delta ?? 0) >= 0;
 
   return (
-    <Card>
+    <Card className="border-border border shadow-none">
       <Card.Content>
         <div className="flex items-start justify-between">
           <div
@@ -132,7 +132,7 @@ export const StatCards = ({
     },
     {
       title: "Low Stock Items",
-      value: `${(inventory?.products.lowStock ?? 0) + (inventory?.variants.lowStock ?? 0)} SKUs`,
+      value: `${(inventory?.products.lowStock ?? 0) + (inventory?.variants.lowStock ?? 0)}`,
       sub: `${(inventory?.products.outOfStock ?? 0) + (inventory?.variants.outOfStock ?? 0)} out of stock`,
       icon: AlertTriangleIcon,
       iconColor: "text-warning",

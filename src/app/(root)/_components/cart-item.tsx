@@ -12,9 +12,11 @@ import Link from "next/link";
 
 const CartItemRow = ({
   item,
+  onClick,
   variant = "default",
 }: {
   item: CartItem;
+  onClick?: () => void;
   variant?: "default" | "drawer";
 }) => {
   const updateItem = useUpdateCartItems();
@@ -62,6 +64,11 @@ const CartItemRow = ({
                 <Skeleton className="h-4 w-24 rounded" />
               ) : (
                 <Link
+                  onClick={() => {
+                    if (onClick) {
+                      onClick();
+                    }
+                  }}
                   href={`/products/${item.product.id}`}
                   className="text-foreground hover:text-accent line-clamp-1 text-sm font-medium transition-colors"
                 >

@@ -46,7 +46,7 @@ export function MultiImageUploader({
     });
 
     setUploadedKeys(map);
-  }, [value]);
+  }, []);
 
   const { startUpload } = useUploadThing("imageUploader", {
     onClientUploadComplete: (res) => {
