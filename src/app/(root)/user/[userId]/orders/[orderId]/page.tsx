@@ -56,8 +56,6 @@ const OrderDetails = () => {
 
   const address = JSON.parse(data.shippingAddressSnapshot);
 
-  console.log(data);
-
   return (
     <div className="space-y-6">
       {/* ---------------- ORDER HEADER ---------------- */}
@@ -80,7 +78,9 @@ const OrderDetails = () => {
 
           <div>
             <p className="text-default-500 text-sm">Paid At</p>
-            <p>{data.paidAt ? new Date(data.paidAt).toLocaleString() : "—"}</p>
+            <p>
+              {data.paidAt ? new Date(data.paidAt).toLocaleString() : "N/A"}
+            </p>
           </div>
 
           <div>
@@ -90,8 +90,7 @@ const OrderDetails = () => {
         </Card.Content>
       </Card>
 
-      {/* ---------------- ITEMS ---------------- */}
-      <Card>
+      <Card className="bg-transparent p-0 shadow-none">
         <Card.Header>
           <h3 className="font-semibold">Items</h3>
         </Card.Header>
@@ -103,22 +102,22 @@ const OrderDetails = () => {
             // : {};
 
             return (
-              <div
-                key={item.id}
-                className="flex items-start gap-4 border-b pb-4 last:border-none"
-              >
-                <img
-                  src={item.imageUrl}
-                  alt={item.productName}
-                  className="h-20 w-20 rounded-xl object-cover"
-                />
+              <Card key={item.id} className="gap-4 border pb-4">
+                <Card.Content className="sm:flex-row">
+                  <img
+                    src={item.imageUrl}
+                    alt={item.productName}
+                    className="mr-2 h-20 w-20 rounded-xl object-cover"
+                  />
 
-                <div className="flex-1">
-                  <p className="font-medium">{item.productName}</p>
-                  <p className="text-default-500 text-sm">{item.variantName}</p>
+                  <div className="flex-1">
+                    <p className="font-medium">{item.productName}</p>
+                    <p className="text-default-500 text-sm">
+                      {item.variantName}
+                    </p>
 
-                  {/* Variant options */}
-                  {/* <div className="mt-1 flex flex-wrap gap-2">
+                    {/* Variant options */}
+                    {/* <div className="mt-1 flex flex-wrap gap-2">
                     {Object.entries(options).map(([k, v]) => (
                       <Chip key={k} size="sm" variant="soft">
                         {k}: {String(v)}
@@ -126,41 +125,45 @@ const OrderDetails = () => {
                     ))}
                   </div> */}
 
-                  <p className="text-default-500 mt-2 text-sm">
-                    Qty: {item.quantity}
-                  </p>
-                </div>
+                    <p className="text-default-500 mt-2 text-sm">
+                      Qty: {item.quantity}
+                    </p>
+                  </div>
 
-                <div className="text-right">
-                  <p className="font-medium">{formatMoney(item.totalPrice)}</p>
-                  <p className="text-default-500 text-xs">
-                    {formatMoney(item.unitPrice)} each
-                  </p>
-                  {/* <p>{item.id}</p> */}
-                  <Chip size="sm" variant="soft" className="my-2">
-                    {item.status}
-                  </Chip>
-                  {["pending", "processing"].includes(item.status) &&
-                    data.isPaid && (
-                      <CancelOrder orderId={data.id} orderItemId={item.id} />
-                    )}
-                </div>
-                {item.status === "delivered" && (
-                  <OrderItemReview
-                    orderItemId={item.id}
-                    productId={item.productId}
-                    productName={item.productName}
-                    orderId={data.id}
-                    // userId={session.user.id}
-                  />
-                )}
-              </div>
+                  <div className="">
+                    <p className="font-medium">
+                      {formatMoney(item.totalPrice)}
+                    </p>
+                    <p className="text-default-500 text-xs">
+                      {formatMoney(item.unitPrice)} each
+                    </p>
+                    {/* <p>{item.id}</p> */}
+                    <Chip size="sm" variant="soft" className="my-2">
+                      {item.status}
+                    </Chip>
+                    {["pending", "processing"].includes(item.status) &&
+                      data.isPaid && (
+                        <CancelOrder orderId={data.id} orderItemId={item.id} />
+                      )}
+                  </div>
+                </Card.Content>
+                <Card.Footer className="w-full">
+                  {item.status === "delivered" && (
+                    <OrderItemReview
+                      orderItemId={item.id}
+                      productId={item.productId}
+                      productName={item.productName}
+                      orderId={data.id}
+                      // userId={session.user.id}
+                    />
+                  )}
+                </Card.Footer>
+              </Card>
             );
           })}
         </Card.Content>
       </Card>
 
-      {/* ---------------- SHIPPING + SUMMARY ---------------- */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* SHIPPING */}
         <Card>
@@ -212,7 +215,7 @@ const OrderDetails = () => {
           </Card.Content>
         </Card>
       </div>
-      <>
+      <Card>
         <div>
           <h3 className="font-semibold">Refunds</h3>
         </div>
@@ -241,7 +244,7 @@ const OrderDetails = () => {
             <h2>No Refunds Request</h2>
           )}
         </Card.Content>
-      </>
+      </Card>
     </div>
   );
 };

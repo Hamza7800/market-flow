@@ -1,7 +1,6 @@
 "use client";
 
 import { ErrorState } from "@/components/error-state";
-import { LoadingState } from "@/components/loading-state";
 import { useProductDetail } from "@/hooks/use-public";
 import { RotateCcw, Star, Truck } from "lucide-react";
 import Image from "next/image";
@@ -55,7 +54,9 @@ const ProductDetails = ({ productId }: { productId: string }) => {
   }
 
   if (!data) {
-    return <EmptyState title="No Product Found" description="" />;
+    return (
+      <EmptyState className="h-dvh" title="No Product Found" description="" />
+    );
   }
 
   return (
@@ -71,7 +72,7 @@ const ProductDetails = ({ productId }: { productId: string }) => {
           </Link>
           <span>/</span>
           <Link
-            href="/products"
+            href={`/products?category=${data?.category?.id}`}
             className="hover:text-foreground cursor-pointer transition-colors"
           >
             {data?.category?.name}

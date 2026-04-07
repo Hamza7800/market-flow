@@ -78,7 +78,7 @@ const SignUser = () => {
     setIsSubmitting(true);
     try {
       await loginAction({
-        email: "vendor1@example.com",
+        email: "vendor2@example.com",
         password: "password123",
       });
 

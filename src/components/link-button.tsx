@@ -11,6 +11,7 @@ const myButtonVariants = tv({
   defaultVariants: {
     radius: "lg",
     variant: "primary",
+    size: "md",
   },
   extend: buttonVariants,
   variants: {
