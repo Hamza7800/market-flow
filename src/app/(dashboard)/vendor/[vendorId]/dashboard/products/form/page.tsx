@@ -45,7 +45,8 @@ const ProductFormPage = async ({
             product.data?.variants?.map((v) => ({
               id: v.id,
               name: v.name,
-              options: JSON.parse(v.options),
+              options: {},
+              // options: JSON.parse(v.options),
               price: v.price,
               stock: v.stock,
               sku: v.sku,

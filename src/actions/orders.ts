@@ -11,7 +11,7 @@ import { getUser } from "@/server/better-auth/server";
 import { db } from "@/server/db";
 import { orderItems, orders, vendorProfiles } from "@/server/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
-import { getVendorProfile } from "@/actions/vendor";
+// import { getVendorProfile } from "@/actions/vendor";
 import type { OrderStatus } from "@/lib/nuqs/nuqs";
 import {
   updateStatusSchema,
