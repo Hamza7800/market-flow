@@ -47,7 +47,7 @@ import {
   useUpdateProductStatus,
 } from "@/hooks/use-product";
 import { MultiImageUploader } from "@/components/image-upload";
-import DeleteProduct from "./delete-product";
+// import DeleteProduct from "./delete-product";
 
 export type Category = { id: string; name: string; parentId?: string | null };
 
@@ -423,7 +423,7 @@ const ProductForm = (props: Props) => {
               </div>
 
               <div className="flex items-center gap-2">
-                {isEdit && (
+                {/* {isEdit && (
                   <DeleteProduct
                     isEdit={isEdit}
                     productId={props.productId}
@@ -435,7 +435,7 @@ const ProductForm = (props: Props) => {
                       </Button>
                     }
                   />
-                )}
+                )} */}
 
                 <Button
                   type="submit"

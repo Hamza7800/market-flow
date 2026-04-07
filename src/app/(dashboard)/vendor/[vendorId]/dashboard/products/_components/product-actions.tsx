@@ -35,7 +35,7 @@ const ProductActions = ({
         </LinkButton>
         <Tooltip.Content>Edit</Tooltip.Content>
       </Tooltip>
-      <DeleteProduct
+      {/* <DeleteProduct
         isTable
         isEdit={true}
         productId={productId}
@@ -48,14 +48,13 @@ const ProductActions = ({
               isIconOnly
               variant="danger"
               className="h-7 w-7 rounded-full px-3 text-xs font-medium"
-              // href={`/vendor/${vendorId}/dashboard/products/form?productId=${row.original.id}`}
             >
               <Trash2 />
             </Button>
             <Tooltip.Content>Delete</Tooltip.Content>
           </Tooltip>
         }
-      />
+      /> */}
 
       <ArchiveProduct
         isEdit={true}

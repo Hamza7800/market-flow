@@ -12,6 +12,7 @@ import {
   Skeleton,
   TextField,
   Card,
+  Form,
 } from "@heroui/react";
 import { PaymentElement } from "@stripe/react-stripe-js";
 import {
@@ -150,7 +151,7 @@ const CheckoutForm = () => {
           )}
 
           {!isPaymentStep && (
-            <form onSubmit={handleSubmit(onSubmit)} noValidate>
+            <Form onSubmit={handleSubmit(onSubmit)}>
               <Card className="border p-4 shadow-none">
                 <h2 className="flex items-center gap-2 text-base font-semibold">
                   <span className="bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold">
@@ -160,23 +161,31 @@ const CheckoutForm = () => {
                 </h2>
 
                 {/* Contact */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <TextField
-                    isInvalid={!!errors.email}
-                    isRequired
-                    className="sm:col-span-2"
-                  >
-                    <Label>Email</Label>
-                    <Input
-                      {...register("email")}
+                {/* <div className="grid grid-cols-1 gap-4 sm:grid-cols-2"> */}
+                <Controller
+                  control={control}
+                  name="email"
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
                       type="email"
-                      className={"border-border border shadow-none"}
-                      placeholder="you@example.com"
-                    />
-                    <FieldError>{errors.email?.message}</FieldError>
-                  </TextField>
+                      isInvalid={fieldState.invalid}
+                    >
+                      <Label className="mb-1.5 block text-xs font-medium text-zinc-400">
+                        Email
+                      </Label>
+                      <Input
+                        className={"border-border border shadow-none"}
+                        placeholder="john@example.com"
+                      />
+                      <FieldError className="mt-1 text-xs text-red-400">
+                        {fieldState.error?.message}
+                      </FieldError>
+                    </TextField>
+                  )}
+                />
 
-                  <TextField
+                {/* <TextField
                     isInvalid={!!errors.phone}
                     className="sm:col-span-2"
                   >
@@ -193,14 +202,44 @@ const CheckoutForm = () => {
                       placeholder="+1 555 000 0000"
                     />
                     <FieldError>{errors.phone?.message}</FieldError>
-                  </TextField>
-                </div>
+                  </TextField> */}
+                {/* </div> */}
+                <Controller
+                  control={control}
+                  name="phone"
+                  render={({ field, fieldState }) => (
+                    <TextField {...field} isInvalid={fieldState.invalid}>
+                      <Label className="mb-1.5 block text-xs font-medium text-zinc-400">
+                        Phone (Optional)
+                      </Label>
+                      <Input className={"border-border border shadow-none"} />
+                      <FieldError className="mt-1 text-xs text-red-400">
+                        {fieldState.error?.message}
+                      </FieldError>
+                    </TextField>
+                  )}
+                />
 
-                <Separator />
+                {/* <Separator /> */}
 
                 {/* Address */}
+                <Controller
+                  control={control}
+                  name="fullName"
+                  render={({ field, fieldState }) => (
+                    <TextField {...field} isInvalid={fieldState.invalid}>
+                      <Label className="mb-1.5 block text-xs font-medium text-zinc-400">
+                        Full Name
+                      </Label>
+                      <Input className={"border-border border shadow-none"} />
+                      <FieldError className="mt-1 text-xs text-red-400">
+                        {fieldState.error?.message}
+                      </FieldError>
+                    </TextField>
+                  )}
+                />
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <TextField
+                  {/* <TextField
                     isInvalid={!!errors.fullName}
                     isRequired
                     className="sm:col-span-2"
@@ -212,8 +251,8 @@ const CheckoutForm = () => {
                       placeholder="Jane Smith"
                     />
                     <FieldError>{errors.fullName?.message}</FieldError>
-                  </TextField>
-
+                  </TextField> */}
+                  {/* 
                   <TextField
                     isInvalid={!!errors.line1}
                     isRequired
@@ -226,8 +265,41 @@ const CheckoutForm = () => {
                       placeholder="123 Main Street"
                     />
                     <FieldError>{errors.line1?.message}</FieldError>
-                  </TextField>
-
+                  </TextField> */}
+                  <Controller
+                    control={control}
+                    name="line1"
+                    render={({ field, fieldState }) => (
+                      <TextField {...field} isInvalid={fieldState.invalid}>
+                        <Label className="mb-1.5 block text-xs font-medium text-zinc-400">
+                          Address
+                        </Label>
+                        <Input className={"border-border border shadow-none"} />
+                        <FieldError className="mt-1 text-xs text-red-400">
+                          {fieldState.error?.message}
+                        </FieldError>
+                      </TextField>
+                    )}
+                  />
+                  <Controller
+                    control={control}
+                    name="line2"
+                    render={({ field, fieldState }) => (
+                      <TextField {...field} isInvalid={fieldState.invalid}>
+                        <Label>
+                          Apt, suite, etc.{" "}
+                          <span className="text-default-400 text-xs">
+                            (optional)
+                          </span>
+                        </Label>
+                        <Input className={"border-border border shadow-none"} />
+                        <FieldError className="mt-1 text-xs text-red-400">
+                          {fieldState.error?.message}
+                        </FieldError>
+                      </TextField>
+                    )}
+                  />
+                  {/* 
                   <TextField className="sm:col-span-2">
                     <Label>
                       Apt, suite, etc.{" "}
@@ -240,9 +312,22 @@ const CheckoutForm = () => {
                       className={"border-border border shadow-none"}
                       placeholder="Apt 4B"
                     />
-                  </TextField>
+                  </TextField> */}
+                  <Controller
+                    control={control}
+                    name="city"
+                    render={({ field, fieldState }) => (
+                      <TextField {...field} isInvalid={fieldState.invalid}>
+                        <Label>City</Label>
+                        <Input className={"border-border border shadow-none"} />
+                        <FieldError className="mt-1 text-xs text-red-400">
+                          {fieldState.error?.message}
+                        </FieldError>
+                      </TextField>
+                    )}
+                  />
 
-                  <TextField isInvalid={!!errors.city} isRequired>
+                  {/* <TextField isInvalid={!!errors.city} isRequired>
                     <Label>City</Label>
                     <Input
                       {...register("city")}
@@ -250,9 +335,9 @@ const CheckoutForm = () => {
                       placeholder="Brooklyn"
                     />
                     <FieldError>{errors.city?.message}</FieldError>
-                  </TextField>
+                  </TextField> */}
 
-                  <TextField isInvalid={!!errors.state}>
+                  {/* <TextField isInvalid={!!errors.state}>
                     <Label>State / Province</Label>
                     <Input
                       {...register("state")}
@@ -260,9 +345,22 @@ const CheckoutForm = () => {
                       placeholder="NY"
                     />
                     <FieldError>{errors.state?.message}</FieldError>
-                  </TextField>
+                  </TextField> */}
 
-                  <TextField isInvalid={!!errors.postalCode} isRequired>
+                  <Controller
+                    control={control}
+                    name="state"
+                    render={({ field, fieldState }) => (
+                      <TextField {...field} isInvalid={fieldState.invalid}>
+                        <Label>State</Label>
+                        <Input className={"border-border border shadow-none"} />
+                        <FieldError className="mt-1 text-xs text-red-400">
+                          {fieldState.error?.message}
+                        </FieldError>
+                      </TextField>
+                    )}
+                  />
+                  {/* <TextField isInvalid={!!errors.postalCode} isRequired>
                     <Label>Postal code</Label>
                     <Input
                       {...register("postalCode")}
@@ -270,7 +368,20 @@ const CheckoutForm = () => {
                       placeholder="10001"
                     />
                     <FieldError>{errors.postalCode?.message}</FieldError>
-                  </TextField>
+                  </TextField> */}
+                  <Controller
+                    control={control}
+                    name="postalCode"
+                    render={({ field, fieldState }) => (
+                      <TextField {...field} isInvalid={fieldState.invalid}>
+                        <Label>Postal Code</Label>
+                        <Input className={"border-border border shadow-none"} />
+                        <FieldError className="mt-1 text-xs text-red-400">
+                          {fieldState.error?.message}
+                        </FieldError>
+                      </TextField>
+                    )}
+                  />
 
                   <Controller
                     control={control}
@@ -343,12 +454,12 @@ const CheckoutForm = () => {
                     : "Continue to payment"}
                 </Button>
               </Card.Footer>
-            </form>
+            </Form>
           )}
 
           {/* ── Step 2: Payment ───────────────────────────────────────── */}
           {isPaymentStep && clientSecret && (
-            <section className="border-divider bg-content1 space-y-5 rounded-2xl border p-6">
+            <section className="border-divider space-y-5 rounded-2xl border bg-white p-6">
               <div className="flex items-center justify-between">
                 <h2 className="flex items-center gap-2 text-base font-semibold">
                   <span className="bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold">

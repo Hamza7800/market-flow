@@ -122,8 +122,6 @@ export const addToCart = async (input: AddToCartInput) => {
     let price: string = "0";
     let availableStock: number = 0;
 
-    console.log(product);
-
     if (variantId && product.hasVariants) {
       const variant = product?.variants?.[0];
       if (!variant) {

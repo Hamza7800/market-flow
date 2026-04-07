@@ -5,7 +5,7 @@ import { ErrorState } from "@/components/error-state";
 import { LoadingState } from "@/components/loading-state";
 import { useUserOrders } from "@/hooks/use-orders";
 import { AlertCircle } from "lucide-react";
-import OrdersTable from "../../_components/user-orders-table";
+import OrdersTable from "@/app/(root)/user/_components/user-orders-table";
 
 const UserOrders = () => {
   const { data, isPending, isError, error, refetch } = useUserOrders();
@@ -36,6 +36,14 @@ const UserOrders = () => {
 
   return (
     <div>
+      <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-foreground text-3xl font-bold tracking-tight">
+            Your Orders
+          </h1>
+          <p className="text-muted mt-1 text-sm">Manage your orders info.</p>
+        </div>
+      </div>
       <OrdersTable orders={data} />
     </div>
   );

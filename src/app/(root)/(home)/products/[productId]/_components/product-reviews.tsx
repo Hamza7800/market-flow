@@ -28,9 +28,6 @@ const ProductReviews = ({
   averageRating,
   reviewCount,
 }: ProductReviewsProps) => {
-  console.log(reviews);
-  console.log(averageRating);
-  console.log(reviewCount);
   const rating = Number(averageRating ?? 0);
   const totalReviews = reviewCount ?? 0;
 

@@ -26,14 +26,14 @@ export const checkoutSchema = z.object({
 export type CheckoutSchema = z.infer<typeof checkoutSchema>;
 
 export const checkoutDefaults: CheckoutSchema = {
-  email: "",
-  phone: "",
-  fullName: "",
-  line1: "",
-  line2: "",
-  city: "",
-  state: "",
-  postalCode: "",
+  email: "hamza@gmail.com",
+  phone: "+1123123134",
+  fullName: "Hamza Dev",
+  line1: "Line One",
+  line2: "Line Two",
+  city: "NYC",
+  state: "NYC",
+  postalCode: "12345",
   country: "US",
   discountCode: "",
   saveAddress: false,

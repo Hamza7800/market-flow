@@ -327,7 +327,7 @@ export default function ProductsTable({
                 className={cn(
                   "bg-default-50 text-default-500 text-xs font-semibold tracking-wide uppercase first:pl-5 last:pr-5",
                   // header.id === "product" && "w-full max-w-[150px]", // 👈 full width
-                  header.id === "actions" && "min-w-[140px]",
+                  header.id === "actions" && "min-w-[90px]",
                   header.id === "status" && "min-w-[80px]",
                   header.id === "rating" && "min-w-[150px]",
                   header.id === "stock" && "min-w-[120px]",

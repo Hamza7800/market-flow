@@ -527,57 +527,57 @@ export const deleteProduct = async (productId: string) => {
       };
     }
 
-    const existing = await db.query.products.findFirst({
-      where: and(
-        eq(products.id, productId),
-        eq(products.vendorId, vendor.id),
-        isNull(products.deletedAt),
-      ),
-      with: {
-        images: true,
-      },
-      columns: { id: true, slug: true, status: true, categoryId: true },
-    });
+    // const existing = await db.query.products.findFirst({
+    //   where: and(
+    //     eq(products.id, productId),
+    //     eq(products.vendorId, vendor.id),
+    //     isNull(products.deletedAt),
+    //   ),
+    //   with: {
+    //     images: true,
+    //   },
+    //   columns: { id: true, slug: true, status: true, categoryId: true },
+    // });
 
-    if (!existing) {
-      return {
-        success: false,
-        data: null,
-        message: "Product not found or access denied",
-      };
-    }
+    // if (!existing) {
+    //   return {
+    //     success: false,
+    //     data: null,
+    //     message: "Product not found or access denied",
+    //   };
+    // }
 
-    if (existing.images.length > 0) {
-      const keysToDelete = existing.images
-        .map((img) => extractUploadThingKey(img.url))
-        .filter(Boolean) as string[];
+    // if (existing.images.length > 0) {
+    //   const keysToDelete = existing.images
+    //     .map((img) => extractUploadThingKey(img.url))
+    //     .filter(Boolean) as string[];
 
-      if (keysToDelete.length > 0) {
-        deleteUploadThingFiles(keysToDelete)
-          .then((r) => console.log("Delete IMAGE Success", r))
-          .catch((e) => console.error("UploadThing cleanup failed:", e));
-      }
-    }
+    //   if (keysToDelete.length > 0) {
+    //     deleteUploadThingFiles(keysToDelete)
+    //       .then((r) => console.log("Delete IMAGE Success", r))
+    //       .catch((e) => console.error("UploadThing cleanup failed:", e));
+    //   }
+    // }
 
-    await db
-      .update(products)
-      .set({ deletedAt: new Date(), updatedAt: new Date() })
-      .where(eq(products.id, productId));
+    // await db
+    //   .update(products)
+    //   .set({ deletedAt: new Date(), updatedAt: new Date() })
+    //   .where(eq(products.id, productId));
 
-    cacheDel(
-      productKeys.tags.detail(existing.id),
-      productKeys.tags.lists(),
-      productKeys.tags.byVendor(vendor.id),
-      productKeys.tags.byVendorAndStatus(vendor.id, existing.status),
-      ...(existing.categoryId
-        ? [productKeys.tags.byCategory(existing.categoryId)]
-        : []),
-    );
+    // cacheDel(
+    //   productKeys.tags.detail(existing.id),
+    //   productKeys.tags.lists(),
+    //   productKeys.tags.byVendor(vendor.id),
+    //   productKeys.tags.byVendorAndStatus(vendor.id, existing.status),
+    //   ...(existing.categoryId
+    //     ? [productKeys.tags.byCategory(existing.categoryId)]
+    //     : []),
+    // );
 
     return {
       success: true,
       message: "Product Deleted",
-      data: existing,
+      data: { id: "Delete Success" },
     };
   } catch (error) {
     return returnError(error, "Unable to delete product");

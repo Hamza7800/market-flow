@@ -5,9 +5,11 @@ import { LoadingState } from "@/components/loading-state";
 import { useUserOrdersDetails } from "@/hooks/use-orders";
 import { formatMoney } from "@/lib/utils";
 import { Button, Card, Chip, Separator } from "@heroui/react";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ArrowLeftIcon } from "lucide-react";
 import CancelOrder from "@/app/(root)/user/_components/cancel-order";
 import { OrderItemReview } from "@/components/review-components";
+import Link from "next/link";
+import { authClient } from "@/server/better-auth/client";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -24,8 +26,8 @@ const getStatusColor = (status: string) => {
 
 const OrderDetails = () => {
   const { data, isPending, isError, error, refetch } = useUserOrdersDetails();
-
-  console.log(data);
+  const { data: userAuth } = authClient.useSession();
+  const userId = userAuth?.user.id;
 
   if (isPending) {
     return <LoadingState />;
@@ -58,7 +60,15 @@ const OrderDetails = () => {
 
   return (
     <div className="space-y-6">
-      {/* ---------------- ORDER HEADER ---------------- */}
+      <div className="mt-2 mb-6">
+        <Link
+          href={`/user/${userId}/orders`}
+          className="text-accent mb-2 flex w-fit items-center gap-2 text-sm hover:underline"
+        >
+          <ArrowLeftIcon size={13} /> Back to orders
+        </Link>
+        <h1 className="text-2xl font-semibold tracking-tight">Order Details</h1>
+      </div>
       <Card>
         <Card.Header className="">
           <div className="flex gap-2">
@@ -215,7 +225,7 @@ const OrderDetails = () => {
           </Card.Content>
         </Card>
       </div>
-      <Card>
+      <Card className="p-0 shadow-none">
         <div>
           <h3 className="font-semibold">Refunds</h3>
         </div>
@@ -224,7 +234,10 @@ const OrderDetails = () => {
           {data.refunds.length ? (
             data.refunds.map((refund) => {
               return (
-                <Card key={refund.id}>
+                <Card
+                  key={refund.id}
+                  className="border-border border shadow-none"
+                >
                   <Card.Header>
                     <Chip className="w-fit">{refund.status}</Chip>
                   </Card.Header>

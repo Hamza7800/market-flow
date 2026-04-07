@@ -144,9 +144,7 @@ const CartItemRow = ({
     return (
       <Card
         key={item.id}
-        className={`border-border overflow-hidden border p-0 transition-all ${
-          isItemPending ? "pointer-events-none opacity-60" : ""
-        }`}
+        className={`border-border overflow-hidden border p-0 transition-all`}
       >
         <Card.Content className="flex gap-6 p-6 sm:flex-row">
           {/* PRODUCT IMAGE */}
@@ -189,7 +187,7 @@ const CartItemRow = ({
                     onClick={() =>
                       handleUpdateQuantity(item.id, item.quantity - 1)
                     }
-                    disabled={isItemPending}
+                    // disabled={isItemPending}
                     className="hover:bg-background cursor-pointer rounded p-1 transition-colors disabled:opacity-50"
                     aria-label="Decrease quantity"
                   >
@@ -202,7 +200,7 @@ const CartItemRow = ({
                     onClick={() =>
                       handleUpdateQuantity(item.id, item.quantity + 1)
                     }
-                    disabled={isItemPending}
+                    // disabled={isItemPending}
                     className="hover:bg-background cursor-pointer rounded p-1 transition-colors disabled:opacity-50"
                     aria-label="Increase quantity"
                   >
@@ -214,7 +212,7 @@ const CartItemRow = ({
                   isIconOnly
                   size="sm"
                   onClick={() => removeItem.mutate(item.id)}
-                  isDisabled={isItemPending}
+                  // isDisabled={isItemPending}
                   // className="border-border cursor-pointer rounded-lg border p-2 text-red-500 transition-colors hover:border-red-300 hover:bg-red-50 disabled:opacity-50"
                   aria-label="Remove item"
                 >

@@ -333,7 +333,9 @@ const ProductDetails = ({ productId }: { productId: string }) => {
 
       {/* SIMILAR PRODUCTS */}
       <div>
-        <h2>Similar Products</h2>
+        <h2 className="mb-4 text-2xl font-bold tracking-tight md:text-3xl">
+          Similar Products
+        </h2>
         <ProductsList
           category={data?.category?.id ?? ""}
           filters={{

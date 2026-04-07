@@ -102,10 +102,10 @@ const Vendors = ({ slice }: { slice?: number }) => {
             <LinkButton
               href="/vendors"
               variant="outline"
-              className="inline-flex items-center gap-2 font-semibold transition-all hover:gap-3"
+              className="inline-flex items-center gap-2 bg-white font-semibold transition-all hover:gap-3"
             >
               Browse All Vendors
-              <ArrowRight size={20} />
+              {/* <ArrowRight size={20} /> */}
             </LinkButton>
           </div>
         )}

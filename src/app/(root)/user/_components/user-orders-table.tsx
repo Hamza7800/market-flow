@@ -3,7 +3,7 @@
 import type { SortDescriptor } from "@heroui/react";
 import type { SortingState } from "@tanstack/react-table";
 
-import { Chip, Pagination, Table } from "@heroui/react";
+import { Chip, cn, Pagination, Table } from "@heroui/react";
 import {
   createColumnHelper,
   flexRender,
@@ -160,6 +160,13 @@ const OrdersTable = ({ orders }: { orders: Orders }) => {
                 isRowHeader
                 id={header.id}
                 allowsSorting={header.column.getCanSort()}
+                className={cn(
+                  "bg-default-50 text-default-500 text-xs font-semibold tracking-wide uppercase first:pl-5 last:pr-5",
+                  // header.id === "productName" && "w-full min-w-[300px]",
+                  // header.id === "isPaid" && "min-w-[120px]",
+                  // header.id === "payment" && "min-w-[100px]",
+                  // header.id === "isTotal" && "min-w-[100px]",
+                )}
               >
                 {({ sortDirection }) => (
                   <span className="flex items-center justify-between">
