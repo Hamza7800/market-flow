@@ -1,7 +1,6 @@
 import { getVendorOrders } from "@/actions/orders";
 import { LoadingState } from "@/components/loading-state";
 import { loadOrderSearchParams, type OrderStatus } from "@/lib/nuqs/nuqs";
-import { Surface } from "@heroui/react";
 import { Suspense } from "react";
 import OrdersNavHeader from "./_components/orders-nav-header";
 import { OrdersTable } from "./_components/orders-table";
@@ -56,6 +55,17 @@ export const OrdersPage = async ({ params, searchParams }: PageProps) => {
 
   return (
     <div>
+      <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-foreground text-3xl font-bold tracking-tight">
+            Orders
+          </h1>
+          <p className="text-muted mt-1 text-sm">
+            Manage your orders and track status.
+          </p>
+        </div>
+      </div>
+
       <OrdersNavHeader status={status} />
       <Suspense fallback={<LoadingState />}>
         <Content vendorId={vendorId} status={status} page={page} />

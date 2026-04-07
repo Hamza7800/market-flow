@@ -95,7 +95,7 @@ export const VariantBuilder = ({ control, setValue }: Props) => {
                   "overflow-hidden rounded-xl border transition-colors",
                   variantError
                     ? "border-danger/50 bg-danger/5"
-                    : "border-border bg-surface",
+                    : "border-border",
                 ].join(" ")}
               >
                 {/* Row header */}
@@ -173,7 +173,7 @@ export const VariantBuilder = ({ control, setValue }: Props) => {
                     />
 
                     {/* Price + Stock + SKU */}
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid gap-3 md:grid-cols-3">
                       <Controller
                         control={control}
                         name={`variants.${index}.price`}
@@ -351,17 +351,19 @@ function OptionPairs({
       </Label>
       <div className="space-y-1.5">
         {pairs.map(([key, val], i) => (
-          <div key={i} className="flex items-center gap-2">
+          <div key={i} className="flex flex-col items-center gap-2 md:flex-row">
             <Input
+              fullWidth
               variant="secondary"
               value={key}
               onChange={(e) => updateKey(i, e.target.value)}
               placeholder="Color"
-              className="w-1/3 text-sm"
+              className="text-sm md:w-1/3"
               aria-label="Option name"
             />
             <span className="text-muted-foreground">:</span>
             <Input
+              fullWidth
               variant="secondary"
               value={val}
               onChange={(e) => updateValue(i, e.target.value)}
@@ -370,7 +372,7 @@ function OptionPairs({
               aria-label="Option value"
             />
             <Button
-              variant="outline"
+              variant="danger-soft"
               size="sm"
               isIconOnly
               onPress={() => removePair(i)}

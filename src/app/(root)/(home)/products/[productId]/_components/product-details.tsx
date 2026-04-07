@@ -198,7 +198,7 @@ const ProductDetails = ({ productId }: { productId: string }) => {
             /> */}
 
             {userId ? (
-              <div className="flex items-end gap-3">
+              <div className="flex flex-col items-end gap-3 sm:flex-row">
                 <div>
                   <NumberField
                     minValue={1}
@@ -222,7 +222,7 @@ const ProductDetails = ({ productId }: { productId: string }) => {
                   </NumberField>
                 </div>
 
-                <div className="pt-0">
+                <div className="w-full pt-0 sm:w-fit">
                   {!!totalStock &&
                     (data.hasVariants ? (
                       <AddToCartWithVariant

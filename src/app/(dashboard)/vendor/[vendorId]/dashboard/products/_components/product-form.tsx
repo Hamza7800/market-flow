@@ -197,7 +197,7 @@ const ProductForm = (props: Props) => {
         )}
       </Surface>
 
-      <Card className="border p-6">
+      <Card className="p-1.5">
         <Form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
           <Controller
             control={control}
@@ -365,7 +365,7 @@ const ProductForm = (props: Props) => {
 
           <Separator />
           <Card.Footer>
-            <div className="flex w-full items-center justify-between gap-3">
+            <div className="flex w-full flex-col justify-between gap-3 md:flex-row md:items-center">
               <div className="flex items-center gap-2">
                 {isEdit && onStatusChange && (
                   <>

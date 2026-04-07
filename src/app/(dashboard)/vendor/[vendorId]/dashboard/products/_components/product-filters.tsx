@@ -67,10 +67,11 @@ function FilterToolbar({
   vendorId,
 }: FilterToolbarProps) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex w-full flex-col gap-2 md:flex-row md:items-center">
       <Input
         placeholder="Search by name…"
         value={search}
+        className={"border-border w-full border shadow-none md:w-[250px]"}
         onChange={(e) => onClientChange("search", e.target.value)}
       />
 
@@ -79,7 +80,7 @@ function FilterToolbar({
         value={priceSort}
         onChange={(v) => onClientChange("priceSort", v)}
         options={PRICE_OPTIONS}
-        className="w-[170px]"
+        className="md:w-[170px]"
       />
 
       <FilterSelect
@@ -87,7 +88,7 @@ function FilterToolbar({
         value={minRating}
         onChange={(v) => onClientChange("minRating", v)}
         options={RATING_OPTIONS}
-        className="w-[150px]"
+        className="md:w-[150px]"
       />
     </div>
   );
@@ -108,7 +109,7 @@ function FilterSelect<T extends string>({
 }) {
   return (
     <Select
-      // fullWidth
+      fullWidth
       className={cn("w-full min-w-[200px]", className)}
       value={value}
       onChange={(val) => {
@@ -117,7 +118,8 @@ function FilterSelect<T extends string>({
     >
       <Label className="sr-only">{label}</Label>
       <Select.Trigger
-      // className="border-default-200 bg-default-50 h-8 min-h-0 rounded-lg border px-3 text-sm shadow-none"
+        className={"border-border border shadow-none"}
+        // className="border-default-200 bg-default-50 h-8 min-h-0 rounded-lg border px-3 text-sm shadow-none"
       >
         <Select.Value />
         <Select.Indicator />

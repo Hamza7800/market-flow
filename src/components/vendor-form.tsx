@@ -96,7 +96,7 @@ const VendorForm = ({ initialData }: VendorFormProps) => {
   }
 
   return (
-    <Card className="shadow-none">
+    <Card className="p-0 p-1.5 shadow-none">
       <Form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
         {/* Banner */}
         <Controller

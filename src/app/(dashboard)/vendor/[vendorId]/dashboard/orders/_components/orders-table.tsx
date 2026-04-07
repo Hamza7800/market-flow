@@ -243,8 +243,8 @@ export function OrdersTable({
                 isRowHeader={header.id === "productName"}
                 className={cn(
                   "bg-default-50 text-default-500 text-xs font-semibold tracking-wide uppercase first:pl-5 last:pr-5",
-                  header.id === "productName" && "w-full", // 👈 full width
-                  header.id === "actions" && "min-w-[140px]",
+                  header.id === "productName" && "w-full min-w-[300px]",
+                  header.id === "actions" && "min-w-[70px]",
                   header.id === "status" && "min-w-[100px]",
                   header.id === "quantity" && "min-w-[50px]",
                   header.id === "unitPrice" && "min-w-[120px]",

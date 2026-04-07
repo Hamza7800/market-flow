@@ -51,7 +51,18 @@ const RefundsPage = async ({ params, searchParams }: PageProps) => {
 
   return (
     <div>
-      <RefundNavHeader status={status} />
+      <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-foreground text-3xl font-bold tracking-tight">
+            Refunds
+          </h1>
+          <p className="text-muted mt-1 text-sm">
+            Manage your refunds and track status.
+          </p>
+        </div>
+        <RefundNavHeader status={status} />
+      </div>
+
       <Suspense fallback={<LoadingState />}>
         <Content vendorId={vendorId} status={status} page={page} />
       </Suspense>

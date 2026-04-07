@@ -29,9 +29,9 @@ const OrdersNavHeader = ({ status }: { status: OrderStatus }) => {
   const activeStatus = urlStatus ?? status;
 
   return (
-    <Card className="mb-4 shadow-none">
+    <Card className="mb-4 p-0 shadow-none">
       <Card.Content className="flex-row justify-between">
-        <h2 className="text-2xl">Orders Management</h2>
+        {/* <h2 className="text-2xl">Orders Management</h2> */}
 
         {/* <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-2">
@@ -39,7 +39,7 @@ const OrdersNavHeader = ({ status }: { status: OrderStatus }) => {
         </div>
       </div> */}
 
-        <div className="flex flex-wrap gap-2">
+        <div className="grid w-full grid-cols-2 flex-col gap-2 md:flex md:flex-row">
           {(
             [
               "pending",
@@ -56,7 +56,8 @@ const OrdersNavHeader = ({ status }: { status: OrderStatus }) => {
               <Button
                 variant={selected ? "secondary" : "outline"}
                 key={item}
-                size="sm"
+                // size="sm"
+                fullWidth
                 onPress={() => setStatus(item)}
               >
                 {STATUS_LABELS[item]}

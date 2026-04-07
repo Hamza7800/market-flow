@@ -1,6 +1,7 @@
 import { ConfirmModal } from "@/components/confirm-modal";
 import { useRejectItemRefund } from "@/hooks/use-refund";
 import { Button } from "@heroui/react";
+import { X } from "lucide-react";
 
 const RejectRefund = ({ refundId }: { refundId: string }) => {
   const rejectRefund = useRejectItemRefund();
@@ -22,8 +23,8 @@ const RejectRefund = ({ refundId }: { refundId: string }) => {
         );
       }}
       trigger={
-        <Button fullWidth variant="danger-soft">
-          Reject
+        <Button isIconOnly variant="danger-soft">
+          <X />
         </Button>
       }
     />

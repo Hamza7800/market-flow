@@ -5,25 +5,25 @@ import { useCategories } from "@/hooks/use-public";
 import {
   browseClientParams,
   browseServerParams,
-  SORT_LABELS,
-  SORT_OPTIONS,
-  type SortOption,
+  // SORT_LABELS,
+  // SORT_OPTIONS,
+  // type SortOption,
 } from "@/lib/nuqs/public";
 import {
-  Input,
-  Label,
-  Separator,
+  // Input,
+  // Label,
+  // Separator,
   Skeleton,
   Tag,
   TagGroup,
-  Select,
-  ListBox,
-  NumberField,
-  Checkbox,
-  Button,
+  // Select,
+  // ListBox,
+  // NumberField,
+  // Checkbox,
+  // Button,
 } from "@heroui/react";
 import { useQueryStates } from "nuqs";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 
 const ProductFilters = () => {
   const { data: categories, isLoading: catsLoading } = useCategories();
@@ -38,7 +38,7 @@ const ProductFilters = () => {
     { history: "replace", shallow: true },
   );
 
-  const [searchInput, setSearchInput] = useState(search ?? "");
+  // const [searchInput, setSearchInput] = useState(search ?? "");
   // const searchTimer = useRef<ReturnType<typeof setTimeout>>();
 
   // useEffect(() => {
@@ -51,14 +51,14 @@ const ProductFilters = () => {
 
   const [isPending, startTransition] = useTransition();
 
-  const activeFiltersCount = [
-    category,
-    sort !== "newest" ? sort : null,
-    minPrice ? minPrice : null,
-    maxPrice ? maxPrice : null,
-    inStock === "false" ? "inStock" : null,
-    search ? search : null,
-  ].filter(Boolean).length;
+  // const activeFiltersCount = [
+  //   category,
+  //   sort !== "newest" ? sort : null,
+  //   minPrice ? minPrice : null,
+  //   maxPrice ? maxPrice : null,
+  //   inStock === "false" ? "inStock" : null,
+  //   search ? search : null,
+  // ].filter(Boolean).length;
 
   // const hasMore = true;
 

@@ -27,11 +27,13 @@ type Props = {
   variants: Variant[];
   productId: string;
   quantity?: number;
+  fullWidth?: boolean;
 };
 
 export default function AddToCartWithVariant({
   variants,
   productId,
+  fullWidth = false,
   quantity = 1,
 }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
@@ -54,7 +56,10 @@ export default function AddToCartWithVariant({
 
   return (
     <Modal>
-      <Button className="bg-primary hover:bg-primary/90 text-primary-foreground group w-full font-semibold transition-all">
+      <Button
+        fullWidth={fullWidth}
+        className="bg-primary hover:bg-primary/90 text-primary-foreground group w-full font-semibold transition-all"
+      >
         <ShoppingCart className="mr-2" />
         Select Variant
       </Button>

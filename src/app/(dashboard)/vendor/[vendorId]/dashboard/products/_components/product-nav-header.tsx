@@ -29,8 +29,8 @@ const ProductNavHeader = ({
   const activeStatus = urlStatus ?? status;
 
   return (
-    <div className="">
-      <div className="flex flex-wrap items-center gap-2">
+    <div className="w-full">
+      <div className="flex w-full items-center gap-2">
         {(["active", "draft", "archived"] as const).map((item) => {
           const selected = item === activeStatus;
 
@@ -38,7 +38,8 @@ const ProductNavHeader = ({
             <Button
               variant={selected ? "primary" : "outline"}
               key={item}
-              size="sm"
+              // size="sm"
+              fullWidth
               className={"text-sm"}
               onPress={() => setStatus(item)}
             >
@@ -46,16 +47,17 @@ const ProductNavHeader = ({
             </Button>
           );
         })}
-        <Button
+        {/* <Button
           variant="outline"
           size="sm"
+          fullWidth
           className="h-8 shadow-none"
           onClick={() =>
             router.push(`/vendor/${vendorId}/dashboard/products/form`)
           }
         >
           Create
-        </Button>
+        </Button> */}
       </div>
     </div>
   );

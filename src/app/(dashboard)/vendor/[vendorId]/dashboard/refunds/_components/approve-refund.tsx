@@ -1,6 +1,7 @@
 import { ConfirmModal } from "@/components/confirm-modal";
 import { useApproveItemRefund } from "@/hooks/use-refund";
 import { Button } from "@heroui/react";
+import { CheckIcon } from "lucide-react";
 
 const ApproveRefund = ({ refundId }: { refundId: string }) => {
   const approveRefund = useApproveItemRefund();
@@ -19,8 +20,8 @@ const ApproveRefund = ({ refundId }: { refundId: string }) => {
         });
       }}
       trigger={
-        <Button fullWidth variant="secondary">
-          Approve
+        <Button isIconOnly variant="secondary">
+          <CheckIcon />
         </Button>
       }
     />

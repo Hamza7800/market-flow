@@ -27,7 +27,7 @@ export const OverviewHeader = ({
   return (
     <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
       <div>
-        <h1 className="text-foreground text-[22px] font-bold tracking-tight">
+        <h1 className="text-foreground text-3xl font-bold tracking-tight">
           Dashboard
         </h1>
         <p className="text-default-400 mt-0.5 text-sm">

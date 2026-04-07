@@ -15,6 +15,7 @@ import {
 import { productKeys } from "@/lib/cache-keys";
 import ProductFilters from "@/app/(dashboard)/vendor/[vendorId]/dashboard/products/_components/product-filters";
 import { Surface } from "@heroui/react";
+import { LinkButton } from "@/components/link-button";
 
 type PageProps = {
   params: Promise<{ vendorId: string }>;
@@ -62,8 +63,30 @@ export default async function ProductsPage({
 
   return (
     <div>
-      <h2 className="mb-4 text-2xl">Products Management</h2>
-      <Surface className="mb-2 flex flex-row items-center justify-between rounded-lg p-1">
+      <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-foreground text-3xl font-bold tracking-tight">
+            Products
+          </h1>
+          <p className="text-muted mt-1 text-sm">
+            Manage your inventory, track status, and optimize your listings.
+          </p>
+        </div>
+
+        {/* CTA */}
+        <div className="flex gap-2">
+          <LinkButton
+            className="w-full"
+            href={`/vendor/${vendorId}/dashboard/products/form`}
+            // className="bg-accent text-accent-foreground rounded-lg px-4 py-2 text-sm font-medium transition hover:opacity-90"
+          >
+            + Add Product
+          </LinkButton>
+        </div>
+      </div>
+
+      {/* <h2 className="mb-4 text-2xl">Products Management</h2> */}
+      <Surface className="mb-4 flex flex-col items-center justify-between gap-4 rounded-lg p-1 md:flex-row">
         <ProductFilters vendorId={vendorId} />
         <ProductNavHeader status={status} vendorId={vendorId} />
       </Surface>

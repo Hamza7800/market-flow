@@ -73,15 +73,15 @@ const columns = [
     },
   }),
 
-  columnHelper.accessor((row) => row.order.id, {
-    id: "order",
-    header: "Order",
-    cell: (info) => (
-      <span className="font-mono text-xs">
-        {info.getValue().slice(0, 8)}...
-      </span>
-    ),
-  }),
+  // columnHelper.accessor((row) => row.order.id, {
+  //   id: "order",
+  //   header: "Order",
+  //   cell: (info) => (
+  //     <span className="font-mono text-xs">
+  //       {info.getValue().slice(0, 8)}...
+  //     </span>
+  //   ),
+  // }),
 
   columnHelper.accessor((row) => row.refund.amount, {
     id: "amount",
@@ -195,6 +195,15 @@ export function RefundsTable({ data }: { data: any }) {
                 isRowHeader
                 id={header.id}
                 allowsSorting={header.column.getCanSort()}
+                className={cn(
+                  "bg-default-50 text-default-500 text-xs font-semibold tracking-wide uppercase first:pl-5 last:pr-5",
+                  header.id === "product" && "w-full min-w-[300px]",
+                  header.id === "reason" && "w-full min-w-[300px]",
+                  header.id === "amount" && "min-w-[100px]",
+                  header.id === "qty" && "min-w-[90px]",
+                  header.id === "status" && "min-w-[100px]",
+                  header.id === "actions" && "min-w-[100px]",
+                )}
               >
                 {({ sortDirection }) => (
                   <span className="flex items-center justify-between">
