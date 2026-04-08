@@ -16,8 +16,10 @@ import { NavMain } from "@/app/(dashboard)/_components/app-main";
 import Link from "next/link";
 import { NavUser } from "@/components/nav-user";
 import Image from "next/image";
+import { useVendor } from "@/hooks/use-vedor";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { profile } = useVendor();
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -31,11 +33,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     width={70}
                     height={70}
                     alt="logo"
-                    src={"/market-flow-logo.png"}
+                    className="rounded-full"
+                    src={profile?.logoUrl ?? "/market-flow-logo.png"}
                   />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">MarketFlow</span>
+                  <span className="truncate font-medium">
+                    {profile?.storeName ?? "MarketFlow"}
+                  </span>
                 </div>
               </Link>
             </SidebarMenuButton>

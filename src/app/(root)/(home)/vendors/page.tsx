@@ -20,6 +20,7 @@ const VendorsContent = async () => {
       }
       return r.data;
     },
+    staleTime: 1000 * 60 * 5,
   });
 
   return (

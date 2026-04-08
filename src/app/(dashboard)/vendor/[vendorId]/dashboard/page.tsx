@@ -13,7 +13,6 @@ import { OverviewHeader } from "@/app/(dashboard)/_components/overview/over-head
 import { StatCards } from "@/app/(dashboard)/_components/overview/stat-cards";
 import { analyticsKeys } from "@/lib/cache-keys";
 import { fKey, type MonthFilter } from "@/lib/utils";
-import { Skeleton } from "@heroui/react";
 import {
   dehydrate,
   HydrationBoundary,

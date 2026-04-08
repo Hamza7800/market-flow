@@ -29,8 +29,13 @@ const ProductVendorCard = ({ vendor }: ProductVendorCardProps) => {
 
       <Card.Content>
         <div className="border-border mb-2 flex items-start gap-4 border-b pb-6">
-          <div className="bg-accent/10 flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg">
-            <Store size={32} className="text-accent" />
+          <div className="bg-accent/10 border-border flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg border">
+            {/* <Store size={32} className="text-accent" /> */}
+            {vendor.logoUrl ? (
+              <img src={vendor.logoUrl} alt="" className="rounded-sm" />
+            ) : (
+              <Store size={24} className="text-accent" />
+            )}
           </div>
           <div className="flex-1">
             <Link

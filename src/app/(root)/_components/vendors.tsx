@@ -45,7 +45,7 @@ const Vendors = ({ slice }: { slice?: number }) => {
                       <h3 className="text-foreground truncate text-lg font-semibold transition-colors">
                         {vendor.storeName}
                       </h3>
-                      <p className="text-muted mt-1 text-sm">
+                      <p className="text-muted mt-1 line-clamp-3 text-sm">
                         {vendor.description}
                       </p>
                     </div>
