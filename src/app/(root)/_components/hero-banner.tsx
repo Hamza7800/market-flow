@@ -86,11 +86,8 @@ export function HeroBanner() {
 
           {/* RIGHT IMAGE COMPOSITION: APPAREL FOCUS */}
           <div className="relative hidden lg:block">
-            {/* Background Decorative Frame */}
-            <div className="border-primary/10 absolute -inset-4 rounded-[3rem] border opacity-50" />
-
             {/* Main Image: Editorial Apparel */}
-            <div className="border-card bg-accent relative aspect-[4/5] overflow-hidden rounded-[2.5rem] border-8 shadow-xl">
+            <div className="border-card bg-accent relative aspect-[4/5] overflow-hidden rounded-[2.5rem] border-8">
               <img
                 src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1000&auto=format&fit=crop"
                 alt="High-end Fashion"
@@ -118,7 +115,7 @@ export function HeroBanner() {
             </div>
 
             {/* Floating Icon */}
-            <div className="bg-background text-foreground absolute -top-6 -left-6 flex h-16 w-16 -rotate-6 items-center justify-center rounded-2xl shadow-md">
+            <div className="text-foreground absolute -top-6 -left-6 flex h-16 w-16 -rotate-6 items-center justify-center rounded-2xl bg-white/80 shadow-md">
               <ShoppingBag size={28} />
             </div>
           </div>
