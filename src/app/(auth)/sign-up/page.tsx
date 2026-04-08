@@ -1,4 +1,5 @@
 "use client";
+
 import { SignUpSchema, type SignUpSchemaType } from "@/zod-schema/auth-schema";
 import { authClient } from "@/server/better-auth/client";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,6 +19,7 @@ import {
 import { useRouter } from "nextjs-toploader/app";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 const SignUpUser = () => {
   const router = useRouter();
@@ -72,13 +74,14 @@ const SignUpUser = () => {
     <div className="relative flex min-h-screen items-center justify-center p-6">
       <div className="relative w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center gap-2">
-          <Image
-            // className="mb-4"
-            width={90}
-            height={90}
-            alt="logo"
-            src={"/market-flow-logo.png"}
-          />
+          <Link href={"/"}>
+            <Image
+              width={90}
+              height={90}
+              alt="logo"
+              src={"/market-flow-logo.png"}
+            />
+          </Link>
           {/* <h1
                     className="text-2xl font-semibold tracking-tight"
                     style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}

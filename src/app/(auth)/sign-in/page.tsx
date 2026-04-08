@@ -21,6 +21,7 @@ import { useSearchParams } from "next/navigation";
 import { QueryClient } from "@tanstack/react-query";
 import { vendorKeys } from "@/lib/cache-keys";
 import Image from "next/image";
+import Link from "next/link";
 
 const SignUser = () => {
   const qc = new QueryClient();
@@ -95,13 +96,15 @@ const SignUser = () => {
     <div className="relative flex min-h-screen items-center justify-center p-6">
       <div className="relative w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center gap-2">
-          <Image
-            // className="mb-4"
-            width={90}
-            height={90}
-            alt="logo"
-            src={"/market-flow-logo.png"}
-          />
+          <Link href={"/"}>
+            <Image
+              // className="mb-4"
+              width={90}
+              height={90}
+              alt="logo"
+              src={"/market-flow-logo.png"}
+            />
+          </Link>
           {/* <h1
             className="text-2xl font-semibold tracking-tight"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}

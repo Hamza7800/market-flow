@@ -42,7 +42,7 @@ const Vendors = ({ slice }: { slice?: number }) => {
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-foreground group-hover:text-accent truncate text-lg font-semibold transition-colors">
+                      <h3 className="text-foreground truncate text-lg font-semibold transition-colors">
                         {vendor.storeName}
                       </h3>
                       <p className="text-muted mt-1 text-sm">

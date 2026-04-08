@@ -1,6 +1,28 @@
-import { Suspense, type ReactNode } from "react";
+"use client";
+
+import { LoadingState } from "@/components/loading-state";
+import { authClient } from "@/server/better-auth/client";
+import { useRouter } from "nextjs-toploader/app";
+import { Suspense, useEffect, type ReactNode } from "react";
 
 const AuthLayout = ({ children }: { children: ReactNode }) => {
+  const { data, isPending } = authClient.useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (data?.user?.id && !isPending) {
+      router.replace("/");
+    }
+  }, [data, isPending, router]);
+
+  if (isPending) {
+    return (
+      <div className="h-dvh">
+        <LoadingState />
+      </div>
+    );
+  }
+
   return (
     <Suspense>
       <div className="relative min-h-screen w-full overflow-hidden bg-white">

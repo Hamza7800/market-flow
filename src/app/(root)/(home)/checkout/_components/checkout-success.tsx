@@ -1,6 +1,7 @@
 "use client";
 
 import { LinkButton } from "@/components/link-button";
+import { authClient } from "@/server/better-auth/client";
 // import { Button, Chip } from "@heroui/react";
 import {
   CheckCircleIcon,
@@ -11,7 +12,9 @@ import { useSearchParams } from "next/navigation";
 
 export const CheckoutSuccess = () => {
   const params = useSearchParams();
+  const { data } = authClient.useSession();
   const orderId = params.get("orderId");
+  const userId = data?.user.id;
 
   return (
     <div className="mx-auto flex min-h-[80vh] max-w-md flex-col items-center justify-center px-4 py-16 text-center">
@@ -35,7 +38,7 @@ export const CheckoutSuccess = () => {
 
       <div className="mt-8 flex w-full flex-col gap-3">
         {orderId && (
-          <LinkButton fullWidth href={`/account/orders/${orderId}`}>
+          <LinkButton fullWidth href={`/user/${userId}/orders/${orderId}`}>
             View order
           </LinkButton>
         )}

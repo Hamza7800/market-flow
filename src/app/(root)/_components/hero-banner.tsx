@@ -10,12 +10,12 @@ export function HeroBanner() {
         <div className="bg-accent/10 absolute right-1/4 bottom-0 h-[400px] w-[400px] rounded-full blur-[100px]" />
       </div> */}
 
-      <div className="relative z-10 container mx-auto sm:px-4 md:px-8">
+      <div className="relative z-10 container mx-auto">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           {/* LEFT CONTENT: GENERAL FASHION FOCUS */}
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-            <div className="border-primary/20 bg-primary/5 text-primary mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium">
-              <Sparkles size={16} />
+            <div className="border-primary/20 text-primary mb-6 inline-flex items-center gap-2 rounded-full border bg-white/50 px-4 py-2 text-sm font-medium">
+              {/* <Sparkles size={16} /> */}
               New Season Collection
             </div>
 

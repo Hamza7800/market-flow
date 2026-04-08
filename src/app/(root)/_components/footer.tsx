@@ -44,7 +44,7 @@ export function Footer() {
                 </div>
                 <div className="text-muted flex items-center gap-3 text-sm">
                   <Mail size={18} className="text-accent flex-shrink-0" />
-                  <span>support@MarketFlow.com</span>
+                  <span>support@marketflow.com</span>
                 </div>
               </div>
             </div>
