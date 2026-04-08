@@ -39,6 +39,7 @@ import { useRouter } from "nextjs-toploader/app";
 import { usePathname } from "next/navigation";
 import { authClient } from "@/server/better-auth/client";
 import CheckoutSkeleton from "@/components/loading-skeletons/checkout-loading";
+import { StripeTestCard } from "@/components/stripe-test-card";
 
 const CheckoutForm = () => {
   const router = useRouter();
@@ -460,6 +461,7 @@ const CheckoutForm = () => {
           {/* ── Step 2: Payment ───────────────────────────────────────── */}
           {isPaymentStep && clientSecret && (
             <section className="border-divider space-y-5 rounded-2xl border bg-white p-6">
+              <StripeTestCard />
               <div className="flex items-center justify-between">
                 <h2 className="flex items-center gap-2 text-base font-semibold">
                   <span className="bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold">
