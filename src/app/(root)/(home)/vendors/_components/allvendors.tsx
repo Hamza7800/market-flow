@@ -1,13 +1,18 @@
 "use client";
 
 import Vendors from "@/app/(root)/_components/vendors";
+import MaxWidthContainer from "@/components/max-w-container";
+import { Separator } from "@heroui/react";
 import { ArrowRight } from "lucide-react";
 
 const AllVendors = () => {
   return (
     <div>
-      <Vendors />
-      <section className="py-16">
+      <MaxWidthContainer>
+        <Vendors />
+      </MaxWidthContainer>
+      <Separator />
+      <section className="bg-accent/5 py-16">
         <div className="text-center">
           <h2 className="text-foreground mb-4 text-3xl font-bold md:text-4xl">
             Are you a Vendor?

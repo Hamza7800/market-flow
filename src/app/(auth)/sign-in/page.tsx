@@ -20,6 +20,7 @@ import { useRouter } from "nextjs-toploader/app";
 import { useSearchParams } from "next/navigation";
 import { QueryClient } from "@tanstack/react-query";
 import { vendorKeys } from "@/lib/cache-keys";
+import Image from "next/image";
 
 const SignUser = () => {
   const qc = new QueryClient();
@@ -93,6 +94,22 @@ const SignUser = () => {
   return (
     <div className="relative flex min-h-screen items-center justify-center p-6">
       <div className="relative w-full max-w-sm">
+        <div className="mb-8 flex flex-col items-center gap-2">
+          <Image
+            // className="mb-4"
+            width={90}
+            height={90}
+            alt="logo"
+            src={"/market-flow-logo.png"}
+          />
+          {/* <h1
+            className="text-2xl font-semibold tracking-tight"
+            style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+          >
+            MarketFlow
+          </h1> */}
+          <p className="text-md text-zinc-500">Welcome back</p>
+        </div>
         <Card className="border p-6">
           <Form
             className="flex flex-col gap-4"

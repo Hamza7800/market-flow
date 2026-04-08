@@ -40,7 +40,7 @@ const MobileDrawer = () => {
           <Drawer.Dialog>
             <Drawer.CloseTrigger />
             <Drawer.Header>
-              <Drawer.Heading>Shop Forge</Drawer.Heading>
+              <Drawer.Heading>MarketFlow</Drawer.Heading>
             </Drawer.Header>
             <Drawer.Body>
               <nav className="flex flex-col gap-1">

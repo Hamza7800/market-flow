@@ -15,6 +15,7 @@ import {
 import { NavMain } from "@/app/(dashboard)/_components/app-main";
 import Link from "next/link";
 import { NavUser } from "@/components/nav-user";
+import Image from "next/image";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -23,12 +24,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Command className="size-4" />
+              <Link href="/" className="flex items-center">
+                <div className="text-sidebar-primary-foreground flex aspect-square size-12 items-center justify-center rounded-lg">
+                  <Image
+                    // className="mb-4"
+                    width={70}
+                    height={70}
+                    alt="logo"
+                    src={"/market-flow-logo.png"}
+                  />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Shop Forge</span>
+                  <span className="truncate font-medium">MarketFlow</span>
                 </div>
               </Link>
             </SidebarMenuButton>

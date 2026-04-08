@@ -1,5 +1,4 @@
 import { getPublicVendors } from "@/actions/public";
-import MaxWidthContainer from "@/components/max-w-container";
 import {
   dehydrate,
   HydrationBoundary,
@@ -32,11 +31,9 @@ const VendorsContent = async () => {
 
 const VendorsPage = () => {
   return (
-    <MaxWidthContainer>
-      <Suspense fallback={<PublicVendorsLoading />}>
-        <VendorsContent />
-      </Suspense>
-    </MaxWidthContainer>
+    <Suspense fallback={<PublicVendorsLoading />}>
+      <VendorsContent />
+    </Suspense>
   );
 };
 

@@ -8,6 +8,7 @@ import {
   MapPin,
   Phone,
 } from "lucide-react";
+import Image from "next/image";
 
 export function Footer() {
   return (
@@ -18,9 +19,16 @@ export function Footer() {
           <div className="mb-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
             {/* COMPANY INFO */}
             <div>
-              <h3 className="text-foreground mb-4 text-lg font-bold">
-                ShopeForge
-              </h3>
+              {/* <h3 className="text-foreground mb-4 flex items-center gap-4 text-lg font-bold"> */}
+              <Image
+                className="mb-4"
+                width={120}
+                height={120}
+                alt="logo"
+                src={"/market-flow-logo.png"}
+              />
+              {/* <span>MarketFlow</span> */}
+              {/* </h3> */}
               <p className="text-muted mb-6 text-sm">
                 Your trusted marketplace for quality products from verified
                 vendors worldwide.
@@ -36,7 +44,7 @@ export function Footer() {
                 </div>
                 <div className="text-muted flex items-center gap-3 text-sm">
                   <Mail size={18} className="text-accent flex-shrink-0" />
-                  <span>support@shopforge.com</span>
+                  <span>support@MarketFlow.com</span>
                 </div>
               </div>
             </div>
@@ -57,7 +65,7 @@ export function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/browse"
+                    href="/products"
                     className="text-muted hover:text-accent text-sm transition-colors"
                   >
                     Browse Products
@@ -73,7 +81,7 @@ export function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/deals"
+                    href="/"
                     className="text-muted hover:text-accent text-sm transition-colors"
                   >
                     Daily Deals
@@ -90,7 +98,7 @@ export function Footer() {
               <ul className="space-y-3">
                 <li>
                   <Link
-                    href="/help"
+                    href="/"
                     className="text-muted hover:text-accent text-sm transition-colors"
                   >
                     Help Center
@@ -98,7 +106,7 @@ export function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/contact"
+                    href="/"
                     className="text-muted hover:text-accent text-sm transition-colors"
                   >
                     Contact Us
@@ -106,7 +114,7 @@ export function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/shipping"
+                    href="/"
                     className="text-muted hover:text-accent text-sm transition-colors"
                   >
                     Shipping Info
@@ -114,7 +122,7 @@ export function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/returns"
+                    href="/"
                     className="text-muted hover:text-accent text-sm transition-colors"
                   >
                     Returns & Refunds
@@ -131,7 +139,7 @@ export function Footer() {
               <ul className="space-y-3">
                 <li>
                   <Link
-                    href="/privacy"
+                    href="/"
                     className="text-muted hover:text-accent text-sm transition-colors"
                   >
                     Privacy Policy
@@ -139,7 +147,7 @@ export function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/terms"
+                    href="/"
                     className="text-muted hover:text-accent text-sm transition-colors"
                   >
                     Terms of Service
@@ -156,7 +164,7 @@ export function Footer() {
           <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
             {/* COPYRIGHT */}
             <p className="text-muted text-center text-sm md:text-left">
-              &copy; 2026 Shope Forge. All rights reserved.
+              &copy; 2026 MarketFlow. All rights reserved.
             </p>
           </div>
         </div>

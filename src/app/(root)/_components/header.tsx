@@ -10,6 +10,7 @@ import NavLink from "@/app/(root)/_components/nav-link";
 import MobileDrawer from "./mobile-drawer";
 import CartDrawer from "./cart-drawer";
 import UserLinks from "./user-links";
+import Image from "next/image";
 // import { LinkButton } from "@/components/link-button";
 // import ThemeSwitch from "@/components/theme-switcher";
 
@@ -26,9 +27,14 @@ const Header = () => {
     <header className="flex h-full w-full items-center">
       <div className="grid w-full grid-cols-3 items-center lg:hidden">
         <MobileDrawer />
-        <Link href="/" className="text-3xl font-bold">
-          SHOP
-          <span className="sr-only">SHOP</span>
+        <Link href="/" className="mx-auto">
+          <Image
+            width={70}
+            height={70}
+            alt="logo"
+            src={"/market-flow-logo.png"}
+          />
+          <span className="sr-only">Flow</span>
         </Link>
         <div className="ml-auto flex gap-2">
           {/* <div className="w-0.5" /> */}
@@ -40,8 +46,13 @@ const Header = () => {
       {/* ── Desktop Navigation ── */}
       <nav className="mx-auto hidden w-full items-center justify-between gap-2 lg:flex">
         <Link href="/" className="mr-6 text-xl font-bold">
-          SHOP
-          <span className="sr-only">SHOP</span>
+          <Image
+            width={70}
+            height={70}
+            alt="logo"
+            src={"/market-flow-logo.png"}
+          />
+          <span className="sr-only">Flow</span>
         </Link>
 
         <div className="flex w-full items-center justify-center gap-2">

@@ -6,10 +6,10 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import {
   ChevronsUpDown,
-  Sparkles,
-  BadgeCheck,
-  CreditCard,
-  Bell,
+  // Sparkles,
+  // BadgeCheck,
+  // CreditCard,
+  // Bell,
   LogOut,
 } from "lucide-react";
 import { useRouter } from "nextjs-toploader/app";
