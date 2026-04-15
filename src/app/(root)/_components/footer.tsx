@@ -1,13 +1,5 @@
 import Link from "next/link";
-import {
-  Facebook,
-  Twitter,
-  Instagram,
-  Linkedin,
-  Mail,
-  MapPin,
-  Phone,
-} from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 import Image from "next/image";
 
 export function Footer() {
@@ -163,8 +155,15 @@ export function Footer() {
           {/* BOTTOM SECTION */}
           <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
             {/* COPYRIGHT */}
-            <p className="text-muted text-center text-sm md:text-left">
-              &copy; 2026 MarketFlow. All rights reserved.
+            <p className="text-muted flex items-center gap-1 text-center text-sm md:text-left">
+              &copy; 2026 Hamza Farooq. All rights reserved.
+              <Link
+                className="underline"
+                target="_blank"
+                href="https://github.com/Hamza7800"
+              >
+                Github
+              </Link>
             </p>
           </div>
         </div>
