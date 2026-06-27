@@ -323,7 +323,7 @@ export default function ProductsTable({
                 id={header.id}
                 allowsSorting={header.column.getCanSort()}
                 // isRowHeader={header.id === "product"}
-                isRowHeader
+                isRowHeader  
                 className={cn(
                   "bg-default-50 text-default-500 text-xs font-semibold tracking-wide uppercase first:pl-5 last:pr-5",
                   // header.id === "product" && "w-full max-w-[150px]", // 👈 full width

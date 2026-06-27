@@ -6,10 +6,6 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import {
   ChevronsUpDown,
-  // Sparkles,
-  // BadgeCheck,
-  // CreditCard,
-  // Bell,
   LogOut,
 } from "lucide-react";
 import { useRouter } from "nextjs-toploader/app";
@@ -27,7 +23,6 @@ export function NavUser() {
 
   return (
     <Dropdown>
-      {/* TRIGGER */}
       <Dropdown.Trigger
         className={"flex flex-row items-center rounded-lg border p-2"}
       >
@@ -43,7 +38,6 @@ export function NavUser() {
         <ChevronsUpDown size={16} />
       </Dropdown.Trigger>
 
-      {/* CONTENT */}
       <Dropdown.Popover className="min-w-64">
         <Dropdown.Menu aria-label="User menu">
           <Dropdown.Item id="profile" textValue="profile" className="gap-2">
