@@ -19,36 +19,6 @@ import type { VendorOrders } from "@/actions/orders";
 import { LoadingState } from "@/components/loading-state";
 import OrderActions from "./order-actions";
 
-// type OrderItem = {
-//   id: string;
-//   productName: string;
-//   variantName: string;
-//   imageUrl: string;
-//   quantity: number;
-//   unitPrice: string;
-//   totalPrice: string;
-//   status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
-//   createdAt: string;
-//   variant: {
-//     id: string;
-//     name: string;
-//     options: string;
-//   };
-//   order: {
-//     id: string;
-//     isPaid: boolean;
-//     shippingAddressSnapshot: string;
-//     createdAt: string;
-//     paidAt: string | null;
-//     refunds: Array<{
-//       id: string;
-//       amount: string;
-//       reason: string;
-//       createdAt: string;
-//     }>;
-//   };
-// };
-
 type VendorOrder = NonNullable<VendorOrders>;
 type OrderItem = NonNullable<VendorOrder["data"]>[number];
 

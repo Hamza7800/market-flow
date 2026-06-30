@@ -29,7 +29,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <Link href="/" className="flex items-center">
                 <div className="text-sidebar-primary-foreground flex aspect-square size-12 items-center justify-center rounded-lg">
                   <Image
-                    // className="mb-4"
                     width={70}
                     height={70}
                     alt="logo"

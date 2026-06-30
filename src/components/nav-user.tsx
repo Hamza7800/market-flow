@@ -42,7 +42,6 @@ export function NavUser() {
         <Dropdown.Menu aria-label="User menu">
           <Dropdown.Item id="profile" textValue="profile" className="gap-2">
             <div className="flex items-center gap-2">
-              {/* <Avatar src={user.avatar} name={user.name} size="sm" /> */}
               <div className="flex flex-col">
                 <span className="text-sm font-medium">{data?.user.name}</span>
                 <span className="text-default-500 text-xs">
