@@ -69,13 +69,8 @@ cd market-flow
 pnpm install
 ```
 
-### 3. Configure environment variables
-
-Copy the example environment file:
-
-```bash
-cp .env.example .env.local
-```
+### 3. Configure environment variables in
+.env file
 
 Then populate the required environment variables for PostgreSQL, Better Auth, Stripe, UploadThing, and other services.
 
