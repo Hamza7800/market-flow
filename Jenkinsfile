@@ -1,11 +1,8 @@
 pipeline{
     agent any
-    parameters {
-      choice(
-        name:"BUMP", 
-        choices:['patch', 'minor', 'major'], 
-        description:"Version dump type (webhook builds use patch)"
-      )
+     parameters {
+    choice(name: 'BUMP', choices: ['patch', 'minor', 'major'],
+          description: 'Version bump type (webhook builds use patch)')
     }
 
     environment{
@@ -17,8 +14,8 @@ pipeline{
 
     stages{
         stage("Bump version"){
-            steps{
-                echo "========Bumping Version========"
+            steps {
+              script {
                 sh '''
                   docker run --rm -i -e BUMP node:24.13.0-slim sh -c '
                     cd /tmp && cat > package.json &&
@@ -29,6 +26,7 @@ pipeline{
                 env.VERSION = sh(returnStdout: true,
                   script: '''grep -m1 '"version"' package.json | cut -d'"' -f4''').trim()
                 currentBuild.displayName = "#${BUILD_NUMBER} v${env.VERSION}"
+              }
             }
             post{
                 always{
