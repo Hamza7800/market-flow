@@ -15,9 +15,9 @@ RUN --mount=type=cache,target=/root/.npm \
     --mount=type=cache,target=/root/.local/share/pnpm/store \
   if [ -f package-lock.json ]; then \
     npm ci --no-audit --no-fund; \
-  elif [ -f yarn.lock ]; then; \
+  elif [ -f yarn.lock ]; then \
     corepack enable yarn && yarn install --frozen-lockfile --production=false; \
-  elif [ -f pnpm-lock.yaml ]; then; \
+  elif [ -f pnpm-lock.yaml ]; then \
     corepack enable pnpm && pnpm install --frozen-lockfile; \
   else \
     echo "NO Lockfile found." && exit 1; \
@@ -35,6 +35,15 @@ COPY --from=dependencies /market-flow-app/node_modules ./node_modules
 
 COPY . .
 
+ENV BETTER_AUTH_SECRET="build_placeholder_secret_string_32_chars_long"
+ENV BETTER_AUTH_URL="http://localhost:3000"
+ENV DATABASE_URL="postgresql://dummy_user:dummy_pass@localhost:5432/dummy_db"
+ENV STRIPE_SECRET_KEY="sk_test_dummy"
+ENV STRIPE_WEBHOOK_SECRET="whsec_dummy"
+ENV UPLOADTHING_TOKEN="dummy_token"
+ENV NEXT_PUBLIC_BETTER_AUTH_URL="http://localhost:3000"
+ENV NEXT_PUBLIC_APP_URL="http://localhost:3000"
+ENV NEXT_PUBLIC_STRIPE_PUBLIC_KEY="pk_test_dummy"
 ENV NODE_ENV=production
 
 RUN if [ -f package-lock.json ]; then \
