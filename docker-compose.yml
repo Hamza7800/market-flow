@@ -1,0 +1,16 @@
+services:
+  market-flow:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: market-flow-app:latest
+    container_name: market-flow-container
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+    restart: always
