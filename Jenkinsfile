@@ -10,8 +10,8 @@ pipeline{
 
     environment{
       // PORT where Nexus is listening for docker images upload
-      REGISTRY:"localhost:8084"
-      IMAGE: "${REGISTRY}/market-flow-app"
+      REGISTRY = 'localhost:8084' 
+      IMAGE    = "${REGISTRY}/market-flow-app"
       GITHUB_REPO = 'github.com/Hamza7800/market-flow.git'
     }
 
