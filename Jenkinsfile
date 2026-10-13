@@ -4,7 +4,7 @@ pipeline{
       choice(
         name:"BUMP", 
         choices:['patch', 'minor', 'major'], 
-        desciption:"Version dump type (webhook builds use patch)"
+        description:"Version dump type (webhook builds use patch)"
       )
     }
 
