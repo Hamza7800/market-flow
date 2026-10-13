@@ -29,7 +29,6 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
-    NEXT_PUBLIC_TINY_MCE: z.string(),
     NEXT_PUBLIC_STRIPE_PUBLIC_KEY: z.string(),
     NEXT_PUBLIC_BETTER_AUTH_URL: z.url(),
     NEXT_PUBLIC_APP_URL: z.url(),
@@ -53,7 +52,6 @@ export const env = createEnv({
 
     NEXT_PUBLIC_BETTER_AUTH_URL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
-    NEXT_PUBLIC_TINY_MCE: process.env.NEXT_PUBLIC_TINY_MCE,
     NEXT_PUBLIC_STRIPE_PUBLIC_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY,
   },
   /**
